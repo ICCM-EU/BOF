@@ -12,7 +12,11 @@ get the dependancies with composer:
     cd src
     composer install
 
-setup the logs directory
+setup the logs directory:
 
     mkdir src/logs
     chmod a+w src/logs
+
+configure the database connection:
+
+    cp src/settings-example.php src/settings.php
