@@ -1,0 +1,9 @@
+# either define this here, or in your apache httpd site conf.
+# see also http://tltech.com/info/rewriterule-in-htaccess-vs-httpd-conf/
+#RewriteEngine on
+#RewriteBase /subdirectory
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteRule . index.php [L]
+
+
