@@ -9,7 +9,7 @@ return [
             'host' => 'localhost',
             'name' => 'mydbname',
             'user' => 'myuser',
-            'password' => 'mypwd'
+            'pass' => 'mypwd'
         ]
     ],
 ];

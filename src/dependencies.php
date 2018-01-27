@@ -29,4 +29,14 @@ $container['view'] = function ($container) {
     return $view;
 };
 
+$container['ICCM\BOF\Auth'] = function ($c) {
+    global $app;
+    global $settings;
+    return new \ICCM\BOF\Auth(
+        $c['view'],
+        $c['db'],
+        $app->getContainer()->get('router'),
+        $settings['settings']['secrettoken']);
+};
+
 ?>
