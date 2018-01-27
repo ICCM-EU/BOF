@@ -1,6 +1,7 @@
 <?php
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use \Firebase\JWT\JWT;
 
 require '../vendor/autoload.php';
 
@@ -38,9 +39,24 @@ $container['view'] = function ($container) {
     return $view;
 };
 
+// the authentication
+$app->add(new \Slim\Middleware\JwtAuthentication([
+    "secure" => false, // we know we are using https behind a proxy
+    "cookie" => "authtoken",
+    "path" => [ "/admin", "/vote", "/nominate"],
+    #"passthrough" => ["/home", "/login", "/authenticate"],
+    "secret" => $config['secrettoken'],
+    "error" => function ($request, $response, $arguments) {
+        $data["status"] = "error";
+        $data["message"] = $arguments["message"];
+        return $response
+            ->withHeader("Content-Type", "application/json")
+            ->write(json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+    }
+]));
+
 $app->get('/', function (Request $request, Response $response, array $args) {
-    echo "this is the test page. go <a href='hello/world'>here</a> to say hello";
-    return $response;
+    return $this->view->render($response, 'home.html');
 })->setName('home');
 
 $app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
@@ -50,5 +66,35 @@ $app->get('/hello/{name}', function (Request $request, Response $response, array
     ]);
 
 })->setName('hello');
+
+$app->get('/admin', function (Request $request, Response $response, array $args) {
+    return $this->view->render($response, 'admin.html', [
+        'loggedin' => true
+    ]);
+})->setName('admin');
+
+$app->get('/login', function (Request $request, Response $response, array $args) {
+    return $this->view->render($response, 'login.html');
+})->setName('login');
+
+$app->post('/authenticate', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $login = $data['user_name'];
+    $password = $data['password'];
+    if ($login == "admin" && $password == "admin") {
+        $payload = array("is_admin" => true);
+        $token = JWT::encode($payload, $this->settings['secrettoken'], "HS256");
+        setcookie("authtoken", $token, time()+3600);  // cookie expires in one hour
+        global $app;
+        return $response->withRedirect($app->getContainer()->get('router')->pathFor("admin"))->withStatus(302);
+    } else {
+        echo json_encode("No valid user or password");
+    }
+})->setName('authenticate');
+
+$app->get('/logout', function (Request $request, Response $response, array $args) {
+    setcookie("authtoken", "", time()-3600);
+    return $this->view->render($response, 'loggedout.html');
+})->setName('logout');
 
 $app->run();

@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1>Login</h1>
+<form action="{{ path_for( 'authenticate' )}}" method="POST">
+user: <input type="text" name="user_name"/><br/>
+password: <input type="password" name="password"/><br/>
+<input type="submit" value="Login"/>
+</form>
+{% endblock %}
