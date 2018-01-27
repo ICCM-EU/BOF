@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}ICCM BOF app{% endblock %}</title>
+    </head>
+    <body>
+        <div id="sidebar">
+            {% block sidebar %}
+                <ul>
+                    <li><a href="{{ path_for('home') }}">Home</a></li>
+                    <li><a href="{{ path_for('hello', { 'name': 'world' })}}">Hello World</a></li>
+                </ul>
+            {% endblock %}
+        </div>
+
+        <div id="content">
+            {% block body %}{% endblock %}
+        </div>
+    </body>
+</html>

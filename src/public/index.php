@@ -25,12 +25,30 @@ $container['db'] = function ($c) {
     return $pdo;
 };
 
+$container['view'] = function ($container) {
+    $view = new \Slim\Views\Twig('../templates/', [
+        # we could use the caching by setting a path here, eg. ../cache
+        'cache' => false
+    ]);
+
+    // Instantiate and add Slim specific extension
+    $basePath = rtrim(str_ireplace('index.php', '', $container['request']->getUri()->getBasePath()), '/');
+    $view->addExtension(new Slim\Views\TwigExtension($container['router'], $basePath));
+
+    return $view;
+};
+
+$app->get('/', function (Request $request, Response $response, array $args) {
+    echo "this is the test page. go <a href='hello/world'>here</a> to say hello";
+    return $response;
+})->setName('home');
+
 $app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
     $name = $args['name'];
-    $response->getBody()->write("Hello, $name");
-    $this->logger->addInfo('Something interesting happened: we said hello to '.$name);
-    echo "<br/>To force the database connection, we need to do something with the db object: ".print_r($this->db,true);
+    return $this->view->render($response, 'hello.html', [
+        'name' => $args['name']
+    ]);
 
-    return $response;
-});
+})->setName('hello');
+
 $app->run();
