@@ -3,11 +3,12 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Firebase\JWT\JWT;
 
-require '../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
-require '../settings.php';
+// Instantiate the app
+$settings = require __DIR__.'/../settings.php';
+$app = new \Slim\App($settings);
 
-$app = new \Slim\App(["settings" => $config]);
 $container = $app->getContainer();
 
 $container['logger'] = function($c) {
@@ -45,7 +46,7 @@ $app->add(new \Slim\Middleware\JwtAuthentication([
     "cookie" => "authtoken",
     "path" => [ "/admin", "/vote", "/nominate"],
     #"passthrough" => ["/home", "/login", "/authenticate"],
-    "secret" => $config['secrettoken'],
+    "secret" => $settings['settings']['secrettoken'],
     "error" => function ($request, $response, $arguments) {
         $data["status"] = "error";
         $data["message"] = $arguments["message"];
