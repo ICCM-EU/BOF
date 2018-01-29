@@ -19,4 +19,9 @@ setup the logs directory:
 
 configure the database connection:
 
-    cp src/settings-example.php src/settings.php
+    cp cfg/settings-example.php cfg/settings.php
+
+load the database:
+
+    mysql -u myuser mydbname -p < sql/createtables.sql
+    mysql -u myuser mydbname -p < sql/initialdata.sql
