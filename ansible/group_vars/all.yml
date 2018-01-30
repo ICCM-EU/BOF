@@ -1,0 +1,12 @@
+# Server setup
+locale: en_GB.UTF-8
+timezone: Europe/London
+
+web_directory: /srv/bof
+
+deploy_user: deploy
+
+# Oh my. Don't use this in production
+mysql_dummy_user: myuser
+mysql_dummy_pass: mypwd
+mysql_dummy_db: mydbname

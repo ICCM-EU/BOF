@@ -1,0 +1,22 @@
+---
+- name: "Create web group"
+  group:
+    name: webdeploy
+    state: present
+
+- name: "Create deploy user"
+  user:
+    name: "{{ deploy_user }}"
+    createhome: no
+    groups: webdeploy
+    state: present
+  with_items:
+  - "{{ deploy_user }}"
+
+- name: "Put users in group"
+  user:
+    name: "{{ item }}"
+    groups: webdeploy
+  with_items: 
+   - ubuntu
+   - "{{ deploy_user }}"

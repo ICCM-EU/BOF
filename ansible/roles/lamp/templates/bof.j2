@@ -1,0 +1,16 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+
+    DocumentRoot /var/www/bof/src/public/
+
+    <Directory /var/www/bof/src/public/>
+      Options Indexes FollowSymLinks MultiViews
+      Order allow,deny
+      Allow From All 
+
+      RewriteEngine on
+      RewriteCond %{REQUEST_FILENAME} !-d
+      RewriteCond %{REQUEST_FILENAME} !-f
+      RewriteRule . index.php [L]     
+    </Directory>
+</VirtualHost>
