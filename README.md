@@ -25,3 +25,18 @@ load the database:
 
     mysql -u myuser mydbname -p < sql/createtables.sql
     mysql -u myuser mydbname -p < sql/initialdata.sql
+
+## Via Vagrant…
+
+Install [Vagrant](https://www.vagrantup.com/downloads.html), [Virtual Box](https://www.virtualbox.org/wiki/Downloads) and [Ansible](http://docs.ansible.com/ansible/latest/intro_installation.html#installing-the-control-machine).
+
+`vagrant up`
+
+On the virtual machine (`vssh`) you'll need to add in the test data:
+
+`mysql -h localhost -u myuser -pmypwd mydbname -p < sql/createtables.sql`
+`mysql -h localhost -u myuser -pmypwd mydbname -p < sql/initialdata.sql`
+
+Everything should be accessible at [http://192.168.33.153] (or [http://bof.local] if you add it to your hosts file*.
+
+* Install [Vagrant HostManager](https://github.com/devopsgroup-io/vagrant-hostmanager) to make this happen automagically

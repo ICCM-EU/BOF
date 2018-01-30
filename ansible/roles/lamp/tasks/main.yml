@@ -1,0 +1,76 @@
+---
+- name: "Install Apache"
+  apt: pkg={{ item }} state=installed
+  with_items:
+  - apache2
+  - libapache2-mod-php7.0
+  - php
+  - php-mysql
+  - mariadb-server
+  - php-zip
+  - ca-certificates
+  - composer
+  - php-dom
+  - php-mbstring
+
+- name: install python mysql bindings
+  apt:
+    name: python-mysqldb
+    state: installed
+  become: yes
+
+- name: "Set up the logs directory"
+  file:
+    path: /srv/bof/src/logs
+    state: directory
+    mode: "a+w"
+
+- name: stat example settings
+  stat: path=/srv/bof/cfg/settings-example.php
+  register: example_settings_stat
+
+- name: Config Database connection
+  command: cp /srv/bof/cfg/settings-example.php /srv/bof/cfg/settings.php
+  when: example_settings_stat.stat.exists
+
+- name: "install composer modules"
+  composer:
+    command: install
+    working_dir: /var/www/bof/src/
+
+- mysql_user:
+    name: "{{ mysql_dummy_user }}"
+    password: "{{ mysql_dummy_pass }}"
+    priv: '*.*:ALL'
+    state: present
+
+- name: check if DB exists
+  shell: mysql -h localhost -u myuser -pmypwd -e 'SHOW DATABASES;' | grep {{ mysql_dummy_db }}
+  register: dbstatus
+  failed_when: dbstatus.rc == 2
+
+- name: "Create DB"
+  command: mysql -h localhost -u {{ mysql_dummy_user }} -p{{ mysql_dummy_pass }} -e "CREATE DATABASE {{ mysql_dummy_db }}"
+  when: dbstatus.stdout == "0"
+
+- name: "apache config"
+  file:
+    path: /etc/apache2/sites-enabled/000-default.conf
+    state: absent
+
+- template:
+    src: ../templates/bof.j2
+    dest: /etc/apache2/sites-enabled/bof.conf
+
+- name: "Enable apache mod_expires"
+  command: a2enmod expires
+  become: true
+
+- name: "Enable apache mod_rewrite"
+  command: a2enmod rewrite
+  become: true
+
+- name: "reload apache"
+  service:
+    name: apache2
+    state: restarted

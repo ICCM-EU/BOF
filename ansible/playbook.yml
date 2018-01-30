@@ -1,0 +1,16 @@
+--- 
+- name: Setup server
+  hosts: all
+  become: true # become sudo
+  gather_facts: False
+  pre_tasks:
+    - name: "apt-get update"
+      raw: apt-get update -qq
+    - name: "apt-get upgrade"
+      raw: apt-get upgrade -qq
+    - raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+    - setup: # aka gather_facts
+  roles:
+    - general
+    - users
+    - lamp
