@@ -92,10 +92,10 @@ CREATE TABLE `bof_metadata` (
 -- Table structure for table `config`
 --
 
-DROP TABLE IF EXISTS `config`;
+DROP TABLE IF EXISTS `config_old`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `config` (
+CREATE TABLE `config_old` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `voting_begins` datetime NOT NULL,
   `voting_ends` datetime NOT NULL,
@@ -104,6 +104,19 @@ CREATE TABLE `config` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+
+DROP TABLE IF EXISTS `config`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `config` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `item` varchar(30) NOT NULL,
+  `value` varchar(30) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Table structure for table `location`
