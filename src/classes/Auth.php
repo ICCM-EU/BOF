@@ -73,6 +73,8 @@ class Auth
 			$sql = 'INSERT INTO `participant`
 				(`name`, `password`)
 				VALUES (?, PASSWORD(?))';
+
+			$this->db->beginTransaction();
 			$query=$this->db->prepare($sql);
 			$param = array ($login, $password);
 			try {
