@@ -17,20 +17,21 @@ class Stage
         $sql = 'SELECT * FROM `config`';
         $query=$this->db->prepare($sql);
         $param = array ();
-	$config = array ();
+	    $config = array ();
         $query->execute($param);
-       while ($row=$query->fetch(PDO::FETCH_OBJ)) { print_r($row);
-		$config [$row->item]=$row->value;
 
+        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+		    $config [$row->item]=$row->value;
         }         
 
-	if (time() > strtotime($config['nomination_begins']) && time() < strtotime($config['nomination_ends'])){
-	return 'nominating';
-	}
-	if (time() > strtotime($config['voting_begins']) && time() < strtotime($config['voting_ends'])){
-	return 'voting';
-	}
-	return 'locked';
+        if (time() > strtotime($config['nomination_begins']) && time() < strtotime($config['nomination_ends'])){
+            return 'nominating';
+        }
+        if (time() > strtotime($config['voting_begins']) && time() < strtotime($config['voting_ends'])){
+            return 'voting';
+        }
+        
+        return 'locked';
 	}
 }
 

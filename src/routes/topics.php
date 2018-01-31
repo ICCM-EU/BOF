@@ -29,7 +29,8 @@ $app->get('/topics', function (Request $request, Response $response, array $args
     }
     $allgetvars = $request->getQueryParams();
     $stage =new ICCM\BOF\Stage($this->db);
-	  $stage2 =$stage->getstage();
+    $stage2 =$stage->getstage();
+    
     return $this->view->render($response, 'topics.html', [
         'bofs' => $bofs,
         'stage' => $stage2,

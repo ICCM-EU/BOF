@@ -19,7 +19,13 @@ use \Psr\Http\Message\ResponseInterface as Response;
  * 
  */
 $app->get('/projector', function (Request $request, Response $response, array $args) {
-        $sql = 'SELECT * FROM `workshop` where published >0 order by votes desc, id desc';
+
+        $sql = 'SELECT workshop.name, SUM(participant) as `votes`
+                FROM workshop_participant
+                JOIN workshop ON workshop_participant.workshop_id = workshop.id
+                GROUP BY workshop_id
+                ORDER BY `votes` DESC';
+
         $query=$this->db->prepare($sql);
         $param = array ();
         $query->execute($param);
@@ -28,9 +34,12 @@ $app->get('/projector', function (Request $request, Response $response, array $a
 		$bofs [] = $row;
 	}
 	$stage =new ICCM\BOF\Stage($this->db);
-	$stage2 =$stage->getstage();
-        return $this->view->render($response, 'projector.html',[
-        'bofs' => $bofs, 'stage' => $stage2, 'locked' => $stage2=='locked',
+        $stage2 =$stage->getstage();
+        
+        return $this->view->render($response, 'proj_layout.html', [
+                'bofs' => $bofs,
+                'stage' => $stage2,
+                'locked' => $stage2=='locked',
 	]);
 })->setName('projector');
 

@@ -24,6 +24,5 @@ require __DIR__ . '/../routes/voting.php';
 require __DIR__ . '/../routes/projector.php';
 require __DIR__ . '/../routes/moderation.php';
 require __DIR__ . '/../routes/topics.php';
-require __DIR__ . '/../routes/moderation.php';
 
 $app->run();
