@@ -1,9 +1,8 @@
 {% extends "proj_layout.html" %}
 
 {% block body %}
-<b> stage :</B> <i> current status </i>
+stage : {{stage}} 
 
-<p>Projector.</p>
 	{% for item in bofs %}  
                 <li>
 	<u>{{item.name}}</u>:
