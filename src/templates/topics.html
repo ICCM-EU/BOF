@@ -5,6 +5,13 @@
 		{% include 'partials/_created_new_user.html' %}
 	{% endif %}
 
+	{% if voted_count >= 3 %}
+		<div class="notice notice--warning">
+			<h1>Squark!</h1>
+			<p>All your full votes have been used.</p>
+		</div>
+	{% endif %}
+
 	{% for topic in bofs %}           
 		{% include 'partials/_topic.html' %}
   {% endfor %}

@@ -27,12 +27,24 @@ $app->get('/topics', function (Request $request, Response $response, array $args
     while ($row=$query->fetch(PDO::FETCH_OBJ)) {
         $bofs [] = $row;
     }
+
+    $sql = 'SELECT workshop_id FROM `workshop_participant` WHERE participant = 1 AND participant_id = 83';
+    $query = $this->db->prepare($sql);
+    $param = array ();
+    $query->execute($param);
+    
+    $voted_for = array ();
+    while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+        $voted_for [] = $row;
+    }
+
     return $this->view->render($response, 'topics.html', [
         'bofs' => $bofs,
         'stage' => 'voting',
         'locked' => False,
         'newuser' => True,
         'loggedin' => True,
+        'voted_count' => $query->rowCount(),
     ]);
 })->setName('topics');
 
