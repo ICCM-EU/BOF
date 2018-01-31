@@ -44,7 +44,8 @@ class Auth
             setcookie("authtoken", $token, time()+3600);  // cookie expires in one hour
             return $response->withRedirect($goto)->withStatus(302);
         } else {
-            echo json_encode("No valid user or password");
+            // echo json_encode("No valid user or password");
+	    return $response->withRedirect($this->router->pathFor("login") . "?message=invalid")->withStatus(302);
         }
     }
     
@@ -94,7 +95,7 @@ class Auth
 		
     public function logout($request, $response, $args) {
         setcookie("authtoken", "", time()-3600);
-        return $this->view->render($response, 'loggedout.html');
+        return $this->view->render($response, 'home.html');
     }
 }
 

@@ -2,6 +2,13 @@
 
 {% block body %}
 
+{% if message == 'invalid' %}
+<div class="notice notice--error">
+<h1>Error</h1>
+<p>Invalid username or password.</p>
+</div>
+{% endif %}
+
 <form action="{{ path_for( 'authenticate' )}}" method="POST" class="bof-form">
 
   <div class="bof-form__item">
