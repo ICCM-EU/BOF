@@ -4,7 +4,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
 $app->get('/projector', function (Request $request, Response $response, array $args) {
-        $sql = 'SELECT * FROM `workshop`';
+        $sql = 'SELECT * FROM `workshop` where published >0 order by votes desc, id desc';
         $query=$this->db->prepare($sql);
         $param = array ();
         $query->execute($param);
