@@ -1,0 +1,23 @@
+.foot-nav {
+  align-content: center;
+  bottom: 0;
+  background-color: siteColor(bof-grass-green);
+  display: flex;
+  justify-content: space-around;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  width: 100%;
+
+  li {
+    padding: 0;
+    margin: 0;
+  }
+
+  a {
+    display: inline-block;
+    padding: 8px 16px;
+    text-decoration: none;
+  }
+}

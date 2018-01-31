@@ -21,10 +21,7 @@ const paths = {
 	svg_dest: `${__dirname}/src/public/assets/svg`
 };
 
-const dependencies = [
-	'react',
-  'react-dom'
-];
+const dependencies = [];
 
 let scriptsCount = 0;
 
@@ -119,7 +116,7 @@ function bundleJS(isProduction) {
  
   	appBundler
   		// transform ES6 and JSX to ES5 with babelify
-	  	.transform("babelify", {presets: ["es2015", "react"]})
+	  	.transform("babelify", {presets: ["es2015"]})
 	    .bundle()
 	    .on('error', gutil.log)
 	    .pipe(source('bundle.js'))
