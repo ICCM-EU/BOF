@@ -1,0 +1,23 @@
+.notice {
+  padding: 16px;
+  width: 100%;
+  
+  h1 {
+    font-size: 32px;
+    line-height: 32px;
+    margin: 0 0 16px;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .mono {
+    font-family: monospace;
+  }
+
+  &--success {
+    background-color: siteColor(bof-grass-green);
+  }
+}

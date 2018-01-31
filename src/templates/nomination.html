@@ -2,9 +2,19 @@
 
 {% block body %}
 <h1>Nominate a BOF Session</h1>
-<form action="{{ path_for( 'nomination' )}}" method="POST">
-Title: <input type="text" name="title"/><br/>
-Description: <textarea name="description" rows="4" cols="65" id="description_box"></textarea><br/>
-<input type="submit" value="Nominate"/>
+
+<form action="{{ path_for( 'nomination' )}}" method="POST" class="bof-form">
+  <div class="bof-form__item">
+    <label class="bof-form__label">Title</label>
+    <input type="text" name="title" class="bof-form__input"/>
+  </div>
+
+  <div class="bof-form__item">
+    <label class="bof-form__label">Description:</label>
+    <textarea name="description" class="bof-form__textarea"></textarea>
+  </div>
+
+  <input type="submit" value="Nominate" class="btn btn--primary" />
 </form>
+
 {% endblock %}
