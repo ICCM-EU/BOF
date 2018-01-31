@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1>BOF application</h1>
+
+{% for workshop in workshops %}
+  <form action="add" method="post">
+    {{ workshop.name }}
+    <select name="vote">
+      <option value='1'>1</option>
+      <option value='0.5'>0.5</option>
+      <option value='0.25'>0.25</option>
+    </select>
+    <input type="hidden" name="workshopid" value="{{ workshop.id }}" ><br><br>
+
+    <input type="submit" value="Submit">
+</form> 
+<hr/>
+{% endfor %}
+
+{% endblock %}

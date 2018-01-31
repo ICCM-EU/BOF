@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1>BOF application</h1>
+<p>Votes</p>
+
+<ul>
+{% for vote in votes %}
+  <li>{{ vote.participant }}, {{ vote.workshop }}, vote: {{ vote.vote }} leader: {{vote.leader}}</li>
+{% endfor %}
+</ul>
+
+{% endblock %}
