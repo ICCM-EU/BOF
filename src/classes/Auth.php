@@ -1,4 +1,5 @@
 <?php
+	/* Pr
 
 namespace ICCM\BOF;
 use \Firebase\JWT\JWT;
@@ -45,7 +46,20 @@ class Auth
             echo json_encode("No valid user or password");
         }
     }
-
+    
+    
+    /*
+    	register a user;
+    	user supllies a username and password
+    	check if user exists, if so respond with return code 1
+    	if users doesn't exist and return with exit code 0 
+    	after creation do return with authenticate
+	*/
+    public function register($request, $response, $args) {
+    
+    
+    }
+		
     public function logout($request, $response, $args) {
         setcookie("authtoken", "", time()-3600);
         return $this->view->render($response, 'loggedout.html');
