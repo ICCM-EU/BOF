@@ -1,0 +1,128 @@
+// http://meyerweb.com/eric/tools/css/reset/ v2.0 | 20110126 License: none (public domain)
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, hr, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  border: 0;
+  font-size: 100%;
+  margin: 0;
+  outline: 0;
+  padding: 0;
+  vertical-align: baseline;
+}
+
+// HTML5 display-role reset for older browsers
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+
+  &:before, &:after {
+    content: '';
+    content: none;
+  }
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+// end resets, start defaults
+html, body {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  background-color: siteColor(simple-grey);
+  color: black;
+  font-family: fontFamily(main);
+  font-size: 20px;
+  line-height: 1.7;
+  margin-bottom: 1px;
+  font-smoothing: antialiased;
+}
+
+img, video {
+  vertical-align: bottom;
+}
+
+p, fieldset, table, ol, ul, dl, iframe {
+  margin: 0 0 10px;
+}
+
+p:last-child{
+  margin: 0;
+}
+
+a {
+  color: inherit;
+
+  &:hover {
+    color: siteColor(sockeye);
+  }
+}
+
+hr {
+  background-color: transparent;
+  border-bottom: 1px solid siteColor(petrel);
+  clear: both;
+  margin: 5px 0;
+}
+
+abbr, acronym {
+  border-bottom: 1px dotted grey;
+}
+
+em {
+  font-style: italic;
+}
+
+small, sub, sup {
+  font-size: 85%;
+}
+
+sub, sup {
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -.3em;
+}
+
+sup {
+  top: -.3em;
+}
+
+ol, ul {
+  list-style-position: outside;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+ul {
+  list-style-type: disc;
+}
+
+li {
+  margin: 0 0 10px;
+}
+
+textarea, input, button {
+  outline: none;
+}
+
+button, input {
+  font-family: fontFamily(main);
+  letter-spacing: 0.1em;
+}
