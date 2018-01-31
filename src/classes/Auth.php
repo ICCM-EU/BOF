@@ -54,7 +54,7 @@ class Auth
     	check if user exists, if so respond with return code 0
     	if users doesn't exist, create it and return with the user's ID
 	*/
-    public function register($request, $response, $args) {
+    public function new_user($request, $response, $args) {
         $data = $request->getParsedBody();
         $login = $data['user_name'];
         $sql = 'SELECT * FROM `participant`
