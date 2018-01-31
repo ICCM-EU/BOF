@@ -20,6 +20,10 @@ class Nomination
         $data = $request->getParsedBody();
         $title = $data['title'];
         $description = $data['description'];
+        if (strlen($title) == 0 || strlen($description) == 0) {
+		print "Empty title or description. Don't do that!";
+		return 0;
+        }
         $sql = 'INSERT IGNORE INTO `workshop` (`name`,`description`)
             VALUES (?, ?)';
 		
