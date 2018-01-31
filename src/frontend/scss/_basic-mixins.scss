@@ -1,0 +1,58 @@
+@mixin visuallyHidden {
+  border: none;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+@mixin bpMinXSmall {
+  @media (min-width: breakpoint(x-small)) {
+    @content;
+  }
+}
+
+@mixin bpMinSmall {
+  @media (min-width: breakpoint(small)) {
+    @content;
+  }
+}
+
+@mixin bpMinMedium {
+  @media (min-width: breakpoint(medium)) {
+    @content;
+  }
+}
+
+@mixin bpMinLarge {
+  @media (min-width: breakpoint(large)) {
+    @content;
+  }
+}
+
+@mixin bpMaxXSmall {
+  @media (max-width: breakpoint(x-small)) {
+    @content;
+  }
+}
+
+@mixin bpMaxSmall {
+  @media (max-width: breakpoint(small)) {
+    @content;
+  }
+}
+
+@mixin bpMaxMedium {
+  @media (max-width: breakpoint(medium)) {
+    @content;
+  }
+}
+
+@mixin bpMaxLarge {
+  @media (max-width: breakpoint(large)) {
+    @content;
+  }
+}

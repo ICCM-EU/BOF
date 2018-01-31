@@ -1,0 +1,37 @@
+$site_colors: (
+  sockeye: #d06348,
+  petrel: #282938,
+  gold-braid: #c6ae40,
+  lark-green: #83c3a5,
+  simple-grey: #e6e6e6,
+  deviant-grey: #d9d9d9,
+  bof-sky-blue: #afdde9,
+  bof-sky-blue-dark: #37abc8,
+  bof-lilac: #c6afe9,
+  bof-lilac-dark: #5a2ca0,
+  bof-grass-green: #bcd35f,
+  
+);
+
+$font-family: (
+  main: ('Lato', sans-serif)
+);
+
+$breakpoints: (
+  x-small: 360px,
+  small: 768px,
+  medium: 1024px,
+  large: 1200px
+);
+
+@function siteColor($c: sockeye) {
+  @return map-get($site_colors, $c);
+}
+
+@function fontFamily($type: body) {
+  @return map-get($font-family, $type);
+}
+
+@function breakpoint($size) {
+  @return map-get($breakpoints, $size);
+}

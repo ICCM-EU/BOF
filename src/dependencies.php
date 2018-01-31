@@ -39,4 +39,14 @@ $container['ICCM\BOF\Auth'] = function ($c) {
         $settings['settings']['secrettoken']);
 };
 
+$container['ICCM\BOF\Nomination'] = function ($c) {
+    global $app;
+    global $settings;
+    return new \ICCM\BOF\Nomination(
+        $c['view'],
+        $c['db'],
+        $app->getContainer()->get('router'));
+};
+
+
 ?>

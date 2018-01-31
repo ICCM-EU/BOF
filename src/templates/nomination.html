@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1>Nominate a BOF Session</h1>
+<form action="{{ path_for( 'nomination' )}}" method="POST">
+Title: <input type="text" name="title"/><br/>
+Description: <textarea name="description" rows="4" cols="65" id="description_box"></textarea><br/>
+<input type="submit" value="Nominate"/>
+</form>
+{% endblock %}

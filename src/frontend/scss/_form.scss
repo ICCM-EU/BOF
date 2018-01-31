@@ -1,0 +1,23 @@
+.bof-form {
+  width: 100%;
+}
+
+.bof-form__item {
+  margin-bottom: 16px;
+}
+
+.bof-form__label {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.21em;
+  margin: 0;
+  padding: 0;
+  text-transform: uppercase;
+}
+
+.bof-form__input {
+  border: 0;
+  font-size: 16px;
+  padding: 16px;
+  width: 100%;
+}
