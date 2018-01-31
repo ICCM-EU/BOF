@@ -82,7 +82,8 @@ class Auth
 			} catch (PDOException $e){
 			    echo $e->getMessage();
 			}
-			$this->db->commit();
+			#TODO: needs to check session to commit() on
+#			$this->db->commit();
 			# print the auto incremented user's ID
 			print "User added, got ID : " . $this->db->lastInsertId();
 		}
