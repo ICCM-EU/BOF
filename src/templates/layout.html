@@ -13,6 +13,7 @@
                     <li><a href="{{ path_for('hello', { 'name': 'world' })}}">Hello World</a></li>
                     {% if loggedin == false %}
                     <li><a href="{{ path_for('login')}}">Login</a></li>
+                    <li><a href="{{ path_for('register')}}">Register a new user</a></li>
                     {% else %}
                     <li><a href="{{ path_for('logout')}}">Logout</a></li>
                     {% endif %}
