@@ -77,7 +77,9 @@ class Auth
 			$param = array ($login, $password);
 			$query->execute($param);
 			$query->commit();
+			# print the auto incremented user's ID
 			print $dbh->lastInsertId();
+		}
     }
 
 		
