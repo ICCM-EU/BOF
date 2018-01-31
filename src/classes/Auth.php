@@ -32,16 +32,16 @@ class Auth
         $param = array ($login, $password);
         $query->execute($param);
         if ($row=$query->fetch(PDO::FETCH_OBJ)) {
-            # TODO: at the moment there is only one admin. could be a separate flag in the table participants
             if ($login == "admin") {
-                $payload = array("is_admin" => true);
-                $token = JWT::encode($payload, $this->secrettoken, "HS256");
-                setcookie("authtoken", $token, time()+3600);  // cookie expires in one hour
-                return $response->withRedirect($this->router->pathFor("admin"))->withStatus(302);
+                $payload = array("is_admin" => true, "userid" => $row->id);
+                $goto = $this->router->pathFor("admin");
             } else {
-                # TODO redirect somewhere for the normal user, either nomination or voting, depending on the current stage
-                print "hello, how are you doing?";
+                $payload = array("is_admin" => false, "userid" => $row->id);
+                $goto = $this->router->pathFor("user");
             }
+            $token = JWT::encode($payload, $this->secrettoken, "HS256");
+            setcookie("authtoken", $token, time()+3600);  // cookie expires in one hour
+            return $response->withRedirect($goto)->withStatus(302);
         } else {
             echo json_encode("No valid user or password");
         }
