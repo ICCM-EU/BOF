@@ -45,3 +45,9 @@ On the virtual machine (`vssh`) you'll need to add in the test data:
 Everything should be accessible at [http://192.168.33.153] (or [http://bof.local] if you add it to your hosts file*.
 
 * Install [Vagrant HostManager](https://github.com/devopsgroup-io/vagrant-hostmanager) to make this happen automagically
+
+# Deployment and build
+
+To bundle frontend items properly run:
+
+`node_modules/.bin/gulp deploy`
