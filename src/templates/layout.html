@@ -11,6 +11,7 @@
                 <ul>
                     <li><a href="{{ path_for('home') }}">Home</a></li>
                     <li><a href="{{ path_for('hello', { 'name': 'world' })}}">Hello World</a></li>
+					<li><a href="{{ path_for('nomination')}}">Nominate topic</a></li>
                     {% if loggedin == false %}
                     <li><a href="{{ path_for('login')}}">Login</a></li>
                     {% else %}
