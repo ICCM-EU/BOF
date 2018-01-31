@@ -1,4 +1,5 @@
 <?php
+use \Firebase\JWT\JWT;
 
 // the authentication
 $app->add(new \Slim\Middleware\JwtAuthentication([
@@ -15,5 +16,24 @@ $app->add(new \Slim\Middleware\JwtAuthentication([
             ->write(json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
     }
 ]));
+
+
+$app->add(function($request, $response, $next) {
+    global $settings;
+    global $container;
+
+    $encodedcookie = $request->getCookieParams()['authtoken'];
+    if($encodedcookie === NULL)
+        return $next($request, $response);
+
+    $cookie = (array)JWT::decode($encodedcookie, $settings['settings']['secrettoken'], array('HS256'));
+
+    $container['view']['userid'] = $cookie['userid'];
+    $container['view']['is_admin'] = $cookie['is_admin'];
+    $request = $request->withAttribute('userid', $cookie['userid']);
+    $request = $request->withAttribute('is_admin', $cookie['is_admin']);
+
+    return $next($request, $response);
+});
 
 ?>

@@ -38,7 +38,7 @@ class Auth
             } else {
                 # going to topics
                 $payload = array("is_admin" => false, "userid" => $row->id);
-                return $response->withRedirect($this->router->pathFor("topics"))->withStatus(302);
+                $goto = $this->router->pathFor("topics");
             }
             $token = JWT::encode($payload, $this->secrettoken, "HS256");
             setcookie("authtoken", $token, time()+3600);  // cookie expires in one hour
