@@ -1,6 +1,19 @@
 {% extends "layout.html" %}
 
 {% block body %}
-<h1>BOF application</h1>
-<p>TODO list the current nominations or votes depending on the current stage.</p>
+
+Birds of a feather
+
+{% if loggedin == false %}
+<div class="button-block">
+  <a href="{{ path_for('login')}}" class="btn btn--primary btn--block">
+    Register
+  </a>
+
+  <a href="{{ path_for('login')}}" class="btn btn--secondary btn--block">
+    Sign in
+  </a>
+</div>
+{% endif %}
+
 {% endblock %}
