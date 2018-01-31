@@ -22,9 +22,9 @@ $app->add(function($request, $response, $next) {
     global $settings;
     global $container;
 
-    $encodedcookie = $request->getCookieParams()['authtoken'];
-    if($encodedcookie === NULL)
+    if(!array_key_exists('authtoken', $request->getCookieParams()))
         return $next($request, $response);
+    $encodedcookie = $request->getCookieParams()['authtoken'];
 
     $cookie = (array)JWT::decode($encodedcookie, $settings['settings']['secrettoken'], array('HS256'));
 
