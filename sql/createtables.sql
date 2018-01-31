@@ -92,10 +92,10 @@ CREATE TABLE `bof_metadata` (
 -- Table structure for table `config`
 --
 
-DROP TABLE IF EXISTS `config1`;
+DROP TABLE IF EXISTS `config_old`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `config1` (
+CREATE TABLE `config_old` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `voting_begins` datetime NOT NULL,
   `voting_ends` datetime NOT NULL,
