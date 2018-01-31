@@ -1,0 +1,76 @@
+.topic {
+  background-color: white;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+.topic__tally {
+  width: 100%;
+  font-size: 15px;
+  background-color: siteColor(deviant-grey);
+
+  &__inner {
+    background: siteColor(bof-grass-green);
+    height: 9px;
+  }
+
+  @include bpMaxSmall {
+    &__text {
+      @include visuallyHidden;
+    }
+  }
+}
+
+.topic__detail {
+  padding: 16px;
+
+  h1 {
+    font-size: 16px;
+  }
+
+  p {
+    font-size: 15px;
+  }
+}
+
+.topic__vote {
+  display: flex;
+
+  button {
+    width: 100%;
+  }
+}
+
+@include bpMinSmall {
+  .topic {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .topic__tally {
+    text-indent: 0;
+    height: auto;
+    position: relative;
+    width: auto;
+
+    &__inner {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      height: auto;
+      z-index: 0;
+    }
+
+    &__text {
+      z-index: 1;
+      position: relative;
+      padding: 16px;
+      text-align: center;
+      display: block;
+    }
+  }
+
+  .topic__detail {
+    width: 70%;
+  }
+}

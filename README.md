@@ -26,6 +26,11 @@ load the database:
     mysql -u myuser mydbname -p < sql/createtables.sql
     mysql -u myuser mydbname -p < sql/initialdata.sql
 
+get the frontend tooling working:
+
+    npm install
+    npm run dev
+
 ## Via Vagrant…
 
 Install [Vagrant](https://www.vagrantup.com/downloads.html), [Virtual Box](https://www.virtualbox.org/wiki/Downloads) and [Ansible](http://docs.ansible.com/ansible/latest/intro_installation.html#installing-the-control-machine).

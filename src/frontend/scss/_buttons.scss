@@ -1,0 +1,28 @@
+.btn {
+  color: white;
+  border: 0;
+  font-size: 16px;
+  line-height: 20px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  font-weight: bold;
+  transition: all .5s;
+
+  &__primary {
+    background: siteColor(bof-lilac);
+    border-bottom: 5px solid siteColor(bof-lilac-dark);
+
+    &:hover {
+      background: siteColor(bof-lilac-dark);
+    }
+  }
+
+  &__secondary {
+    background: siteColor(bof-sky-blue);
+    border-bottom: 5px solid siteColor(bof-sky-blue-dark);
+
+    &:hover {
+      background: siteColor(bof-sky-blue-dark);
+    }
+  }
+}
