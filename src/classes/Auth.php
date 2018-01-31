@@ -85,7 +85,9 @@ class Auth
 			#TODO: needs to check session to commit() on
 #			$this->db->commit();
 			# print the auto incremented user's ID
-			print "User added, got ID : " . $this->db->lastInsertId();
+			# print "User added, got ID : " . $this->db->lastInsertId();
+			$payload = array("is_admin" => false, "userid" => $this->db->lastInsertId());
+			return $response->withRedirect($this->router->pathFor("topics"))->withStatus(302);
 		}
     }
 

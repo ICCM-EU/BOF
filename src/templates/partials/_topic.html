@@ -17,13 +17,13 @@
 
   {% if stage == "voting" %}
   <div class="topic__vote">
-    <form action="/votes/add" method="POST">
+    <form action="{{ path_for('votesaddpost')}}" method="POST">
       <input type="hidden" name="vote" value="1" />
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
       <input type="submit" class="btn btn--primary" value="Full vote" />
     </form>
 
-    <form action="/votes/add" method="POST">
+    <form action="{{ path_for('votesaddpost')}}" method="POST">
       <input type="hidden" name="vote" value="0.25" />
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
       <input type="submit" class="btn btn--secondary" value="1⁄4 vote" />
