@@ -21,5 +21,6 @@ require __DIR__ . '/../routes/admin.php';
 require __DIR__ . '/../routes/nomination.php';
 require __DIR__ . '/../routes/voting.php';
 require __DIR__ . '/../routes/projector.php';
+require __DIR__ . '/../routes/topics.php';
 
 $app->run();
