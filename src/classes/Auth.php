@@ -40,7 +40,8 @@ class Auth
                 return $response->withRedirect($this->router->pathFor("admin"))->withStatus(302);
             } else {
                 # TODO redirect somewhere for the normal user, either nomination or voting, depending on the current stage
-                print "hello, how are you doing?";
+                # going to topics
+                return $response->withRedirect($this->router->pathFor("topics"))->withStatus(302);
             }
         } else {
             echo json_encode("No valid user or password");
@@ -57,6 +58,7 @@ class Auth
     public function new_user($request, $response, $args) {
         $data = $request->getParsedBody();
         $login = $data['user_name'];
+        $password = $data['password'];
         $sql = 'SELECT * FROM `participant`
             WHERE ( `name` = ? )';
         $query=$this->db->prepare($sql);
@@ -64,17 +66,15 @@ class Auth
         $query->execute($param);
         if ($row=$query->fetch(PDO::FETCH_OBJ)) {
 			# user already exist, so return with error code 0
+			print "User already exists";
 			return 0;
 		}
 		else {
-			$data = $request->getParsedBody();
-			$login = $data['user_name'];
-			$password = $data['password'];
 			$sql = 'INSERT INTO `participant`
 				(`name`, `password`)
 				VALUES (?, PASSWORD(?))';
 
-			$this->db->beginTransaction();
+#			$this->db->beginTransaction();
 			$query=$this->db->prepare($sql);
 			$param = array ($login, $password);
 			try {
