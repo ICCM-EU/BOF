@@ -34,7 +34,9 @@ $app->get('/votes/add', function (Request $request, Response $response, array $a
 
 $app->post('/votes/add', function (Request $request, Response $response, array $args) {
     $data = $request->getParsedBody();
-    $userid = 83;
+    $userid = $request->getAttribute('userid');
+    if($userid === NULL)
+        return $response->withStatus(401);
 
     $sql_get_votes = '
         SELECT * FROM workshop_participant

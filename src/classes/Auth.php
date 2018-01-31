@@ -37,7 +37,7 @@ class Auth
                 $goto = $this->router->pathFor("admin");
             } else {
                 $payload = array("is_admin" => false, "userid" => $row->id);
-                $goto = $this->router->pathFor("user");
+                $goto = $this->router->pathFor("");
             }
             $token = JWT::encode($payload, $this->secrettoken, "HS256");
             setcookie("authtoken", $token, time()+3600);  // cookie expires in one hour
