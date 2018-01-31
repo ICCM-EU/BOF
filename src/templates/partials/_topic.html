@@ -1,0 +1,30 @@
+
+<div class="topic">
+  {% if stage == "voting" %}
+  <div class="topic__tally">
+    <div class="topic__tally__inner" style="width: 16%"></div>
+    <span class="topic__tally__text">16 1⁄4 votes</span>
+  </div>
+  {% endif %}
+
+  <div class="topic__detail">
+    <h1>{{ topic.name }}</h1>
+    <p>{{ topic.description }}</p>
+  </div>
+
+  {% if stage == "voting" %}
+  <div class="topic__vote">
+    <form action="/votes/add" method="POST">
+      <input type="hidden" name="vote" value="1" />
+      <input type="hidden" name="workshopid" value="{{ topic.id }}" />
+      <input type="submit" class="btn btn--primary" value="Full vote" />
+    </form>
+
+    <form action="/votes/add" method="POST">
+      <input type="hidden" name="vote" value="0.25" />
+      <input type="hidden" name="workshopid" value="{{ topic.id }}" />
+      <input type="submit" class="btn btn--secondary" value="1⁄4 vote" />
+    </form>
+  </div>
+  {% endif %}
+</div>
