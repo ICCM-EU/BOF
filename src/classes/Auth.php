@@ -38,7 +38,7 @@ class Auth
             } else {
                 # going to topics
                 $payload = array("is_admin" => false, "userid" => $row->id);
-                return $response->withRedirect($this->router->pathFor("topics"))->withStatus(302);
+                $goto = $this->router->pathFor("topics");
             }
             $token = JWT::encode($payload, $this->secrettoken, "HS256");
             setcookie("authtoken", $token, time()+3600);  // cookie expires in one hour
@@ -85,7 +85,9 @@ class Auth
 			#TODO: needs to check session to commit() on
 #			$this->db->commit();
 			# print the auto incremented user's ID
-			print "User added, got ID : " . $this->db->lastInsertId();
+			# print "User added, got ID : " . $this->db->lastInsertId();
+			$payload = array("is_admin" => false, "userid" => $this->db->lastInsertId());
+			return $response->withRedirect($this->router->pathFor("topics"))->withStatus(302);
 		}
     }
 

@@ -19,7 +19,7 @@ $app->get('/votes/list', function (Request $request, Response $response, array $
         'votes' => $votes,
     ]);
 
-});
+})->setName("voteslist");
 
 $app->get('/votes/add', function (Request $request, Response $response, array $args) {
     $sql_get_workshops = 'SELECT * FROM workshop';
@@ -30,11 +30,13 @@ $app->get('/votes/add', function (Request $request, Response $response, array $a
     return $this->view->render($response, 'addvote.html', [
         'workshops' => $workshop
     ]);
-});
+})->setName("votesaddget");
 
 $app->post('/votes/add', function (Request $request, Response $response, array $args) {
     $data = $request->getParsedBody();
-    $userid = 83;
+    $userid = $request->getAttribute('userid');
+    if($userid === NULL)
+        return $response->withStatus(401);
 
     $sql_get_votes = '
         SELECT * FROM workshop_participant
@@ -65,6 +67,6 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
 
     $response->getBody()->write('You voted: ' . $data['vote'] . ' for workshopid ' . $data['workshopid']);
     return $response;
-});
+})->setName("votesaddpost");;
 
 ?>

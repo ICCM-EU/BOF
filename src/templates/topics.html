@@ -1,14 +1,12 @@
 {% extends "layout.html" %}
 
 {% block body %}
-stage : {{stage}} 
-<p>List of nominated BOF workshops.</p>
-	{% for item in bofs %}           
-                <li>
-	<u>{{item.name}}</u>
-	<br>
-	{{item.description}} 
-	<br>
-                </li>
-            {% endfor %}
+
+	{% if newuser == 1 %}
+		{% include 'partials/_created_new_user.html' %}
+	{% endif %}
+
+	{% for topic in bofs %}           
+		{% include 'partials/_topic.html' %}
+  {% endfor %}
 {% endblock %}
