@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block body %}
+	{% if newuser == 1 %}
+		{% include 'partials/_created_new_user.html' %}
+	{% endif %}
+
+	{% for topic in bofs %}           
+		{% include 'partials/_topic.html' %}
+  {% endfor %}
+{% endblock %}

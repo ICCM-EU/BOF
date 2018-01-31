@@ -1,19 +1,28 @@
 {% extends "layout.html" %}
 
 {% block body %}
+<div class="landing">
 
-Birds of a feather
+  <svg class="landing__icon">
+    <use xlink:href="/assets/svg/svg-symbols.svg#owl-green"></use>
+  </svg>
 
-{% if loggedin == false %}
-<div class="button-block">
-  <a href="{{ path_for('login')}}" class="btn btn--primary btn--block">
-    Register
-  </a>
+  <h1 class="landing__title">
+    Birds of a Feather
+  </h1>
 
-  <a href="{{ path_for('login')}}" class="btn btn--secondary btn--block">
-    Sign in
-  </a>
+  {% if loggedin == false %}
+  <div class="button-block">
+    <a href="{{ path_for('register')}}" class="btn btn--primary btn--block">
+      Register
+    </a>
+
+    <a href="{{ path_for('login')}}" class="btn btn--secondary btn--block">
+      Sign in
+    </a>
+  </div>
+  {% endif %}
+  
 </div>
-{% endif %}
 
 {% endblock %}

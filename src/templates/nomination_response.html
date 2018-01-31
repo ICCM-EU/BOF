@@ -3,6 +3,9 @@
 {% block body %}
 <p>Thank you for the nomination!</p>
 
-<p><a href="{{ path_for('nomination')}}">Click here to nominate another topic</a></p>
+<div class="button-block">
+  <a href="{{ path_for('topics')}}" class="btn btn--primary">Return to topics</a>
+  <a href="{{ path_for('nomination')}}" class="btn btn--secondary">Nominate another topic</a>
+</div>
 
 {% endblock %}

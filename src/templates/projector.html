@@ -1,13 +1,15 @@
-{% extends "layout.html" %}
+{% extends "proj_layout.html" %}
 
 {% block body %}
+<b> stage :</B> <i> current status </i>
 
 <p>Projector.</p>
-	{% for item in bofs %}           
+	{% for item in bofs %}  
                 <li>
-	<u>{{item.name}}</u>
+	<u>{{item.name}}</u>:
+	{{item.votes}}  votes
 	<br>
-	{{item.description}} 
+	{{item.description}}
 	<br>
                 </li>
             {% endfor %}
