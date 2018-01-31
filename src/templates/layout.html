@@ -7,24 +7,12 @@
     </head>
     <body>
         <div class="container">
-            <div id="sidebar">
-                {% block sidebar %}
-                    <ul>
-                        <li><a href="{{ path_for('home') }}">Home</a></li>
-                        <li><a href="{{ path_for('hello', { 'name': 'world' })}}">Hello World</a></li>
-                        {% if loggedin == false %}
-                        <li><a href="{{ path_for('login')}}">Login</a></li>
-                        {% else %}
-                        <li><a href="{{ path_for('logout')}}">Logout</a></li>
-                        {% endif %}
-                    </ul>
-                {% endblock %}
-            </div>
+
 
             <div id="content">
                 {% block body %}{% endblock %}
 
-                <div class="topic">
+                <!--<div class="topic">
                     <div class="topic__tally">
                         <div class="topic__tally__inner" style="width: 16%"></div>
                         <span class="topic__tally__text">16 1⁄4 votes</span>
@@ -36,13 +24,29 @@
                     </div>
 
                     <div class="topic__vote">
-                        <button class="btn btn__primary">Full vote</button>
-                        <button class="btn btn__secondary">1⁄4 vote</button>
+                        <button class="btn btn--primary">Full vote</button>
+                        <button class="btn btn--secondary">1⁄4 vote</button>
                     </div>
-                </div>
+                </div>-->
 
             </div>
         </div>
+
+        {% if loggedin == false %}
+        <ul class="foot_nav">
+            {% block sidebar %}
+            <li>
+                <a href="{{ path_for('home') }}">Home</a>
+            </li>
+            <li>
+                <a href="{{ path_for('hello', { 'name': 'world' })}}">Hello World</a>
+            </li>
+            <li>
+                <a href="{{ path_for('logout')}}">Logout</a>
+            </li>
+            {% endblock %}
+        </ul>
+        {% endif %}
 
         <script src="/assets/js/vendors.js" crossorigin="anonymous"></script>
         <script src="/assets/js/bundle.js" crossorigin="anonymous"></script>
