@@ -26,8 +26,19 @@ class Moderation
         while ($row=$query->fetch(PDO::FETCH_OBJ)) {
 			$bofs [] = $row;
 		}
+		
+		$sql = 'SELECT * FROM `participant` WHERE `name` <> "admin"';
+        $query=$this->db->prepare($sql);
+        $param = array ();
+        $query->execute($param);
+		$participants = array ();
+        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+			$participants [] = $row;
+		}		
+		
         return $this->view->render($response, 'moderation.html',[
-			'bofs' => $bofs
+			'bofs' => $bofs,
+			'participants' => $participants
 			]);		
     }
 
@@ -40,6 +51,9 @@ class Moderation
 		}
 		else if ($operation == "merge") {
 			return $this->moderateMerge($request, $response, $args);
+		} 
+		else if ($operation == "addFacilitator") {
+			return $this->moderateAddFacilitator($request, $response, $args);
 		} 
 		else {
 			return $this->moderateUpdate($request, $response, $args);
@@ -63,6 +77,24 @@ class Moderation
 		
 		$query=$this->db->prepare($sql);
 		$param = array ($title, $description, $published, $id);
+		
+		$query->execute($param);
+		
+		return $this->showModerationView($request, $response, $args);
+    }
+    public function moderateAddFacilitator($request, $response, $args) {
+        $data = $request->getParsedBody();
+		$facilitator = $data['facilitator'];
+		$id = $data['id'];
+		
+	
+        $sql = 'INSERT INTO `workshop_participant` (`workshop_id`,`participant_id`,`leader`) 
+				VALUES (?,?,1)
+				ON DUPLICATE KEY UPDATE `leader` = 1';
+				
+		
+		$query = $this->db->prepare($sql);
+		$param = array ($id, $facilitator);
 		
 		$query->execute($param);
 		
