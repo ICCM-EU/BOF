@@ -28,10 +28,12 @@ $app->get('/topics', function (Request $request, Response $response, array $args
         $bofs [] = $row;
     }
     $allgetvars = $request->getQueryParams();
+    $stage =new ICCM\BOF\Stage($this->db);
+	  $stage2 =$stage->getstage();
     return $this->view->render($response, 'topics.html', [
         'bofs' => $bofs,
-        'stage' => 'voting',
-        'locked' => False,
+        'stage' => $stage2,
+        'locked' =>  $stage2=='locked',
         'newuser' => $allgetvars['newuser'],
         'loggedin' => True,
     ]);
