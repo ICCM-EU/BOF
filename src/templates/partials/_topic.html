@@ -15,6 +15,12 @@
     <p>{{ topic.description }}</p>
   </div>
 
+  {% if topic.votes %}
+    <div class="topic__vote-count">
+      Votes: {{ topic.votes }}
+    </div>
+  {% endif %}
+
   {% if stage == "voting" %}
   <div class="topic__vote">
     <form action="{{ path_for('votesaddpost')}}" method="POST">

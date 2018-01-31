@@ -45,6 +45,14 @@
   }
 }
 
+.topic__vote-count {
+  padding: 16px;
+  font-size: 16px;
+  background: siteColor(bof-sky-blue);
+  width: 15%;
+  text-align: right;
+}
+
 @include bpMinSmall {
   .topic {
     display: flex;
