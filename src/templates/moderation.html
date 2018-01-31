@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+	<h1>Workshops</h1>
+	<table>
+	{% for item in bofs %}           
+		<tr><td>
+		<form action="{{ path_for( 'moderation' )}}" method="POST">
+			<label for="title">Title</label>
+			<input type="text" name="title" value="{{item.name}}"/><br/>
+			<label for="description">Description</label>
+			<textarea name="description" rows="4" cols="65" id="description_box">{{item.description}}</textarea><br/>
+			<label for="published">Published</label>
+			<input type="checkbox" id="published" name="published" value="Published" {% if item.published != 0 %} checked {% endif %}/>
+			<input type="hidden" id="id" name="id" value="{{item.id}}"/><br/>
+			<input type="submit" value="Save"/>
+		</form> <form action="{{ path_for( 'moderation' )}}" method="POST">
+			<input type="hidden" id="id" name="id" value="{{item.id}}"/><br/>
+			<input type="hidden" id="operation" name="operation" value="delete"/>
+			<input type="submit" value="Delete"/>
+		</form>
+		
+		<form action="{{ path_for( 'moderation' )}}" method="POST">
+			<select name="mergeWithWorkshop">
+			{% for mergeItem in bofs %}
+				{% if (mergeItem.name != item.name) %}
+				<option value="{{mergeItem.id}}">{{mergeItem.name}}</option>
+				{% endif %}
+			{% endfor %}
+			</select>
+			<input type="hidden" id="id" name="id" value="{{item.id}}"/><br/>
+			<input type="hidden" id="operation" name="operation" value="merge"/>
+			<input type="submit" value="Merge"/>
+		</form>
+		<br/>
+		<br/>
+		</td></tr>
+		
+    {% endfor %}
+	</table>
+{% endblock %}
