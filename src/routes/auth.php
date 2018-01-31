@@ -9,7 +9,7 @@ $app->get('/login', function (Request $request, Response $response, array $args)
     return $this->view->render($response, 'login.html');
 })->setName('login');
 
-$app->get('/register', function (Request $request, Response $response, array $args) {
+$app->post('/register', function (Request $request, Response $response, array $args) {
     return $this->view->render($response, 'register.html');
 })->setName('register');
 
