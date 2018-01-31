@@ -10,6 +10,7 @@ $container = $app->getContainer();
 
 // Register dependencies
 require __DIR__ . '/../dependencies.php';
+require __DIR__.'/../classes/Stage.php';
 
 // Register middleware
 require __DIR__ . '/../middleware.php';
