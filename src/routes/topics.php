@@ -27,14 +27,14 @@ $app->get('/topics', function (Request $request, Response $response, array $args
     while ($row=$query->fetch(PDO::FETCH_OBJ)) {
         $bofs [] = $row;
     }
-
+    $allgetvars = $request->getQueryParams();
     $stage =new ICCM\BOF\Stage($this->db);
 	  $stage2 =$stage->getstage();
     return $this->view->render($response, 'topics.html', [
         'bofs' => $bofs,
         'stage' => $stage2,
         'locked' =>  $stage2=='locked',
-        'newuser' => True,
+        'newuser' => $allgetvars['newuser'],
         'loggedin' => True,
     ]);
 })->setName('topics');

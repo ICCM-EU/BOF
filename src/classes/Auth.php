@@ -44,7 +44,8 @@ class Auth
             setcookie("authtoken", $token, time()+3600);  // cookie expires in one hour
             return $response->withRedirect($goto)->withStatus(302);
         } else {
-            echo json_encode("No valid user or password");
+            // echo json_encode("No valid user or password");
+	    return $response->withRedirect($this->router->pathFor("login") . "?message=invalid")->withStatus(302);
         }
     }
     
@@ -87,14 +88,14 @@ class Auth
 			# print the auto incremented user's ID
 			# print "User added, got ID : " . $this->db->lastInsertId();
 			$payload = array("is_admin" => false, "userid" => $this->db->lastInsertId());
-			return $response->withRedirect($this->router->pathFor("topics"))->withStatus(302);
+			return $response->withRedirect($this->router->pathFor("topics") . "?newuser=1")->withStatus(302);
 		}
     }
 
 		
     public function logout($request, $response, $args) {
         setcookie("authtoken", "", time()-3600);
-        return $this->view->render($response, 'loggedout.html');
+        return $this->view->render($response, 'home.html');
     }
 }
 
