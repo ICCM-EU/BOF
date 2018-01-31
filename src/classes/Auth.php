@@ -82,7 +82,7 @@ class Auth
 			}
 			$this->db->commit();
 			# print the auto incremented user's ID
-			print $this->db->lastInsertId();
+			print "User added, got ID : " . $this->db->lastInsertId();
 		}
     }
 
