@@ -1,15 +1,19 @@
 {% extends "layout.html" %}
 
 {% block body %}
+
 	{% if newuser == 1 %}
 		{% include 'partials/_created_new_user.html' %}
 	{% endif %}
 
-	{% if voted_count >= 3 %}
-		<div class="notice notice--warning">
-			<h1>Squark!</h1>
-			<p>All your full votes have been used.</p>
-		</div>
+	<div class="notice notice--warning">
+		<h2>{{ left_votes }} full votes left</h2>
+	</div>
+
+	{% if voted_successfull %}
+	    <p>
+	    Yeeeeey! You did it! You sent your vote. So great...
+	    </p>
 	{% endif %}
 
 	{% for topic in bofs %}           

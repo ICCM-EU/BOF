@@ -18,33 +18,42 @@ use \Psr\Http\Message\ResponseInterface as Response;
  * TODO: config item for locked False/True
  * 
  */
+function float_eq($a, $b) {
+    return abs(abs($a) - abs($b)) < 0.000001;
+}
 $app->get('/topics', function (Request $request, Response $response, array $args) {
+    $userid = $request->getAttribute('userid');
+
     $sql = 'SELECT * FROM `workshop`';
     $query=$this->db->prepare($sql);
-    $param = array ();
-    $query->execute($param);
-    $bofs = array ();
-    while ($row=$query->fetch(PDO::FETCH_OBJ)) {
-        $bofs [] = $row;
-    }
+    $query->execute();
+    $bofs = $query->fetchAll();
 
-    $sql = 'SELECT workshop_id FROM `workshop_participant` WHERE participant = 1 AND participant_id = 83';
+    $sql = 'SELECT workshop_id, participant FROM `workshop_participant` WHERE participant_id = :uid';
     $query = $this->db->prepare($sql);
-    $param = array ();
-    $query->execute($param);
-    
-    $voted_for = array ();
-    while ($row=$query->fetch(PDO::FETCH_OBJ)) {
-        $voted_for [] = $row;
-    }
+    $query->execute(['uid' => $userid]);
+    $votes = $query->fetchAll();
+    $fullvotesleft = 3;
 
+    foreach($votes as $vote) {
+        $fullvotesleft -= float_eq($vote['participant'], 1) ? 1 : 0;
+        foreach($bofs as &$bof) {
+            if($vote['workshop_id'] === $bof['id'] && float_eq($vote['participant'], 1.0))
+                $bof['fullvote'] = True;
+            if($vote['workshop_id'] === $bof['id'] && float_eq($vote['participant'], 0.25))
+                $bof['quartervote'] = True;
+        }
+    }
+    $params = $request->getQueryParams();
+    $show_vote_message = array_key_exists('voted', $params) && $params['voted'] === '1';
     return $this->view->render($response, 'topics.html', [
         'bofs' => $bofs,
         'stage' => 'voting',
         'locked' => False,
         'newuser' => True,
         'loggedin' => True,
-        'voted_count' => $query->rowCount(),
+        'left_votes' => $fullvotesleft,
+        'voted_successfull' => $show_vote_message,
     ]);
 })->setName('topics');
 
