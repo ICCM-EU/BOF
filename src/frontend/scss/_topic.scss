@@ -1,0 +1,77 @@
+.topic {
+  background-color: white;
+  margin-bottom: 16px;
+}
+
+.topic__tally {
+  background-color: siteColor(deviant-grey);
+  font-size: 15px;
+  width: 100%;
+
+  &__inner {
+    background: siteColor(bof-grass-green);
+    height: 9px;
+  }
+
+  @include bpMaxSmall {
+    &__text {
+      @include visuallyHidden;
+    }
+  }
+}
+
+.topic__detail {
+  padding: 16px;
+
+  h1 {
+    font-size: 16px;
+  }
+
+  p {
+    font-size: 15px;
+  }
+}
+
+.topic__vote {
+  display: flex;
+
+  button {
+    width: 100%;
+  }
+}
+
+@include bpMinSmall {
+  .topic {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .topic__tally {
+    align-items: center;
+    display: flex;
+    height: auto;
+    position: relative;
+    text-indent: 0;
+    width: auto;
+
+    &__inner {
+      bottom: 0;
+      height: auto;
+      position: absolute;
+      top: 0;
+      z-index: 0;
+    }
+
+    &__text {
+      display: block;
+      padding: 16px;
+      position: relative;
+      text-align: center;
+      z-index: 1;
+    }
+  }
+
+  .topic__detail {
+    width: 70%;
+  }
+}

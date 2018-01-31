@@ -1,0 +1,45 @@
+.btn {
+  border: 0;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 20px;
+  min-width: 75px;
+  padding: 16px;
+  text-align: center;
+  text-decoration: none;
+  transition: all .5s;
+
+  &:hover {
+    color: white;
+  }
+
+  &--primary {
+    background: siteColor(bof-lilac);
+    border-bottom: 5px solid siteColor(bof-lilac-dark);
+
+    &:hover {
+      background: siteColor(bof-lilac-dark);
+    }
+  }
+
+  &--secondary {
+    background: siteColor(bof-sky-blue);
+    border-bottom: 5px solid siteColor(bof-sky-blue-dark);
+
+    &:hover {
+      background: siteColor(bof-sky-blue-dark);
+    }
+  }
+
+  &--block {
+    display: block;
+    flex: 1 1 auto;
+  }
+}
+
+
+.button-block {
+  display: flex;
+  width: 100%;
+}

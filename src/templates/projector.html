@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<p>Projector.</p>
+	{% for item in bofs %}           
+                <li>
+	<u>{{item.name}}</u>
+	<br>
+	{{item.description}} 
+	<br>
+                </li>
+            {% endfor %}
+{% endblock %}

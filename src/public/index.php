@@ -20,5 +20,6 @@ require __DIR__ . '/../routes/auth.php';
 require __DIR__ . '/../routes/admin.php';
 require __DIR__ . '/../routes/nomination.php';
 require __DIR__ . '/../routes/voting.php';
+require __DIR__ . '/../routes/projector.php';
 
 $app->run();
