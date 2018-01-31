@@ -71,8 +71,8 @@ class Auth
 			$login = $data['user_name'];
 			$password = $data['password'];
 			$sql = 'INSERT INTO `participant`
-				(`name`, ?)
-				VALUES ($login, PASSWORD(?))';
+				(`name`, `password`)
+				VALUES (?, PASSWORD(?))';
 			$query=$this->db->prepare($sql);
 			$param = array ($login, $password);
 			$query->execute($param);
