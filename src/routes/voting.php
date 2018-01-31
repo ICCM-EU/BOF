@@ -10,7 +10,9 @@ $app->get('/votes/list', function (Request $request, Response $response, array $
             workshop.id AS workshop_id, workshop.name AS workshop
       FROM workshop_participant
       JOIN participant ON participant_id = participant.id
-      JOIN workshop ON workshop_id = workshop.id';
+      JOIN workshop ON workshop_id = workshop.id
+      WHERE participant > 0
+    ';
     $sth = $this->db->prepare($sql_get_votes);
     $sth->execute();
     $votes = $sth->fetchAll();
@@ -34,15 +36,25 @@ $app->get('/votes/add', function (Request $request, Response $response, array $a
 
 $app->post('/votes/add', function (Request $request, Response $response, array $args) {
     $data = $request->getParsedBody();
+
+    // check user
     $userid = $request->getAttribute('userid');
     if($userid === NULL)
-        return $response->withStatus(401);
+        return $response->withRedirect($this->router->pathFor('home'), 302);
 
+    // check allowed full-votes (not more than 3)
+    $sql_get_totalvotes = 'SELECT COUNT(*) FROM workshop_participant WHERE participant = 1 AND participant_id = :uid';
+    $sth = $this->db->prepare($sql_get_totalvotes);
+    $sth->execute(['uid' => $userid]);
+    $totalvotes = $sth->fetch();
+    if($totalvotes[0] >= 3 && $data['vote'] >= 1)
+        return $response->withRedirect($this->router->pathFor('topics'), 302);
+
+    // find existing vote entries from this user on this workshop
     $sql_get_votes = '
         SELECT * FROM workshop_participant
         WHERE workshop_id = :wid AND participant_id = :uid
     ';
-
     $sth = $this->db->prepare($sql_get_votes);
     $sth->execute(['wid' => $data['workshopid'], 'uid' => $userid]);
     $votes = $sth->fetchAll();
@@ -64,9 +76,7 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
         'vote' => $data['vote']
     ]);
     $this->db->commit();
-
-    $response->getBody()->write('You voted: ' . $data['vote'] . ' for workshopid ' . $data['workshopid']);
-    return $response;
+    return $response->withRedirect($this->router->pathFor('topics', [], ['voted' => 1]), 302);
 })->setName("votesaddpost");;
 
 ?>
