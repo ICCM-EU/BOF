@@ -75,10 +75,14 @@ class Auth
 				VALUES (?, PASSWORD(?))';
 			$query=$this->db->prepare($sql);
 			$param = array ($login, $password);
-			$query->execute($param);
-			$query->commit();
+			try {
+			    $query->execute($param);
+			} catch (PDOException $e){
+			    echo $e->getMessage();
+			}
+			$this->db->commit();
 			# print the auto incremented user's ID
-			print $dbh->lastInsertId();
+			print $this->db->lastInsertId();
 		}
     }
 
