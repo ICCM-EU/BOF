@@ -27,11 +27,12 @@ $app->get('/topics', function (Request $request, Response $response, array $args
     while ($row=$query->fetch(PDO::FETCH_OBJ)) {
         $bofs [] = $row;
     }
+    $allgetvars = $request->getQueryParams();
     return $this->view->render($response, 'topics.html', [
         'bofs' => $bofs,
         'stage' => 'voting',
         'locked' => False,
-        'newuser' => True,
+        'newuser' => $allgetvars['newuser'],
         'loggedin' => True,
     ]);
 })->setName('topics');
