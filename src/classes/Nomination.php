@@ -27,7 +27,9 @@ class Nomination
 		$param = array ($title, $description);
 		
 		$query->execute($param);
-		return $this->view->render($response, 'nomination_response.html');
+		return $this->view->render($response, 'nomination_response.html', [
+            'loggedin' => True,
+        ]);
 
 		// Handle error
 		// return $this->view->render($response, 'nomination_error.html');
