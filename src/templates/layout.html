@@ -32,8 +32,8 @@
             </div>
         </div>
 
-        {% if loggedin == false %}
-        <ul class="foot_nav">
+        {% if loggedin == true %}
+        <ul class="foot-nav">
             {% block sidebar %}
             <li>
                 <a href="{{ path_for('home') }}">Home</a>

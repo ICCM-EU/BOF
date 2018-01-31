@@ -1,0 +1,16 @@
+.landing {
+  &__icon {
+    background: red;
+    border-radius: 50%;
+    height: 0;
+    margin: 16px auto;
+    padding-bottom: 50%;
+    width: 50%;
+  }
+
+  &__title {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+}
