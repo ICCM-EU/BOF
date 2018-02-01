@@ -76,7 +76,8 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
         'vote' => $data['vote']
     ]);
     $this->db->commit();
-    return $response->withRedirect($this->router->pathFor('topics', [], ['voted' => 1]), 302);
+    $param = $data['vote'] == '0' ? [] : ['voted' => 1];
+    return $response->withRedirect($this->router->pathFor('topics', [], $param), 302);
 })->setName("votesaddpost");;
 
 ?>
