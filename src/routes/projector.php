@@ -24,7 +24,7 @@ $app->get('/projector', function (Request $request, Response $response, array $a
         $stage2 =$stage->getstage();
 
         $sql = 'SELECT workshop.name, workshop.id, 0 as votes
-                FROM workshop';
+                FROM workshop ORDER BY id DESC';
         $query=$this->db->prepare($sql);
         $param = array ();
         $query->execute($param);
@@ -43,10 +43,21 @@ $app->get('/projector', function (Request $request, Response $response, array $a
         while ($row=$query->fetch(PDO::FETCH_OBJ)) {
            $bof[$row->id]->votes = $row->votes;
         }
-// TODO order
+
         $bofs2 = array();
         foreach ($bofs as $bof) {
             $bofs2[] = $bof;
+        }
+
+        function cmp($a, $b)
+        {
+            if ($a->votes > $b->votes) return 1;
+            if ($a->votes < $b->votes) return -1;
+            return 0;
+        }
+
+        if ($stage2 == "voting") {
+            usort($bofs2, "cmp");
         }
 
         return $this->view->render($response, 'proj_layout.html', [
