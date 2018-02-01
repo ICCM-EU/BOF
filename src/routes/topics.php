@@ -50,7 +50,7 @@ $app->get('/topics', function (Request $request, Response $response, array $args
     $show_vote_message = array_key_exists('voted', $params) && $params['voted'] === '1';
     return $this->view->render($response, 'topics.html', [
         'bofs' => $bofs,
-        'stage' => 'voting',
+        'stage' => $stage2,
         'locked' =>  $stage2=='locked',
         'newuser' => $params['newuser'],
         'loggedin' => True,
