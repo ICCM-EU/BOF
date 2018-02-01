@@ -24,13 +24,15 @@ function float_eq($a, $b) {
 $app->get('/topics', function (Request $request, Response $response, array $args) {
     $userid = $request->getAttribute('userid');
 
-    $sql = "SELECT *, '' as leader FROM `workshop`";
+    $sql = "SELECT *, '' as leader
+            FROM `workshop`";
     $query=$this->db->prepare($sql);
     $query->execute();
     $bofs = $query->fetchAll();
 
     $sql = 'SELECT participant.name, workshop_id
-            FROM workshop_participant JOIN participant ON workshop_participant.participant_id = participant.id
+            FROM workshop_participant
+            JOIN participant ON workshop_participant.participant_id = participant.id
             WHERE workshop_participant.leader = 1';
     $query=$this->db->prepare($sql);
     $param = array ();
@@ -46,7 +48,9 @@ $app->get('/topics', function (Request $request, Response $response, array $args
         }
     }
 
-    $sql = 'SELECT workshop_id, participant FROM `workshop_participant` WHERE participant_id = :uid';
+    $sql = 'SELECT workshop_id, participant
+            FROM `workshop_participant`
+            WHERE participant_id = :uid';
     $query = $this->db->prepare($sql);
     $query->execute(['uid' => $userid]);
     $votes = $query->fetchAll();
