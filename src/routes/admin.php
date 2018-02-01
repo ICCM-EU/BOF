@@ -8,5 +8,10 @@ $app->get('/admin', function (Request $request, Response $response, array $args)
         'loggedin' => True
     ]);
 })->setName('admin');
+$app->get('/export', function (Request $request, Response $response, array $args) {
+   $results = new ICCM\BOF\Results($this->db);
+   $results->calculateResults();
+   echo "todo";
+})->setName('export_results');
 
 ?>
