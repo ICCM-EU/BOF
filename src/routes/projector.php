@@ -23,8 +23,8 @@ $app->get('/projector', function (Request $request, Response $response, array $a
 	$stage =new ICCM\BOF\Stage($this->db);
         $stage2 =$stage->getstage();
 
-        $sql = 'SELECT workshop.name, workshop.id, 0 as votes
-                FROM workshop ORDER BY id DESC';
+        $sql = "SELECT workshop.name, workshop.id, 0 as votes, '' as leader
+                FROM workshop ORDER BY id DESC";
         $query=$this->db->prepare($sql);
         $param = array ();
         $query->execute($param);
@@ -42,6 +42,19 @@ $app->get('/projector', function (Request $request, Response $response, array $a
         $query->execute($param);
         while ($row=$query->fetch(PDO::FETCH_OBJ)) {
            $bofs[$row->id]->votes = $row->votes;
+        }
+
+        $sql = 'SELECT participant.name, workshop_id
+                FROM workshop_participant JOIN participant ON workshop_participant.participant_id = participant.id
+                WHERE workshop_participant.leader = 1';
+        $query=$this->db->prepare($sql);
+        $param = array ();
+        $query->execute($param);
+        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+           if (strlen($bofs[$row->workshop_id]->leader) > 0) {
+              $bofs[$row->workshop_id]->leader.= ', ';
+           }
+           $bofs[$row->workshop_id]->leader .= $row->name;
         }
 
         $bofs2 = array();

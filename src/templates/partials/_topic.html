@@ -4,6 +4,9 @@
   <div class="topic__detail">
     <h1>{{ topic.name }}</h1>
     <p>{{ topic.description }}</p>
+    {% if topic.leader %}
+    <p>Facilitator: {{ topic.leader }}</p>
+    {% endif %}
     <form action="{{ path_for('votesaddpost')}}" method="POST" class="facilitation">
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
       <input type="hidden" name="leader" value="1" />
