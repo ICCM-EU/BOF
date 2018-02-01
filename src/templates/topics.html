@@ -6,6 +6,16 @@
 		{% include 'partials/_created_new_user.html' %}
 	{% endif %}
 
+	<div class="notice notice--warning">
+		<h2>{{ left_votes }} full votes left</h2>
+	</div>
+
+	{% if voted_successfull %}
+	    <p>
+	    Yeeeeey! You did it! You sent your vote. So great...
+	    </p>
+	{% endif %}
+
 	{% for topic in bofs %}           
 		{% include 'partials/_topic.html' %}
   {% endfor %}
