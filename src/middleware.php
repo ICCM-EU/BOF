@@ -37,7 +37,7 @@ $app->add(function($request, $response, $next) {
         $username = $results[0];
 
     $container['view']['userid'] = $cookie['userid'];
-    $container['view']['username'] = $username;
+    $container['view']['username'] = $username['name'];
     $container['view']['is_admin'] = $cookie['is_admin'];
     $request = $request->withAttribute('userid', $cookie['userid']);
     $request = $request->withAttribute('is_admin', $cookie['is_admin']);
