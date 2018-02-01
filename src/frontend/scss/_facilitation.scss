@@ -1,0 +1,28 @@
+.facilitation {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  border: 1px solid grey;
+  padding: 8px;
+  width: 100%;
+}
+
+.facilitation__btn {
+  appearance: none;
+  background: aliceblue;
+  border: 0;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 20px;
+  height: 40px;
+  margin-right: 16px;
+  text-align: center;
+  text-decoration: none;
+  transition: all .5s;
+  width: 40px;
+
+  &:hover {
+    background: darken(aliceblue, 10);
+  }
+}
