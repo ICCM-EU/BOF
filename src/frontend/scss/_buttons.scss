@@ -23,6 +23,10 @@
     &:hover {
       background: siteColor(bof-lilac-dark);
     }
+
+    &.btn--toggled {
+      background: siteColor(bof-lilac-dark);
+    }
   }
 
   &--secondary {
@@ -31,6 +35,19 @@
 
     &:hover {
       background: siteColor(bof-sky-blue-dark);
+    }
+
+    &.btn--toggled {
+      background: siteColor(bof-sky-blue-dark);
+    }
+  }
+
+  &--danger {
+    background: siteColor(bof-danger-red);
+    border-bottom: 5px solid siteColor(bof-danger-red-dark);
+
+    &:hover {
+      background: siteColor(bof-danger-red-dark);
     }
   }
 

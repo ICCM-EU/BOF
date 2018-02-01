@@ -26,21 +26,19 @@
     <form action="{{ path_for('votesaddpost')}}" method="POST">
       <input type="hidden" name="vote" value="1" />
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
-      <input type="submit" class="btn btn--primary {{topic.fullvote ? 'topic__selected' : ''}}" value="Full vote" {{left_votes == 0 ? 'disabled' : ''}}/>
-    <p>{{topic.fullvote ? 'X' : ''}}</p>
+      <input type="submit" class="btn btn--primary {{topic.fullvote ? 'btn--toggled' : ''}}" value="Full vote" {{left_votes == 0 ? 'disabled' : ''}}/>
     </form>
 
     <form action="{{ path_for('votesaddpost') }}" method="POST">
       <input type="hidden" name="vote" value="0.25" />
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
-      <input type="submit" class="btn btn--secondary {{topic.quartervote ? 'topic__selected' : ''}}" value="1⁄4 vote" />
-      <p>{{topic.quartervote ? 'X' : ''}}</p>
+      <input type="submit" class="btn btn--secondary {{topic.quartervote ? 'btn--toggled' : ''}}" value="1⁄4 vote" />
     </form>
 
     <form action="{{ path_for('votesaddpost') }}" method="POST">
       <input type="hidden" name="vote" value="0.0" />
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
-      <input type="submit" class="btn btn--secondary" value="X" />
+      <input type="submit" class="btn btn--danger" value="Clear vote" />
     </form>
   </div>
   {% endif %}

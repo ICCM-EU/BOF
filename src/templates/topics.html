@@ -11,9 +11,11 @@
 	</div>
 
 	{% if voted_successfull %}
-	    <p>
-	    Yeeeeey! You did it! You sent your vote. So great...
-	    </p>
+	<div class="notice notice--success js-slideout" style="display: none;">
+		<h2>
+			Yeeeeey! You did it! You sent your vote. So great...
+		</h2>
+	</div>
 	{% endif %}
 
 	{% for topic in bofs %}           

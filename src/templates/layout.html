@@ -18,8 +18,14 @@
           {% include 'partials/_foot-nav.html' %}
         {% endif %}
 
-        <script src="/assets/js/vendors.js" crossorigin="anonymous"></script>
-        <script src="/assets/js/bundle.js" crossorigin="anonymous"></script>
+        <script
+            src="http://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+        <script>
+            // TODO: Jquery does the job here… replace this with Vanilla ASAP
+            $('.js-slideout').slideDown().delay(3000).slideUp();
+        </script>
 
     </body>
 </html>
