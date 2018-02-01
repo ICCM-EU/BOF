@@ -42,6 +42,10 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
     if($userid === NULL)
         return $response->withRedirect($this->router->pathFor('home'), 302);
 
+    if ($data['leader']) {
+        $data['vote'] = 1;
+    }
+
     // check allowed full-votes (not more than 3)
     $sql_get_totalvotes = 'SELECT COUNT(*) FROM workshop_participant WHERE participant = 1 AND participant_id = :uid';
     $sth = $this->db->prepare($sql_get_totalvotes);
@@ -62,10 +66,10 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
     if(count($votes) == 0) {
         // create new vote
         $sql_vote = 'INSERT INTO workshop_participant 
-                         (workshop_id, participant_id, participant) VALUES (:wid, :uid, :vote)';
+                         (workshop_id, participant_id, participant, leader) VALUES (:wid, :uid, :vote, :leader)';
     } else {
         // update vote
-        $sql_vote = 'UPDATE workshop_participant SET participant = :vote
+        $sql_vote = 'UPDATE workshop_participant SET participant = :vote, leader = :leader
                      WHERE workshop_id = :wid AND participant_id = :uid';
     }
     $this->db->beginTransaction();
@@ -73,7 +77,8 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
     $sth->execute([
         'wid' => $data['workshopid'],
         'uid' => $userid,
-        'vote' => $data['vote']
+        'vote' => $data['vote'],
+        'leader' => $data['leader']
     ]);
     $this->db->commit();
     $param = $data['vote'] == '0' ? [] : ['voted' => 1];
