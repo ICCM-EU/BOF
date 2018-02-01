@@ -1,14 +1,5 @@
 
 <div class="topic">
-  <!--
-    TODO: Get percentage sent from database
-  {% if stage == "voting" %}
-  <div class="topic__tally">
-    <div class="topic__tally__inner" style="width: 16%"></div>
-    <span class="topic__tally__text">16 1⁄4 votes</span>
-  </div>
-  {% endif %}
-  -->
 
   <div class="topic__detail">
     <h1>{{ topic.name }}</h1>
@@ -16,6 +7,13 @@
     {% if topic.leader %}
     <p>Facilitator: {{ topic.leader }}</p>
     {% endif %}
+    <form action="{{ path_for('votesaddpost')}}" method="POST" class="facilitation">
+      <input type="hidden" name="workshopid" value="{{ topic.id }}" />
+      <input type="hidden" name="leader" value="1" />
+      <input type="hidden" name="vote" value="1" />
+      <input type="submit" class="facilitation__btn" value="{{topic.leader ? '✔️' : ''}}">
+      <label class="facilitation__lbl">I can facilitate this session</label>
+    </form>
   </div>
 
   {% if topic.votes %}
