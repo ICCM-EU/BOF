@@ -93,10 +93,12 @@
   .topic {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: strech;
   }
 
   .topic__vote-count {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
