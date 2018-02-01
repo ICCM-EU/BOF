@@ -88,3 +88,15 @@
     width: 70%;
   }
 }
+
+.container--projector {
+  .topic {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .topic__vote-count {
+    text-align: center;
+  }
+}
