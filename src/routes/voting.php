@@ -37,6 +37,12 @@ $app->get('/votes/add', function (Request $request, Response $response, array $a
 $app->post('/votes/add', function (Request $request, Response $response, array $args) {
     $data = $request->getParsedBody();
 
+    $setting_leader = 1;
+    if (!array_key_exists('leader', $data)) {
+       $data['leader'] = 0;
+       $setting_leader = 0;
+    }
+
     // check user
     $userid = $request->getAttribute('userid');
     if($userid === NULL)
@@ -79,7 +85,7 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
     ]);
     $this->db->commit();
     $param = $data['vote'] == '0' ? [] : ['voted' => 1];
-    if (array_key_exists('leader', $data)) {
+    if ($setting_leader) {
         $param['leader'] = $data['leader'];
     }
     return $response->withRedirect($this->router->pathFor('topics', [], $param), 302);
