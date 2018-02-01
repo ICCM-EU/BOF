@@ -24,10 +24,27 @@ function float_eq($a, $b) {
 $app->get('/topics', function (Request $request, Response $response, array $args) {
     $userid = $request->getAttribute('userid');
 
-    $sql = 'SELECT * FROM `workshop`';
+    $sql = "SELECT *, '' as leader FROM `workshop`";
     $query=$this->db->prepare($sql);
     $query->execute();
     $bofs = $query->fetchAll();
+
+    $sql = 'SELECT participant.name, workshop_id
+            FROM workshop_participant JOIN participant ON workshop_participant.participant_id = participant.id
+            WHERE workshop_participant.leader = 1';
+    $query=$this->db->prepare($sql);
+    $param = array ();
+    $query->execute($param);
+    while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+        foreach($bofs as &$bof) {
+            if($bof['id'] === $row->workshop_id) {
+                if (strlen($bof['leader']) > 0) {
+                    $bof['leader'] .= ', ';
+                }
+                $bof['leader'] .= $row->name;
+            }
+        }
+    }
 
     $sql = 'SELECT workshop_id, participant FROM `workshop_participant` WHERE participant_id = :uid';
     $query = $this->db->prepare($sql);

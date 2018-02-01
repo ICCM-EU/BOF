@@ -42,9 +42,6 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
     if($userid === NULL)
         return $response->withRedirect($this->router->pathFor('home'), 302);
 
-    if ($data['leader']) {
-        $data['vote'] = 1;
-    }
 
     // check allowed full-votes (not more than 3)
     $sql_get_totalvotes = 'SELECT COUNT(*) FROM workshop_participant WHERE participant = 1 AND participant_id = :uid';
@@ -82,6 +79,9 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
     ]);
     $this->db->commit();
     $param = $data['vote'] == '0' ? [] : ['voted' => 1];
+    if (array_key_exists('leader', $data)) {
+        $param['leader'] = $data['leader'];
+    }
     return $response->withRedirect($this->router->pathFor('topics', [], $param), 302);
 })->setName("votesaddpost");;
 
