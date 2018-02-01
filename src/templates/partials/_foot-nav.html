@@ -2,6 +2,11 @@
   <li>
     <a href="{{ path_for('nomination')}}">Nominate topic</a>
   </li>
+  {% if (is_admin) %}
+  <li>
+    <a href="{{ path_for('moderation') }}">Moderate topics</a>
+  </li>  
+  {% endif %}
   <li>
     <a href="{{ path_for('topics') }}">All topics</a>
   </li>

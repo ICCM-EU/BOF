@@ -6,22 +6,35 @@
 	<table>
 	{% for item in bofs %}           
 		<tr><td>
-		<form action="{{ path_for( 'moderation' )}}" method="POST">
-			<label for="title">Title</label>
-			<input type="text" name="title" value="{{item.name}}"/><br/>
-			<label for="description">Description</label>
-			<textarea name="description" rows="4" cols="65" id="description_box">{{item.description}}</textarea><br/>
-			<label for="published">Published</label>
-			<input type="checkbox" id="published" name="published" value="Published" {% if item.published != 0 %} checked {% endif %}/>
-			<input type="hidden" id="id" name="id" value="{{item.id}}"/><br/>
-			<input type="submit" value="Save"/>
-		</form> <form action="{{ path_for( 'moderation' )}}" method="POST">
+		<form action="{{ path_for( 'moderation' )}}" method="POST"  class="bof-form">
+			<div class="bof-form__item">
+				<label for="title" class="bof-form__label">Title</label>
+				<input type="text" name="title" value="{{item.name}}" class="bof-form__input"/><br/>
+				<label for="description" class="bof-form__label">Description</label>
+				<textarea name="description" rows="4" cols="65" id="description_box" class="bof-form__input">{{item.description}}</textarea><br/>
+				<label for="published" class="bof-form__label">Published</label>
+				<input type="checkbox" id="published" name="published" value="Published" {% if item.published != 0 %} checked {% endif %} class="bof-form__input"/>
+				<input type="hidden" id="id" name="id" value="{{item.id}}" /><br/>
+				<input type="submit" value="Save" class="btn btn--primary"/>
+			</div>
+		</form> <form action="{{ path_for( 'moderation' )}}" method="POST" class="bof-form">
 			<input type="hidden" id="id" name="id" value="{{item.id}}"/><br/>
 			<input type="hidden" id="operation" name="operation" value="delete"/>
-			<input type="submit" value="Delete"/>
+			<input type="submit" value="Delete" class="btn btn--primary"/>
 		</form>
 		
-		<form action="{{ path_for( 'moderation' )}}" method="POST">
+		<form action="{{ path_for( 'moderation' )}}" method="POST" class="bof-form">
+			<input type="hidden" id="id" name="id" value="{{item.id}}"/><br/>
+			<input type="hidden" id="operation" name="operation" value="addFacilitator"/>
+			<select name="facilitator">
+				{% for participant in participants %}
+					<option value="{{participant.id}}">{{participant.name}}</option>
+				{% endfor %}
+			<input type="submit" value="Add Facilitator" class="btn btn--primary"/>
+		</form>
+				
+		
+		<form action="{{ path_for( 'moderation' )}}" method="POST"  class="bof-form">
 			<select name="mergeWithWorkshop">
 			{% for mergeItem in bofs %}
 				{% if (mergeItem.name != item.name) %}
@@ -31,7 +44,7 @@
 			</select>
 			<input type="hidden" id="id" name="id" value="{{item.id}}"/><br/>
 			<input type="hidden" id="operation" name="operation" value="merge"/>
-			<input type="submit" value="Merge"/>
+			<input type="submit" value="Merge" class="btn btn--primary"/>
 		</form>
 		<br/>
 		<br/>
