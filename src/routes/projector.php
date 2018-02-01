@@ -41,7 +41,7 @@ $app->get('/projector', function (Request $request, Response $response, array $a
         $param = array ();
         $query->execute($param);
         while ($row=$query->fetch(PDO::FETCH_OBJ)) {
-           $bof[$row->id]->votes = $row->votes;
+           $bofs[$row->id]->votes = $row->votes;
         }
 
         $bofs2 = array();
@@ -51,8 +51,8 @@ $app->get('/projector', function (Request $request, Response $response, array $a
 
         function cmp($a, $b)
         {
-            if ($a->votes > $b->votes) return 1;
-            if ($a->votes < $b->votes) return -1;
+            if ($a->votes > $b->votes) return -1;
+            if ($a->votes < $b->votes) return 1;
             return 0;
         }
 
