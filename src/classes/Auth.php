@@ -92,7 +92,7 @@ class Auth
 			# print the auto incremented user's ID
 			# print "User added, got ID : " . $this->db->lastInsertId();
 			$payload = array("is_admin" => false, "userid" => $this->db->lastInsertId());
-			return $response->withRedirect($this->router->pathFor("topics") . "?newuser=1")->withStatus(302);
+			return $response->withRedirect($this->router->pathFor("login") . "?newuser=1")->withStatus(302);
 		}
     }
 
