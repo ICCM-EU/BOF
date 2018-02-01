@@ -28,7 +28,16 @@ $app->add(function($request, $response, $next) {
 
     $cookie = (array)JWT::decode($encodedcookie, $settings['settings']['secrettoken'], array('HS256'));
 
+    $sql_username = 'SELECT name FROM participant WHERE id = :uid';
+    $sth = $this->db->prepare($sql_username);
+    $sth->execute(['uid' => $cookie['userid']]);
+    $username = NULL;
+    $results = $sth->fetchAll();
+    if(count($results) > 0)
+        $username = $results[0];
+
     $container['view']['userid'] = $cookie['userid'];
+    $container['view']['username'] = $username;
     $container['view']['is_admin'] = $cookie['is_admin'];
     $request = $request->withAttribute('userid', $cookie['userid']);
     $request = $request->withAttribute('is_admin', $cookie['is_admin']);
