@@ -20,24 +20,37 @@ use \Psr\Http\Message\ResponseInterface as Response;
  */
 $app->get('/projector', function (Request $request, Response $response, array $args) {
 
-        $sql = 'SELECT workshop.name, SUM(participant) as `votes`
-                FROM workshop_participant
-                JOIN workshop ON workshop_participant.workshop_id = workshop.id
-                GROUP BY workshop_id
-                ORDER BY `votes` DESC';
+	$stage =new ICCM\BOF\Stage($this->db);
+        $stage2 =$stage->getstage();
 
+        $sql = 'SELECT workshop.name, workshop.id, 0 as votes
+                FROM workshop';
         $query=$this->db->prepare($sql);
         $param = array ();
         $query->execute($param);
 	$bofs = array ();
         while ($row=$query->fetch(PDO::FETCH_OBJ)) {
-		$bofs [] = $row;
+		$bofs [$row->id] = $row;
 	}
-	$stage =new ICCM\BOF\Stage($this->db);
-        $stage2 =$stage->getstage();
-        
+        $sql = 'SELECT workshop.id, SUM(participant) as `votes`
+                FROM workshop
+                LEFT JOIN workshop_participant ON workshop_participant.workshop_id = workshop.id
+                GROUP BY workshop_id
+                ORDER BY `votes` DESC';
+        $query=$this->db->prepare($sql);
+        $param = array ();
+        $query->execute($param);
+        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+           $bof[$row->id]->votes = $row->votes;
+        }
+// TODO order
+        $bofs2 = array();
+        foreach ($bofs as $bof) {
+            $bofs2[] = $bof;
+        }
+
         return $this->view->render($response, 'proj_layout.html', [
-                'bofs' => $bofs,
+                'bofs' => $bofs2,
                 'stage' => $stage2,
                 'locked' => $stage2=='locked',
 	]);
