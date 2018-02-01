@@ -12,6 +12,9 @@
 
   <div class="topic__detail">
     <h1>{{ topic.name }}</h1>
+    {% if topic.leader %}
+    <p>Facilitator: {{ topic.leader }}</p>
+    {% endif %}
   </div>
 
   {% if topic.votes > 0 %}
