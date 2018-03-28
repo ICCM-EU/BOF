@@ -1,4 +1,9 @@
 ---
+- name: "Prepare Node.js"
+  shell: curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+
 - name: "Install Apache"
   apt: pkg={{ item }} state=installed
   with_items:
@@ -12,31 +17,38 @@
   - composer
   - php-dom
   - php-mbstring
-
-- name: install python mysql bindings
-  apt:
-    name: python-mysqldb
-    state: installed
-  become: yes
+  - nodejs
 
 - name: "Set up the logs directory"
   file:
-    path: /srv/bof/src/logs
+    path: "{{ web_directory }}/logs"
     state: directory
     mode: "a+w"
 
 - name: stat example settings
-  stat: path=/srv/bof/cfg/settings-example.php
+  stat: path="{{ web_directory }}/cfg/settings-example.php"
   register: example_settings_stat
 
 - name: Config Database connection
-  command: cp /srv/bof/cfg/settings-example.php /srv/bof/cfg/settings.php
+  command: cp "{{ web_directory }}/cfg/settings-example.php" "{{ web_directory }}/cfg/settings.php"
   when: example_settings_stat.stat.exists
 
 - name: "install composer modules"
   composer:
     command: install
-    working_dir: /var/www/bof/src/
+    working_dir: "{{ web_directory }}/src/"
+
+# same as running: npm install
+- name: "install npm modules"
+  npm:
+    path: "{{ web_directory }}"
+    state: latest
+
+# to bundle frontend items properly run:
+- name: "bundle frontend items"
+  shell: node_modules/.bin/gulp deploy
+  args:
+     chdir: "{{ web_directory }}"
 
 - mysql_user:
     name: "{{ mysql_dummy_user }}"
@@ -51,7 +63,17 @@
 
 - name: "Create DB"
   command: mysql -h localhost -u {{ mysql_dummy_user }} -p{{ mysql_dummy_pass }} -e "CREATE DATABASE {{ mysql_dummy_db }}"
-  when: dbstatus.stdout == "0"
+  when: dbstatus.rc == 1
+
+- name: "Load DB structure"
+  shell: |
+    mysql -h localhost -u {{ mysql_dummy_user }} -p{{ mysql_dummy_pass }} {{ mysql_dummy_db }} < "{{ web_directory }}/sql/createtables.sql"
+  when: dbstatus.rc == 1
+
+- name: "Load DB initial data"
+  shell: |
+    mysql -h localhost -u {{ mysql_dummy_user }} -p{{ mysql_dummy_pass }} {{ mysql_dummy_db }} < "{{ web_directory }}/sql/initialdata.sql"
+  when: dbstatus.rc == 1
 
 - name: "apache config"
   file:

@@ -17,26 +17,6 @@
     state: installed
     update_cache: yes
   with_items:
-  - dnsutils
   - git
   - vim
-  - ntp
-  - at
-  - lvm2
-  - build-essential
-  - python2.7
-  - python-pip
-  - python-dev
-  - build-essential
-
-- name: create python symlink
-  file:
-    src: /usr/bin/python2.7
-    dest: /usr/bin/python
-    owner: root
-    group: root
-    state: link
-
-- name: Update Pip
-  command: pip install --upgrade pip
-  become: true
+  - curl

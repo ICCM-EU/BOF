@@ -1,0 +1,7 @@
+---
+- name: "git clone"
+  git:
+    repo: 'https://github.com/ICCM-EU/BOF.git'
+    dest: '{{ web_directory }}'
+    # don't complain if there are local changes
+    update: no
