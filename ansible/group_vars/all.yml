@@ -2,7 +2,7 @@
 locale: en_GB.UTF-8
 timezone: Europe/London
 
-web_directory: /srv/bof
+web_directory: /var/www/bof
 
 deploy_user: deploy
 

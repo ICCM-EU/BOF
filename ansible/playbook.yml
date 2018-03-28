@@ -13,4 +13,5 @@
   roles:
     - general
     - users
+    - bof_git
     - lamp
