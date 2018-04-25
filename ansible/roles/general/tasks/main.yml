@@ -14,9 +14,10 @@
 - name: "Install additional software"
   apt:
     pkg: "{{ item }}"
-    state: installed
+    state: present
     update_cache: yes
   with_items:
   - git
   - vim
   - curl
+  - ca-certificates
