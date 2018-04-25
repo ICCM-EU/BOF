@@ -5,12 +5,13 @@
     creates: /etc/apt/sources.list.d/nodesource.list
 
 - name: "Install Apache"
-  apt: pkg={{ item }} state=installed
+  apt: pkg={{ item }} state=present
   with_items:
   - apache2
   - libapache2-mod-php7.0
   - php
   - php-mysql
+  - python-mysqldb
   - mariadb-server
   - php-zip
   - ca-certificates
