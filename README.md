@@ -28,11 +28,11 @@ chown -R deploy:deploy /home/deploy/.ssh
 chmod 600 /home/deploy/.ssh/authorized_keys
 ```
 
-Then call with your IP address of your test machine:
+Then call with your IP address (and port if other than 22) of your test machine:
 
 ```
-IP_TARGET_MACHINE=192.168.124.235
-ansible-playbook playbook.yml --user=deploy --ask-become-pass --become-method=su -i $IP_TARGET_MACHINE,
+TARGET_MACHINE=192.168.124.235:22
+ansible-playbook playbook.yml --user=deploy --ask-become-pass --become-method=su -i $TARGET_MACHINE,
 ```
 
 # Deployment and build
