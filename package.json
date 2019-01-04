@@ -2,6 +2,7 @@
   "name": "birds-of-a-feather",
   "private": true,
   "dependencies": {
+    "cypress": "^3.1.4",
     "gulp-svg-symbols": "^2.0.2",
     "gulp-svgmin": "^1.2.4"
   },

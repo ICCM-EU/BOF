@@ -2,6 +2,8 @@
 *.retry
 .vagrant/*
 node_modules/*
+cypress/plugins/*
+cypress/support/*
 
 src/public/assets/css/*
 src/public/assets/js/*
