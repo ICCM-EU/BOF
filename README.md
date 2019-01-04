@@ -40,3 +40,30 @@ ansible-playbook playbook.yml --user=deploy --ask-become-pass --become-method=su
 To bundle frontend items properly run:
 
 `node_modules/.bin/gulp deploy`
+
+# Resetting the database
+
+```
+UPDATE participant SET password=PASSWORD('bofadminpwd') WHERE name = 'admin';
+DELETE FROM participant;
+INSERT INTO participant(name, password) VALUES('admin', PASSWORD('bofadminpwd'));
+
+DELETE FROM config;
+INSERT INTO config (item, value) VALUES('nomination_begins', '2018-01-25 13:00:00');
+INSERT INTO config (item, value) VALUES('nomination_ends', '2018-01-28 13:00:00');
+INSERT INTO config (item, value) VALUES('voting_begins', '2018-01-28 13:00:00');
+INSERT INTO config (item, value) VALUES('voting_ends', '2018-01-28 18:00:00');
+
+DELETE FROM workshop;
+DELETE FROM workshop_participant;
+```
+
+# Running the tests with Cypress
+
+```
+cd /var/www/bof
+npm install cypress
+apt-get install xvfb gconf2 libgtk2.0-0 libxtst6 libxss1 libnss3 libasound2
+LANG=en CYPRESS_baseUrl=http://localhost ./node_modules/.bin/cypress run --config video=false --spec 'cypress/integration/nomination.js'
+LANG=en CYPRESS_baseUrl=http://localhost ./node_modules/.bin/cypress run --config video=false --spec 'cypress/integration/voting.js'
+```
