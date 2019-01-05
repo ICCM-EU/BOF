@@ -58,6 +58,26 @@ DELETE FROM workshop;
 DELETE FROM workshop_participant;
 ```
 
+Set dates for testing the nomination:
+
+```
+DELETE FROM config;
+INSERT INTO config (item, value) VALUES('nomination_begins', DATE_ADD(NOW(), INTERVAL -1 DAY));
+INSERT INTO config (item, value) VALUES('nomination_ends', DATE_ADD(NOW(), INTERVAL +1 DAY));
+INSERT INTO config (item, value) VALUES('voting_begins', DATE_ADD(NOW(), INTERVAL +1 DAY));
+INSERT INTO config (item, value) VALUES('voting_ends', DATE_ADD(NOW(), INTERVAL +2 DAY));
+```
+
+Set dates for testing the voting:
+
+```
+DELETE FROM config;
+INSERT INTO config (item, value) VALUES('nomination_begins', DATE_ADD(NOW(), INTERVAL -2 DAY));
+INSERT INTO config (item, value) VALUES('nomination_ends', DATE_ADD(NOW(), INTERVAL -1 DAY));
+INSERT INTO config (item, value) VALUES('voting_begins', DATE_ADD(NOW(), INTERVAL -1 DAY));
+INSERT INTO config (item, value) VALUES('voting_ends', DATE_ADD(NOW(), INTERVAL +1 DAY));
+```
+
 # Running the tests with Cypress
 
 ```
