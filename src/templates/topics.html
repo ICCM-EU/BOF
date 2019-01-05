@@ -6,9 +6,11 @@
 		{% include 'partials/_created_new_user.html' %}
 	{% endif %}
 
+	{% if stage == "voting" %}
 	<div class="notice notice--warning">
 		<h2>{{ left_votes }} full votes left</h2>
 	</div>
+	{% endif %}
 
 	{% if voted_successfull %}
 	<div class="notice notice--success js-slideout" style="display: none;">

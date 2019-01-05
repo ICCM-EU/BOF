@@ -48,6 +48,10 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
     if($userid === NULL)
         return $response->withRedirect($this->router->pathFor('home'), 302);
 
+    $stage =new ICCM\BOF\Stage($this->db);
+    $stage2 =$stage->getstage();
+    if ($stage2 != 'voting')
+       return $response->withRedirect($this->router->pathFor('home'), 302);
 
     // check allowed full-votes (not more than 3)
     $sql_get_totalvotes = 'SELECT COUNT(*) FROM workshop_participant WHERE participant = 1 AND participant_id = :uid';
