@@ -1,9 +1,9 @@
 <ul class="foot-nav">
-<!--
+  {% if (stage == 'nominating') %}
   <li>
     <a href="{{ path_for('nomination')}}">Nominate topic</a>
   </li>
--->
+  {% endif %}
   {% if (is_admin) %}
   <li>
     <a href="{{ path_for('moderation') }}">Moderate topics</a>
