@@ -10,11 +10,12 @@ use \Psr\Http\Message\ResponseInterface as Response;
  * or the possibility to vote for topics
  * in the last stage the list of selected topics will be there and location and time slot
  * 
- * 'stage' can be: 'nominating', 'voting'
+ * 'stage' can be: 'nominating', 'voting', 'finished'
  * System can be locked down with variable 'locked'
  * 
  * voting and nominating stages are configured in the config table by timestamps
- * locked is automatically when out of periods of voting and nominating
+ * finished is when voting is over.
+ * locked is automatically when out of periods of voting and nominating and finished
  * TODO: config item for locked False/True
  * 
  */

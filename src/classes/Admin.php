@@ -63,6 +63,10 @@ class Admin
 		return $this->showAdminView($request, $response, $args);
 	}
 
+	public function calcResult($request, $response, $args) {
+		echo "todo";
+	}
+
 }
 
 ?>

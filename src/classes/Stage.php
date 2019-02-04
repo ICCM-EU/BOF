@@ -30,6 +30,9 @@ class Stage
         if (time() > strtotime($config['voting_begins']) && time() < strtotime($config['voting_ends'])){
             return 'voting';
         }
+        if (time() > strtotime($config['voting_ends'])){
+            return 'finished';
+        }
         
         return 'locked';
 	}
