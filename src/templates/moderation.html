@@ -19,6 +19,8 @@
 				<!--<label for="published" class="bof-form__label">Published</label>
 				<input type="checkbox" id="published" name="published" value="Published" {% if item.published != 0 %} checked {% endif %} class="bof-form__input"/>
 				-->
+				<label for="facilitators" class="bof-form__label">Facilitators</label>
+				<textarea name="facilitators" readonly disabled rows="1" cols="65" id="facilitators_box" class="bof-form__input">{{item.leader}}</textarea><br/>
 				<input type="hidden" id="id" name="id" value="{{item.id}}" /><br/>
 				<input type="submit" value="Save" class="btn btn--primary"/>
 			</div>

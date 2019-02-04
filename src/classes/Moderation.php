@@ -18,7 +18,7 @@ class Moderation
 
 	public function showModerationView($request, $response, $args) {
 		
-		$sql = 'SELECT * FROM `workshop`';
+		$sql = "SELECT *, '' as leader FROM `workshop`";
 		$query=$this->db->prepare($sql);
 		$param = array ();
 		$query->execute($param);
@@ -26,7 +26,22 @@ class Moderation
 		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
 			$bofs [] = $row;
 		}
-		
+
+		$sql = 'SELECT p.`name`, wp.`workshop_id` FROM `workshop_participant` wp, `participant` p WHERE wp.`participant_id` = p.`id` AND wp.`leader` = 1';
+		$query=$this->db->prepare($sql);
+		$param = array ();
+		$query->execute($param);
+		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+			foreach ($bofs as $bof) {
+				if ($bof->id == $row->workshop_id) {
+					if ($bof->leader != "") {
+						$bof->leader .= ' ';
+					}
+					$bof->leader .= $row->name;
+				}
+			}
+		}
+
 		$sql = 'SELECT * FROM `participant` WHERE `name` <> "admin"';
 		$query=$this->db->prepare($sql);
 		$param = array ();
