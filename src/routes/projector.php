@@ -46,6 +46,7 @@ $app->get('/projector', function (Request $request, Response $response, array $a
 
         $sql = 'SELECT participant.name, workshop_id
                 FROM workshop_participant JOIN participant ON workshop_participant.participant_id = participant.id
+                JOIN workshop ON workshop.id = workshop_participant.workshop_id
                 WHERE workshop_participant.leader = 1';
         $query=$this->db->prepare($sql);
         $param = array ();
