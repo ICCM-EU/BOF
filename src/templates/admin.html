@@ -2,6 +2,26 @@
 
 {% block body %}
 <h1>Admin</h1>
-<p>This is the admin page</p>
+
+<div>
+	<form action="{{ path_for( 'admin_config' )}}" method="POST">
+		<div class="bof-form__item2">
+			<label for="nomination_begins" class="bof-form__label">Nomination begins</label>
+			<input type="date" name="nomination_begins" value="{{nomination_begins}}" class="bof-form__input2"/>
+			<input type="time" name="time_nomination_begins" value="{{nomination_begins_time}}"/><br/>
+			<label for="nomination_ends" class="bof-form__label">Nomination ends</label>
+			<input type="date" name="nomination_ends" value="{{nomination_ends}}" class="bof-form__input2"/>
+			<input type="time" name="time_nomination_ends" value="{{nomination_ends_time}}"/><br/>
+			<label for="voting_begins" class="bof-form__label">Voting begins</label>
+			<input type="date" name="voting_begins" value="{{voting_begins}}" class="bof-form__input2"/>
+			<input type="time" name="time_voting_begins" value="{{voting_begins_time}}"/><br/>
+			<label for="voting_ends" class="bof-form__label">Voting ends</label>
+			<input type="date" name="voting_ends" value="{{voting_ends}}" class="bof-form__input2"/>
+			<input type="time" name="time_voting_ends" value="{{voting_ends_time}}"/><br/>
+		</div>
+		<input type="submit" value="Save" class="btn btn--primary"/>
+	</form>
+
+</div>
 
 {% endblock %}
