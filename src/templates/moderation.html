@@ -3,9 +3,13 @@
 {% block body %}
 
 	<h1>Workshops</h1>
-	<table>
+	<div>
 	{% for item in bofs %}           
-		<tr><td>
+		<details>
+		<summary>
+		{{item.name}}
+		</summary>
+		<div>
 		<form action="{{ path_for( 'moderation' )}}" method="POST"  class="bof-form">
 			<div class="bof-form__item">
 				<label for="title" class="bof-form__label">Title</label>
@@ -46,10 +50,8 @@
 			<input type="hidden" id="operation" name="operation" value="merge"/>
 			<input type="submit" value="Merge" class="btn btn--primary"/>
 		</form>
-		<br/>
-		<br/>
-		</td></tr>
-		
-    {% endfor %}
-	</table>
+		</div>
+		</details>
+	{% endfor %}
+	</div>
 {% endblock %}
