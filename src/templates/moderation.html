@@ -16,8 +16,9 @@
 				<input type="text" name="title" value="{{item.name}}" class="bof-form__input"/><br/>
 				<label for="description" class="bof-form__label">Description</label>
 				<textarea name="description" rows="4" cols="65" id="description_box" class="bof-form__input">{{item.description}}</textarea><br/>
-				<label for="published" class="bof-form__label">Published</label>
+				<!--<label for="published" class="bof-form__label">Published</label>
 				<input type="checkbox" id="published" name="published" value="Published" {% if item.published != 0 %} checked {% endif %} class="bof-form__input"/>
+				-->
 				<input type="hidden" id="id" name="id" value="{{item.id}}" /><br/>
 				<input type="submit" value="Save" class="btn btn--primary"/>
 			</div>
