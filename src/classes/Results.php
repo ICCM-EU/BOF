@@ -6,16 +6,20 @@ use \PDO;
 class Results
 {
     private $db;
+    private $view;
+    private $router;
     private $logbuffer;
-    private $debug=1;
+    private $debug=0;
+
+	function __construct($view, $db, $router) {
+		$this->view = $view;
+		$this->db = $db;
+		$this->router = $router;
+	}
 
     function log($msg) {
         if ($this->debug) echo $msg."<br/>\n";
-        $this->logbuffer .= $msg;
-    }
-
-    function __construct($db) {
-        $this->db = $db;
+        $this->logbuffer .= $msg."\n";
     }
 
     public function calculateResults($request, $response, $args) {
@@ -188,12 +192,58 @@ class Results
         $this->log("Processing non-scheduled workshops...done");
         $this->db->commit();
 
+        return $this->exportResult($request, $response, $args);
     }
+
     public function exportResult($request, $response, $args) {
+        $csvout = "";
 
+        $sql = "SELECT w.id id, w.name, w.description,
+                       round.time_period,
+                       location.name as location_name,
+                       votes,
+                       available
+                FROM workshop AS w JOIN round ON round_id = round.id JOIN location ON location_id=location.id
+                WHERE w.round_id is NOT null
+                ORDER BY round.id, location.id";
+        $query = $this->db->prepare($sql);
+        $query->execute();
+
+        while ($row=$query->fetch(PDO::FETCH_OBJ))
+        {
+            $facilitators = "";
+
+            $sql = 'SELECT p.`name`
+                FROM `workshop_participant` wp, `participant` p
+                WHERE wp.`participant_id` = p.`id`
+                AND wp.`leader` = 1
+                AND wp.workshop_id = '.$row->id;
+            $query2=$this->db->prepare($sql);
+            $query2->execute(array());
+            while ($frow=$query2->fetch(PDO::FETCH_OBJ)) {
+                foreach ($frow as $facilitator) {
+                    if ($facilitators != "") {
+                           $facilitators .= ', ';
+                    }
+                    $facilitators .= $frow->name;
+                }
+            }
+
+            $csvout .= $row->location_name.",".
+                        '"'.str_replace('"', "'", strip_tags($row->name)).'",'.
+                        '"'.$facilitators.'",'.
+                        '"'.str_replace('"', "'", strip_tags($row->description)).'",'.
+                        $row->votes.",".
+                        $row->available."\n";
+        }
+
+        $config['loggedin'] = true;
+        $stage =new Stage($this->db);
+        $config['stage'] = $stage->getstage();
+        $config['csvdata'] = $csvout;
+        $config['log'] = $this->logbuffer;
+        return $this->view->render($response, 'results.html', $config);
     }
-
-
 }
 
 ?>

@@ -64,8 +64,8 @@ class Admin
 	}
 
 	public function calcResult($request, $response, $args) {
-		$results = new Results($this->db);
-		$results->calculateResults();
+		$results = new Results($this->view, $this->db, $this->router);
+		return $results->calculateResults($request, $response, $args);
 	}
 
 }
