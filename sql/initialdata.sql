@@ -11,3 +11,4 @@ insert into config(id, item, value) values(1, 'nomination_begins', '2018-01-25 1
 insert into config(id, item, value) values(2, 'nomination_ends', '2018-01-28 13:00:00');
 insert into config(id, item, value) values(3, 'voting_begins', '2018-01-28 13:00:00');
 insert into config(id, item, value) values(4, 'voting_ends', '2018-01-28 18:00:00');
+insert into workshop(id, name, description) values(0, 'Prep Team', 'This is where the Prep Team meets to review this conference and discuss ideas for the next years conference. Everyone is welcome to join!');

@@ -115,6 +115,29 @@ class Results
             $count += 1;
         }
 
+        // now reserve the prep team BOF, id 0, room B
+        $sql="SELECT name
+                FROM workshop
+                WHERE id=0";
+        $qry_top3 = $this->db->prepare($sql);
+        $qry_top3->execute();
+
+        $count=0;
+        if ($row=$qry_top3->fetch(PDO::FETCH_OBJ)) {
+            $sql2="UPDATE workshop
+                      SET round_id = 2,
+                          location_id = 1,
+                          available=(SELECT COUNT(ID)
+                                       FROM workshop_participant 
+                                      WHERE workshop.id=workshop_participant.workshop_id
+                                        AND participant>0)
+                    WHERE id = 0";
+
+            $this->log("Putting workshop '{$row->name}' in round '{$round_names[2]}' at location '{$location_names[1]}'. Reason: Prep Team");
+            $updatequery = $this->db->prepare($sql2);
+            $updatequery->execute(array());
+        }
+
         //loop through remaining possible slots
         for ($i=$rounds+1 ; $i <= $rounds * $locations ; $i++) {
 
@@ -144,8 +167,10 @@ class Results
                                               FROM workshop_participant
                                               JOIN workshop ON workshop.id=workshop_participant.workshop_id
                                              WHERE workshop.round_id=roundsTable.round_id
-                                               AND workshop_participant.participant=1)
-                           ) AS available,
+                                               AND (workshop_participant.participant=1 or
+                                                    -- special treatment of workshop 0. prep team
+                                                    (workshop_participant.workshop_id=0 and workshop_participant.participant > 0))
+                           )) AS available,
                            (SELECT count(*) 
                               FROM workshop_participant
                              WHERE workshop_id = s.id
@@ -189,7 +214,6 @@ class Results
             }
         }
 
-        $this->log("Processing non-scheduled workshops...done");
         $this->db->commit();
 
         return $this->exportResult($request, $response, $args);
