@@ -6,34 +6,69 @@ use \PDO;
 class Results
 {
     private $db;
+    private $logbuffer;
+    private $debug=1;
+
+    function log($msg) {
+        if ($this->debug) echo $msg."<br/>\n";
+        $this->logbuffer .= $msg;
+    }
 
     function __construct($db) {
         $this->db = $db;
     }
 
     public function calculateResults($request, $response, $args) {
+        $this->logbuffer = '';
+        $this->db->beginTransaction();
 
-        $log = '';
-        //$this->db->beginTransaction();
+        $sql="SELECT COUNT(*) FROM round";
+        $query=$this->db->prepare($sql);
+        $query->execute();
+        $rounds=$query->fetchColumn();
+
+        $sql="SELECT COUNT(*) FROM location";
+        $query=$this->db->prepare($sql);
+        $query->execute();
+        $locations=$query->fetchColumn();
+
+        // validate that we have consecutive location ids starting with 0
+        $sql="SELECT id FROM location WHERE id >= ".$locations;
+        $query=$this->db->prepare($sql);
+        $query->execute();
+        if ($row=$query->fetch(PDO::FETCH_OBJ)) {
+            die("locations must have consecutive ids starting with 0");
+        }
+
+        // validate that we have consecutive round ids starting with 0
+        $sql="SELECT id FROM round WHERE id >= ".$rounds;
+        $query=$this->db->prepare($sql);
+        $query->execute();
+        if ($row=$query->fetch(PDO::FETCH_OBJ)) {
+            die("rounds must have consecutive ids starting with 0");
+        }
 
         // translate location id to a real name (for logging purposes)
         $sql="SELECT id, name FROM location";
         $query=$this->db->prepare($sql);
         $query->execute();
-       
+
+        $count = 0;
         while ($row=$query->fetch(PDO::FETCH_OBJ)) {
             $location_names[$row->id]=$row->name;
+            $count++;
         }
 
-	$sql="SELECT COUNT(*) FROM round";
+        // translate round id to a real name (for logging purposes)
+        $sql="SELECT id, time_period FROM round";
         $query=$this->db->prepare($sql);
         $query->execute();
-        $rounds=$query->fetchColumn();
 
-        $sql="SELECT COUNT(*)  FROM location";
-        $query=$this->db->prepare($sql);
-        $query->execute();
-        $locations=$query->fetchColumn();
+        $count = 0;
+        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+            $round_names[$row->id] = $row->time_period;
+            $count++;
+        }
 
         //calculate # votes
         $sql="UPDATE workshop
@@ -49,29 +84,29 @@ class Results
         //place top in each round
         $sql="SELECT id,name, votes
                 FROM workshop
-               WHERE published=1
+               -- WHERE published=1
                ORDER BY votes desc
                LIMIT :rounds";
         $qry_top3 = $this->db->prepare($sql);
         $qry_top3->bindValue(':rounds', (int) $rounds, PDO::PARAM_INT);
         $qry_top3->execute();
 
-        $count=1;
+        $count=0;
         while ($row=$qry_top3->fetch(PDO::FETCH_OBJ))
         {
             $sql2="UPDATE workshop
-                      SET round_id = :count,
-                          location_id=1,
+                      SET round_id = ?,
+                          location_id = 0,
                           available=(SELECT COUNT(ID)
                                        FROM workshop_participant 
                                       WHERE workshop.id=workshop_participant.workshop_id
                                         AND participant=1)
-                    WHERE id= :id";
+                    WHERE id = ?";
 
-            $log.="Putting workshop '{$row->name}' in round '$count' at location '{$location_names[1]}'. Reason: {$row->votes} votes\n";
-
+            $this->log("Putting workshop '{$row->name}' in round '{$round_names[$count]}' at location '{$location_names[0]}'. Reason: {$row->votes} votes");
             $updatequery = $this->db->prepare($sql2);
-            $updatequery->execute($sql2, ['count'=>$count, 'id'=> $row->id]);
+            $params = array($count, $row->id);
+            $updatequery->execute($params);
 
             $count += 1;
         }
@@ -83,7 +118,7 @@ class Results
             $sql="SELECT max(votes) as maxvote
                     FROM workshop 
                    WHERE round_id IS NULL 
-                     AND published=1";
+                     -- AND published=1";
             $query = $this->db->prepare($sql);
             $query->execute();
             if (!($maxvote = $query->fetchColumn())) {
@@ -93,7 +128,7 @@ class Results
 
             //find next bof to book
             $sql = "SELECT s.id id,s.name,
-                           roundsTable.round_id round, 
+                           roundsTable.round_id round,
                            roundsTable.last_location last_location,
                            available,  
                            (SELECT count(*) 
@@ -123,41 +158,35 @@ class Results
                                FROM workshop
                                WHERE round_id IS NOT NULL
                                GROUP BY round_id) AS roundsTable 
-                         ON roundsTable.last_location < :locations
+                         ON roundsTable.last_location < ?
                     WHERE s.round_id is null
-                      AND published=1
-                      AND s.votes = :maxVote
+                      -- AND published=1
+                      AND s.votes = ?
                     ORDER BY available DESC, facilitators DESC, round ASC
                     LIMIT 0,1";
             $query = $this->db->prepare($sql);
-            $query->execute(['maxVote'=>$maxvote, 'locations'=>$locations]);
-echo "before whil";
+            $params = array($locations-1, $maxvote);
+            $query->execute($params);
+
             while ($row=$query->fetch(PDO::FETCH_OBJ))
             {
-print_r($row);
                 $sql2="UPDATE workshop
-                              SET round_id = :round,
-                                  location_id = :location,
-                                  available = :avail
-                            WHERE id=:id";
+                              SET round_id = ?,
+                                  location_id = ?,
+                                  available = ?
+                            WHERE id=?";
 
                 $updatequery = $this->db->prepare($sql2);
-                $updatequery->execute([
-                    'round'=>$row->round,
-                    'location'=>$row->last_location + 1,
-                    'avail'=>$row->available,
-                    'id'=>$row->id]);
+                $params = array($row->round, $row->last_location + 1, $row->available, $row->id);
+                $updatequery->execute($params);
 
-                echo "Putting workshop '{$row->name}' in round '{$row->round}' at location '" . $location_names[$row->last_location+1] . "'. Reason: Vote count = {$row->available}, {$row->facilitators} facilitators\n";
-                $log.= "Putting workshop '{$row->name}' in round '{$row->round}' at location '" . $location_names[$row->last_location+1] . "'. Reason: Vote count = {$row->available}, {$row->facilitators} facilitators\n";
+                $this->log("Putting workshop '{$row->name}' in round '{$round_names[$row->round]}' at location '" . $location_names[$row->last_location+1] . "'. Reason: Vote count = {$row->available}, {$row->facilitators} facilitators");
 
             }
         }
 
-
-        $log.="Processing non-scheduled workshops...done";
-echo $log;
-    //    $this->db->commit();
+        $this->log("Processing non-scheduled workshops...done");
+        $this->db->commit();
 
     }
     public function exportResult($request, $response, $args) {

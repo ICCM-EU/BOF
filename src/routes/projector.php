@@ -71,7 +71,12 @@ $app->get('/projector', function (Request $request, Response $response, array $a
             return 0;
         }
 
-        if ($stage2 == "voting") {
+        if ($stage2 == "voting" || $stage2 == "locked") {
+            usort($bofs2, "cmp");
+        }
+
+        // TODO what to do in stage finished? display the final result???
+        if ($stage2 == "finished") {
             usort($bofs2, "cmp");
         }
 
@@ -79,7 +84,7 @@ $app->get('/projector', function (Request $request, Response $response, array $a
                 'bofs' => $bofs2,
                 'stage' => $stage2,
                 'locked' => $stage2=='locked',
-	]);
+        ]);
 })->setName('projector');
 
 ?>

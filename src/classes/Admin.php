@@ -64,7 +64,8 @@ class Admin
 	}
 
 	public function calcResult($request, $response, $args) {
-		echo "todo";
+		$results = new Results($this->db);
+		$results->calculateResults();
 	}
 
 }
