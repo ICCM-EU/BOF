@@ -6,45 +6,60 @@ use \PDO;
 
 class Moderation
 {
-    private $view;
-    private $db;
-    private $router;
+	private $view;
+	private $db;
+	private $router;
 
-    function __construct($view, $db, $router) {
-        $this->view = $view;
-        $this->db = $db;
-        $this->router = $router;
-    }
+	function __construct($view, $db, $router) {
+		$this->view = $view;
+		$this->db = $db;
+		$this->router = $router;
+	}
 
 	public function showModerationView($request, $response, $args) {
 		
-		$sql = 'SELECT * FROM `workshop`';
-        $query=$this->db->prepare($sql);
-        $param = array ();
-        $query->execute($param);
+		$sql = "SELECT *, '' as leader FROM `workshop`";
+		$query=$this->db->prepare($sql);
+		$param = array ();
+		$query->execute($param);
 		$bofs = array ();
-        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
 			$bofs [] = $row;
 		}
-		
+
+		$sql = 'SELECT p.`name`, wp.`workshop_id` FROM `workshop_participant` wp, `participant` p WHERE wp.`participant_id` = p.`id` AND wp.`leader` = 1';
+		$query=$this->db->prepare($sql);
+		$param = array ();
+		$query->execute($param);
+		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+			foreach ($bofs as $bof) {
+				if ($bof->id == $row->workshop_id) {
+					if ($bof->leader != "") {
+						$bof->leader .= ' ';
+					}
+					$bof->leader .= $row->name;
+				}
+			}
+		}
+
 		$sql = 'SELECT * FROM `participant` WHERE `name` <> "admin"';
-        $query=$this->db->prepare($sql);
-        $param = array ();
-        $query->execute($param);
+		$query=$this->db->prepare($sql);
+		$param = array ();
+		$query->execute($param);
 		$participants = array ();
-        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
 			$participants [] = $row;
 		}		
 		
-        return $this->view->render($response, 'moderation.html',[
+		return $this->view->render($response, 'moderation.html',[
 			'bofs' => $bofs,
 			'participants' => $participants
 			]);		
-    }
+	}
 
 	public function moderate($request, $response, $args) {
-        $data = $request->getParsedBody();
-        $operation = $data['operation'];
+		$data = $request->getParsedBody();
+		$operation = $data['operation'];
 		
 		if ($operation == "delete") {
 			return $this->moderateDelete($request, $response, $args);
@@ -58,12 +73,12 @@ class Moderation
 		else {
 			return $this->moderateUpdate($request, $response, $args);
 		}
-   }
+	}
 	
-    public function moderateUpdate($request, $response, $args) {
-        $data = $request->getParsedBody();
-        $title = $data['title'];
-        $description = $data['description'];
+	public function moderateUpdate($request, $response, $args) {
+		$data = $request->getParsedBody();
+		$title = $data['title'];
+		$description = $data['description'];
 		$id = $data['id'];
 		if (empty($data['published'])) {
 			$published = 0;
@@ -71,7 +86,7 @@ class Moderation
 		else {
 			$published = 1;
 		}
-        $sql = 'UPDATE `workshop`
+		$sql = 'UPDATE `workshop`
 				SET `name` = ?, `description` = ?, `published` = ?
 				WHERE `id` = ?';
 		
@@ -81,14 +96,14 @@ class Moderation
 		$query->execute($param);
 		
 		return $this->showModerationView($request, $response, $args);
-    }
-    public function moderateAddFacilitator($request, $response, $args) {
-        $data = $request->getParsedBody();
+	}
+	public function moderateAddFacilitator($request, $response, $args) {
+		$data = $request->getParsedBody();
 		$facilitator = $data['facilitator'];
 		$id = $data['id'];
 		
 	
-        $sql = 'INSERT INTO `workshop_participant` (`workshop_id`,`participant_id`,`leader`) 
+		$sql = 'INSERT INTO `workshop_participant` (`workshop_id`,`participant_id`,`leader`) 
 				VALUES (?,?,1)
 				ON DUPLICATE KEY UPDATE `leader` = 1';
 				
@@ -99,29 +114,29 @@ class Moderation
 		$query->execute($param);
 		
 		return $this->showModerationView($request, $response, $args);
-    }
+	}
 	
 	public function moderateMerge($request, $response, $args) {
-        $data = $request->getParsedBody();
+		$data = $request->getParsedBody();
 		$id = $data['id'];
 		$mergeWithId = $data['mergeWithWorkshop'];		
 		
 		// Get current row
 		$sql = 'SELECT * FROM `workshop` WHERE `id` = ?';
-        $query=$this->db->prepare($sql);
-        $param = array ($id);
-        $query->execute($param);
-        $row = $query->fetch(PDO::FETCH_ASSOC);
+		$query=$this->db->prepare($sql);
+		$param = array ($id);
+		$query->execute($param);
+		$row = $query->fetch(PDO::FETCH_ASSOC);
 		
 		$origName = $row['name'];
 		$origDescription = $row['description'];
 		
 		// Get selected row
 		$sql = 'SELECT * FROM `workshop` WHERE `id` = ?';
-        $query=$this->db->prepare($sql);
-        $param = array ($mergeWithId);
-        $query->execute($param);
-        $row = $query->fetch(PDO::FETCH_ASSOC);
+		$query=$this->db->prepare($sql);
+		$param = array ($mergeWithId);
+		$query->execute($param);
+		$row = $query->fetch(PDO::FETCH_ASSOC);
 		
 		$secondName = $row['name'];
 		$secondDescription = $row['description'];
@@ -131,7 +146,7 @@ class Moderation
 		$mergeName = $origName . " and " . $secondName;
 		$mergeDescription = $origDescription . " and " . $secondDescription;
 		
-        $sql = 'UPDATE `workshop`
+		$sql = 'UPDATE `workshop`
 				SET `name` = ?, `description` = ?
 				WHERE `id` = ?';
 
@@ -142,7 +157,7 @@ class Moderation
 		
 		// Delete selected row
 		
-        $sql = 'DELETE FROM `workshop`
+		$sql = 'DELETE FROM `workshop`
 				WHERE `id` = ?';
 		
 		$query=$this->db->prepare($sql);
@@ -151,13 +166,13 @@ class Moderation
 		$query->execute($param);
 
 		return $this->showModerationView($request, $response, $args);
-    }
+	}
 
 	public function moderateDelete($request, $response, $args) {
-        $data = $request->getParsedBody();
+		$data = $request->getParsedBody();
 		$id = $data['id'];
 		
-        $sql = 'DELETE FROM `workshop`
+		$sql = 'DELETE FROM `workshop`
 				WHERE `id` = ?';
 		
 		$query=$this->db->prepare($sql);
@@ -166,7 +181,7 @@ class Moderation
 		$query->execute($param);
 		
 		return $this->showModerationView($request, $response, $args);
-    }
+	}
 
 
 }

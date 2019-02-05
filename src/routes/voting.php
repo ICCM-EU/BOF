@@ -53,6 +53,11 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
     if ($stage2 != 'voting')
        return $response->withRedirect($this->router->pathFor('home'), 302);
 
+    // turn full votes for Prep BOF into quarter votes. we don't want to waste your full vote!
+    if ($data['workshopid'] == 0) {
+        $data['vote'] = 0.25;
+    }
+
     // check allowed full-votes (not more than 3)
     $sql_get_totalvotes = 'SELECT COUNT(*) FROM workshop_participant WHERE participant = 1 AND participant_id = :uid';
     $sth = $this->db->prepare($sql_get_totalvotes);

@@ -10,11 +10,12 @@ use \Psr\Http\Message\ResponseInterface as Response;
  * or the possibility to vote for topics
  * in the last stage the list of selected topics will be there and location and time slot
  * 
- * 'stage' can be: 'nominating', 'voting'
+ * 'stage' can be: 'nominating', 'voting', 'finished'
  * System can be locked down with variable 'locked'
  * 
  * voting and nominating stages are configured in the config table by timestamps
- * locked is automatically when out of periods of voting and nominating
+ * finished is when voting is over.
+ * locked is automatically when out of periods of voting and nominating and finished
  * TODO: config item for locked False/True
  * 
  */
@@ -46,6 +47,7 @@ $app->get('/projector', function (Request $request, Response $response, array $a
 
         $sql = 'SELECT participant.name, workshop_id
                 FROM workshop_participant JOIN participant ON workshop_participant.participant_id = participant.id
+                JOIN workshop ON workshop.id = workshop_participant.workshop_id
                 WHERE workshop_participant.leader = 1';
         $query=$this->db->prepare($sql);
         $param = array ();
@@ -69,7 +71,12 @@ $app->get('/projector', function (Request $request, Response $response, array $a
             return 0;
         }
 
-        if ($stage2 == "voting") {
+        if ($stage2 == "voting" || $stage2 == "locked") {
+            usort($bofs2, "cmp");
+        }
+
+        // TODO what to do in stage finished? display the final result???
+        if ($stage2 == "finished") {
             usort($bofs2, "cmp");
         }
 
@@ -77,7 +84,7 @@ $app->get('/projector', function (Request $request, Response $response, array $a
                 'bofs' => $bofs2,
                 'stage' => $stage2,
                 'locked' => $stage2=='locked',
-	]);
+        ]);
 })->setName('projector');
 
 ?>

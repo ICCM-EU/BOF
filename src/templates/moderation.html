@@ -3,17 +3,24 @@
 {% block body %}
 
 	<h1>Workshops</h1>
-	<table>
+	<div>
 	{% for item in bofs %}           
-		<tr><td>
+		<details>
+		<summary>
+		{{item.name}}
+		</summary>
+		<div>
 		<form action="{{ path_for( 'moderation' )}}" method="POST"  class="bof-form">
 			<div class="bof-form__item">
 				<label for="title" class="bof-form__label">Title</label>
 				<input type="text" name="title" value="{{item.name}}" class="bof-form__input"/><br/>
 				<label for="description" class="bof-form__label">Description</label>
 				<textarea name="description" rows="4" cols="65" id="description_box" class="bof-form__input">{{item.description}}</textarea><br/>
-				<label for="published" class="bof-form__label">Published</label>
+				<!--<label for="published" class="bof-form__label">Published</label>
 				<input type="checkbox" id="published" name="published" value="Published" {% if item.published != 0 %} checked {% endif %} class="bof-form__input"/>
+				-->
+				<label for="facilitators" class="bof-form__label">Facilitators</label>
+				<textarea name="facilitators" readonly disabled rows="1" cols="65" id="facilitators_box" class="bof-form__input">{{item.leader}}</textarea><br/>
 				<input type="hidden" id="id" name="id" value="{{item.id}}" /><br/>
 				<input type="submit" value="Save" class="btn btn--primary"/>
 			</div>
@@ -46,10 +53,8 @@
 			<input type="hidden" id="operation" name="operation" value="merge"/>
 			<input type="submit" value="Merge" class="btn btn--primary"/>
 		</form>
-		<br/>
-		<br/>
-		</td></tr>
-		
-    {% endfor %}
-	</table>
+		</div>
+		</details>
+	{% endfor %}
+	</div>
 {% endblock %}

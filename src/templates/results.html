@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1>Result in CSV format</h1>
+
+<div>
+	<textarea cols="120" rows="15">{{csvdata}}</textarea>
+</div>
+
+<h1>log</h1>
+<div>
+	<textarea cols="120" rows="15">{{log}}</textarea>
+</div>
+
+{% endblock %}
