@@ -3,6 +3,9 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
+$settings = require __DIR__.'/../../cfg/settings.php';
+$PrepBofId = $settings['settings']['PrepBofId'];
+
 $app->get('/votes/list', function (Request $request, Response $response, array $args) {
     $sql_get_votes = '
       SELECT participant.id AS participant_id, participant.name AS participant,
@@ -35,6 +38,7 @@ $app->get('/votes/add', function (Request $request, Response $response, array $a
 })->setName("votesaddget");
 
 $app->post('/votes/add', function (Request $request, Response $response, array $args) {
+    global $PrepBofId;
     $data = $request->getParsedBody();
 
     $setting_leader = 1;
@@ -54,7 +58,7 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
        return $response->withRedirect($this->router->pathFor('home'), 302);
 
     // turn full votes for Prep BOF into quarter votes. we don't want to waste your full vote!
-    if ($data['workshopid'] == 0) {
+    if ($data['workshopid'] == $PrepBofId) {
         $data['vote'] = 0.25;
     }
 

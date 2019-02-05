@@ -10,12 +10,16 @@ class Results
     private $router;
     private $logbuffer;
     private $debug=0;
+    private $PrepBofId = 1;
 
-	function __construct($view, $db, $router) {
-		$this->view = $view;
-		$this->db = $db;
-		$this->router = $router;
-	}
+    function __construct($view, $db, $router) {
+        $this->view = $view;
+        $this->db = $db;
+        $this->router = $router;
+
+        $settings = require __DIR__.'/../../cfg/settings.php';
+        $this->PrepBofId = $settings['settings']['PrepBofId'];
+    }
 
     function log($msg) {
         if ($this->debug) echo $msg."<br/>\n";
@@ -115,10 +119,10 @@ class Results
             $count += 1;
         }
 
-        // now reserve the prep team BOF, id 0, room B
+        // now reserve the prep team BOF, id 1, room B
         $sql="SELECT name
                 FROM workshop
-                WHERE id=0";
+                WHERE id = ".$this->PrepBofId;
         $qry_top3 = $this->db->prepare($sql);
         $qry_top3->execute();
 
@@ -131,7 +135,7 @@ class Results
                                        FROM workshop_participant 
                                       WHERE workshop.id=workshop_participant.workshop_id
                                         AND participant>0)
-                    WHERE id = 0";
+                    WHERE id = ".$this->PrepBofId;
 
             $this->log("Putting workshop '{$row->name}' in round '{$round_names[2]}' at location '{$location_names[1]}'. Reason: Prep Team");
             $updatequery = $this->db->prepare($sql2);
@@ -169,7 +173,7 @@ class Results
                                              WHERE workshop.round_id=roundsTable.round_id
                                                AND (workshop_participant.participant=1 or
                                                     -- special treatment of workshop 0. prep team
-                                                    (workshop_participant.workshop_id=0 and workshop_participant.participant > 0))
+                                                    (workshop_participant.workshop_id = ".$this->PrepBofId." and workshop_participant.participant > 0))
                            )) AS available,
                            (SELECT count(*) 
                               FROM workshop_participant
