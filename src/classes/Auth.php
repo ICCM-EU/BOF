@@ -99,7 +99,8 @@ class Auth
 		
     public function logout($request, $response, $args) {
         setcookie("authtoken", "", time()-3600);
-        return $this->view->render($response, 'home.html');
+        $config['show_githubforkme'] = true;
+        return $this->view->render($response, 'home.html', $config);
     }
 }
 
