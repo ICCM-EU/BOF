@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="/assets/css/main.css">
     </head>
     <body>
+        {% if show_githubforkme == true %}
         <script type="text/javascript">
         (function(){
             var mlink=document.createElement('a');
@@ -19,6 +20,7 @@
             document.body.insertBefore(mlink, document.body.childNodes[0]);
         })();
         </script>
+        {% endif %}
 
         <div class="container">
             {% block body %}{% endblock %}
