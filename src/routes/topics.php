@@ -59,12 +59,28 @@ $app->get('/topics', function (Request $request, Response $response, array $args
     foreach($votes as $vote) {
         $fullvotesleft -= float_eq($vote['participant'], 1) ? 1 : 0;
         foreach($bofs as &$bof) {
-            if($vote['workshop_id'] === $bof['id'] && float_eq($vote['participant'], 1.0))
+            if($vote['workshop_id'] === $bof['id'] && float_eq($vote['participant'], 1.0)) {
                 $bof['fullvote'] = True;
-            if($vote['workshop_id'] === $bof['id'] && float_eq($vote['participant'], 0.25))
+                $bof['vote'] = 1.0;
+            }
+            if($vote['workshop_id'] === $bof['id'] && float_eq($vote['participant'], 0.25)) {
                 $bof['quartervote'] = True;
+                $bof['vote'] = 0.25;
+            }
         }
     }
+
+    function cmp($a, $b)
+    {
+        if ($a['vote'] > $b['vote']) return -1;
+        if ($a['vote'] < $b['vote']) return 1;
+        if ($a['id'] < $b['id']) return -1;
+        if ($a['id'] > $b['id']) return 1;
+        return 0;
+    }
+
+    usort($bofs, "cmp");
+
     $stage =new ICCM\BOF\Stage($this->db);
     $stage2 =$stage->getstage();
     $params = $request->getQueryParams();
