@@ -5,7 +5,7 @@ use \Firebase\JWT\JWT;
 $app->add(new \Slim\Middleware\JwtAuthentication([
     "secure" => false, // we know we are using https behind a proxy
     "cookie" => "authtoken",
-    "path" => [ "/admin", "/vote", "/nominate"],
+    "path" => [ "/admin", "/vote", "/nomination", "/topics"],
     #"passthrough" => ["/home", "/login", "/authenticate"],
     "secret" => $settings['settings']['secrettoken'],
     "error" => function ($request, $response, $arguments) {
