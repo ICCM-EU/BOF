@@ -17,7 +17,9 @@ class Moderation
 	}
 
 	public function showModerationView($request, $response, $args) {
-		
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$sql = "SELECT *, '' as leader FROM `workshop`";
 		$query=$this->db->prepare($sql);
 		$param = array ();
@@ -49,15 +51,18 @@ class Moderation
 		$participants = array ();
 		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
 			$participants [] = $row;
-		}		
-		
+		}
+
 		return $this->view->render($response, 'moderation.html',[
 			'bofs' => $bofs,
 			'participants' => $participants
-			]);		
+			]);
 	}
 
 	public function moderate($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$data = $request->getParsedBody();
 		$operation = $data['operation'];
 		
@@ -76,6 +81,9 @@ class Moderation
 	}
 	
 	public function moderateUpdate($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$data = $request->getParsedBody();
 		$title = $data['title'];
 		$description = $data['description'];
@@ -98,6 +106,9 @@ class Moderation
 		return $this->showModerationView($request, $response, $args);
 	}
 	public function moderateAddFacilitator($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$data = $request->getParsedBody();
 		$facilitator = $data['facilitator'];
 		$id = $data['id'];
@@ -117,6 +128,9 @@ class Moderation
 	}
 	
 	public function moderateMerge($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$data = $request->getParsedBody();
 		$id = $data['id'];
 		$mergeWithId = $data['mergeWithWorkshop'];		
@@ -169,6 +183,9 @@ class Moderation
 	}
 
 	public function moderateDelete($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$data = $request->getParsedBody();
 		$id = $data['id'];
 		

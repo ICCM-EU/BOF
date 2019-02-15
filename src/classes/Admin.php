@@ -17,7 +17,9 @@ class Admin
 	}
 
 	public function showAdminView($request, $response, $args) {
-		
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$sql = "SELECT * FROM `config`";
 		$query=$this->db->prepare($sql);
 		$param = array ();
@@ -34,6 +36,9 @@ class Admin
 	}
 
 	public function update_config($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$data = $request->getParsedBody();
 
 		$sql = "UPDATE `config` SET value=? WHERE item = 'nomination_begins'";
@@ -64,6 +69,9 @@ class Admin
 	}
 
 	public function calcResult($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$results = new Results($this->view, $this->db, $this->router);
 		return $results->calculateResults($request, $response, $args);
 	}
