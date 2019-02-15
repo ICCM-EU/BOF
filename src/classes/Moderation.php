@@ -17,7 +17,9 @@ class Moderation
 	}
 
 	public function showModerationView($request, $response, $args) {
-		
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$sql = "SELECT *, '' as leader FROM `workshop`";
 		$query=$this->db->prepare($sql);
 		$param = array ();
@@ -27,17 +29,37 @@ class Moderation
 			$bofs [] = $row;
 		}
 
-		$sql = 'SELECT p.`name`, wp.`workshop_id` FROM `workshop_participant` wp, `participant` p WHERE wp.`participant_id` = p.`id` AND wp.`leader` = 1';
+		$sql = 'SELECT p.`name`, wp.`workshop_id`, wp.`leader`, wp.`participant` FROM `workshop_participant` wp, `participant` p WHERE wp.`participant_id` = p.`id`';
 		$query=$this->db->prepare($sql);
 		$param = array ();
 		$query->execute($param);
 		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
 			foreach ($bofs as $bof) {
 				if ($bof->id == $row->workshop_id) {
-					if ($bof->leader != "") {
-						$bof->leader .= ' ';
+					if ($row->participant == 1) {
+						if ($bof->fullvoters != "") {
+							$bof->fullvoters .= ', ';
+						}
+						$bof->fullvoters .= $row->name;
 					}
-					$bof->leader .= $row->name;
+					if ($row->leader == 1) {
+						if ($bof->leader != "") {
+							$bof->leader .= ', ';
+						}
+						$bof->leader .= $row->name;
+					}
+				}
+			}
+		}
+
+		$sql = 'SELECT p.`name`, w.`id` as workshop_id FROM `workshop` w, `participant` p WHERE w.`creator_id` = p.`id`';
+		$query=$this->db->prepare($sql);
+		$param = array ();
+		$query->execute($param);
+		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+			foreach ($bofs as $bof) {
+				if ($bof->id == $row->workshop_id) {
+						$bof->createdby = $row->name;
 				}
 			}
 		}
@@ -49,15 +71,18 @@ class Moderation
 		$participants = array ();
 		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
 			$participants [] = $row;
-		}		
-		
+		}
+
 		return $this->view->render($response, 'moderation.html',[
 			'bofs' => $bofs,
 			'participants' => $participants
-			]);		
+			]);
 	}
 
 	public function moderate($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$data = $request->getParsedBody();
 		$operation = $data['operation'];
 		
@@ -76,6 +101,9 @@ class Moderation
 	}
 	
 	public function moderateUpdate($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$data = $request->getParsedBody();
 		$title = $data['title'];
 		$description = $data['description'];
@@ -98,6 +126,9 @@ class Moderation
 		return $this->showModerationView($request, $response, $args);
 	}
 	public function moderateAddFacilitator($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$data = $request->getParsedBody();
 		$facilitator = $data['facilitator'];
 		$id = $data['id'];
@@ -117,6 +148,9 @@ class Moderation
 	}
 	
 	public function moderateMerge($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$data = $request->getParsedBody();
 		$id = $data['id'];
 		$mergeWithId = $data['mergeWithWorkshop'];		
@@ -169,6 +203,9 @@ class Moderation
 	}
 
 	public function moderateDelete($request, $response, $args) {
+		$is_admin = $request->getAttribute('is_admin');
+		if (!$is_admin) die("you don't have permissions for this page");
+
 		$data = $request->getParsedBody();
 		$id = $data['id'];
 		
