@@ -171,6 +171,7 @@ DROP TABLE IF EXISTS `workshop`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `workshop` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `creator_id` int(10) unsigned DEFAULT NULL,
   `round_id` int(10) unsigned DEFAULT NULL,
   `location_id` int(10) unsigned DEFAULT NULL,
   `name` varchar(255) COLLATE latin1_general_ci NOT NULL,

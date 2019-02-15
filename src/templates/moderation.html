@@ -29,7 +29,9 @@
 			<input type="hidden" id="operation" name="operation" value="delete"/>
 			<input type="submit" value="Delete" class="btn btn--primary"/>
 		</form>
-		
+
+		<div class="potentialfacilitators">Workshop suggested by: {{item.createdby}}<br/>
+			People that gave a full vote: {{item.fullvoters}}</div>
 		<form action="{{ path_for( 'moderation' )}}" method="POST" class="bof-form">
 			<input type="hidden" id="id" name="id" value="{{item.id}}"/><br/>
 			<input type="hidden" id="operation" name="operation" value="addFacilitator"/>
