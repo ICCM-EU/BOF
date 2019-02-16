@@ -3,6 +3,12 @@ Birds of a feather flock together: this is a software that can be used for propo
 
 You can try a demo at https://bof.demo.solidcharity.com, with user `admin` and password `secret`. It is being reset each night automatically.
 
+For more details about the Slim framework and other technical details, see the wiki: https://github.com/ICCM-EU/BOF/wiki
+
+Please report issues at https://github.com/ICCM-EU/BOF/issues.
+
+Pull requests are very much welcome!
+
 # Installation
 
 ## Via Vagrant… (with Ansible in the background)
