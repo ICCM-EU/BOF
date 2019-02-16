@@ -16,6 +16,9 @@ require __DIR__.'/../classes/Results.php';
 // Register middleware
 require __DIR__ . '/../middleware.php';
 
+// Register translation
+require __DIR__ . '/../i18n.php';
+
 // Register routes
 require __DIR__ . '/../routes/home.php';
 require __DIR__ . '/../routes/auth.php';

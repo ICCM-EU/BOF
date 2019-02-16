@@ -1,18 +1,18 @@
 {% extends "layout.html" %}
 
 {% block body %}
-<h1>Register a new user</h1>
+<h1>{{'Register a new user'|trans}}</h1>
 <form action="{{ path_for( 'new_user' )}}" method="POST" class="bof-form">
   <div class="bof-form__item">
-    <label class="bof-form__label">Username</label>
+    <label class="bof-form__label">{{'Username'|trans}}</label>
     <input type="text" name="user_name" class="bof-form__input" />
   </div>
   
   <div class="bof-form__item">
-    <label class="bof-form__label">Password</label>
+    <label class="bof-form__label">{{'Password'|trans}}</label>
     <input type="password" name="password" class="bof-form__input" />
   </div>
   
-  <input type="submit" value="Register" class="btn btn--primary" />
+  <input type="submit" value="{{'Register'|trans}}" class="btn btn--primary" />
   </form>
 {% endblock %}

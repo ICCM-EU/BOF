@@ -8,14 +8,14 @@
 
 	{% if stage == "voting" %}
 	<div class="notice notice--warning">
-		<h2>{{ left_votes }} full votes left, and unlimited number of 1/4 votes</h2>
+		<h2>{{ left_votes }} {{'full votes left, and unlimited number of 1/4 votes'|trans}}</h2>
 	</div>
 	{% endif %}
 
 	{% if voted_successfull %}
 	<div class="notice notice--success js-slideout" style="display: none;">
 		<h2>
-			Yeeeeey! You did it! You sent your vote. So great...
+			{{'Yeeeeey! You did it! You sent your vote. So great...'|trans}}
 		</h2>
 	</div>
 	{% endif %}

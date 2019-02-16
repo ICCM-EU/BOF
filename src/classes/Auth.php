@@ -66,12 +66,14 @@ class Auth
         $param = array ($login);
         $query->execute($param);
         if (strlen($login) == 0 || strlen($password) == 0) {
-		print "Empty user or pass. Don't do that!";
+		global $translator;
+		print $translator->trans("Empty user or pass. Don't do that!");
 		return 0;
         }
         if ($row=$query->fetch(PDO::FETCH_OBJ)) {
 			# user already exist, so return with error code 0
-			print "User already exists";
+			global $translator;
+			print $translator->trans("User already exists");
 			return 0;
 		}
 		else {
