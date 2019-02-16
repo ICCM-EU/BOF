@@ -5,10 +5,8 @@ insert into location (id,name) values (2,'Room C');
 insert into round (id,time_period) values(0,'first');
 insert into round (id,time_period) values(1,'second');
 insert into round (id,time_period) values(2,'third');
-insert into config_old(id, nomination_begins, nomination_ends, voting_begins, voting_ends)
-values(1, '2018-01-25 13:00:00', '2018-01-28 13:00:00', '2018-01-28 13:00:00', '2018-01-28 18:00:00');
-insert into config(id, item, value) values(1, 'nomination_begins', '2018-01-25 13:00:00');
-insert into config(id, item, value) values(2, 'nomination_ends', '2018-01-28 13:00:00');
-insert into config(id, item, value) values(3, 'voting_begins', '2018-01-28 13:00:00');
-insert into config(id, item, value) values(4, 'voting_ends', '2018-01-28 18:00:00');
-insert into workshop(id, name, description) values(1, 'Prep Team', 'This is where the Prep Team meets to review this conference and discuss ideas for the next years conference. Everyone is welcome to join!');
+insert into config(id, item, value) values(1, 'nomination_begins', DATE_ADD(NOW(), INTERVAL -2 DAY));
+insert into config(id, item, value) values(2, 'nomination_ends', DATE_ADD(NOW(), INTERVAL -1 DAY));
+insert into config(id, item, value) values(3, 'voting_begins', DATE_ADD(DATE_ADD(NOW(), INTERVAL -1 DAY), INTERVAL +2 HOUR));
+insert into config(id, item, value) values(4, 'voting_ends', DATE_ADD(NOW(), INTERVAL + 1 DAY));
+insert into workshop(id, name, description) values(1, 'Prep Team', 'The Prep Team is a handful of people who plan these annual conferences. If you might be interested in joining this team please come to this BOF. We\'re always looking for new ideas and help to make ICCM special every year!');
