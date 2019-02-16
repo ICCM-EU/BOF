@@ -1,303 +1,321 @@
-INSERT INTO `participant` (`id`, `name`, `password`) VALUES
-(83, 'user1', PASSWORD('password')),
-(84, 'user2', PASSWORD('password')),
-(85, 'user3', PASSWORD('password')),
-(86, 'user4', PASSWORD('password')),
-(87, 'user5', PASSWORD('password')),
-(88, 'user6', PASSWORD('password')),
-(89, 'user7', PASSWORD('password')),
-(90, 'user8', PASSWORD('password')),
-(91, 'user9', PASSWORD('password')),
-(92, 'user10', PASSWORD('password')),
-(93, 'user11', PASSWORD('password')),
-(94, 'user12', PASSWORD('password')),
-(95, 'user13', PASSWORD('password')),
-(96, 'user14', PASSWORD('password')),
-(97, 'user15', PASSWORD('password')),
-(98, 'user16', PASSWORD('password')),
-(99, 'user17', PASSWORD('password')),
-(100, 'user18', PASSWORD('password')),
-(101, 'user19', PASSWORD('password')),
-(102, 'user20', PASSWORD('password')),
-(103, 'user21', PASSWORD('password')),
-(104, 'user22', PASSWORD('password')),
-(105, 'user23', PASSWORD('password')),
-(106, 'user24', PASSWORD('password')),
-(107, 'user25', PASSWORD('password')),
-(108, 'user26', PASSWORD('password')),
-(109, 'user27', PASSWORD('password')),
-(110, 'user28', PASSWORD('password')),
-(111, 'user29', PASSWORD('password')),
-(112, 'user30', PASSWORD('password')),
-(113, 'user31', PASSWORD('password')),
-(114, 'user32', PASSWORD('password')),
-(115, 'user33', PASSWORD('password')),
-(116, 'user34', PASSWORD('password')),
-(117, 'user35', PASSWORD('password')),
-(118, 'user36', PASSWORD('password')),
-(119, 'user37', PASSWORD('password')),
-(120, 'user38', PASSWORD('password')),
-(121, 'user39', PASSWORD('password')),
-(122, 'user40', PASSWORD('password')),
-(123, 'user41', PASSWORD('password')),
-(124, 'user42', PASSWORD('password')),
-(125, 'user43', PASSWORD('password')),
-(126, 'user44', PASSWORD('password')),
-(127, 'user45', PASSWORD('password')),
-(128, 'user46', PASSWORD('password')),
-(129, 'user47', PASSWORD('password'));
+-- MySQL dump 10.15  Distrib 10.0.36-MariaDB, for debian-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: mydbname
+-- ------------------------------------------------------
+-- Server version	10.0.36-MariaDB-0ubuntu0.16.04.1
 
-INSERT INTO `workshop` (`id`, `round_id`, `location_id`, `name`, `description`, `published`, `votes`, `available`) VALUES
-(47, 2, 1, 'Discussion on IPv6 implementation', 'Ask all your IPv6 questions', 1, 12.25, 11),
-(48, NULL, NULL, 'IP Codecs - Point to point audio streaming', 'Specifically, radio station studio transmitter links over less than reliable Internet connections. ', 1, 4.25, NULL),
-(49, 2, 2, 'Sharepoint', 'Specifically Office 365. How do you NOT get it wrong? And what have you successfully used it for? ', 1, 9, 8),
-(50, NULL, NULL, 'IT for spreading the Gospel/Missionfield', 'In this BOF I like to talk about the how we can use IT for spreading the Gospel or to support the missionfield. We can brainstorm about the need etc. ', 1, 3.5, NULL),
-(51, NULL, NULL, 'Inventory and license management and helpdesk software', 'Having needed a solution that would show me all machines and their corresponding licenses, I found a very easy to use solution. The discussion would revolve around different solutions we have used and implemented.', 1, 2.25, NULL),
-(52, NULL, NULL, '', '', 1, 0, NULL),
-(53, NULL, NULL, 'Federated identity', 'I would like to find out more about Federated ID\'s', 1, 4, NULL),
-(54, 3, 3, 'Microsoft Cloud...', 'Have you moved to or used MS Cloud?  Please share what you have learned.', 1, 5.75, 3),
-(55, NULL, NULL, 'Great Bible study software', 'There is much good software to help us study the Bible, but lots of Christian software could be improved substantially. Let\'s talk about how!', 1, 5.5, NULL),
-(56, 3, 1, 'EU Privacy Regulations', 'The EU is making new privacy laws this year. What do we know, and what we should do.', 1, 12, 11),
-(57, NULL, NULL, 'DevOps', 'Anybody out there using configuration management tools such as saltstack\'s salt, or puppet, chef, ansible etc?', 1, 1, NULL),
-(58, NULL, NULL, 'secure voip', 'Are you using a voip system to comunicate in your org? \r\nWhat are your experiences, what works, what not.', 1, 2.5, NULL),
-(59, NULL, NULL, 'Mobile media library box', 'Come do hands on build of a pocket sized battery operated mobile WiFi server for delivering audio, video, text to mobile devices.  7.3 B people with 75% having mobile phones...  ', 1, 3.5, NULL),
-(60, 2, 3, 'Empowering great teams', 'Exchange some experience how we can create powerful teams / team culture, who take responsibility without burning out and who support each other and the common goals with providing valuable feedback to the leadership and each other.', 1, 6, 5),
-(61, 1, 3, 'Church websites are terrible! How can we change it?', 'We make sure that our church buildings are nice and tidy, services are well organized and worship has good music. Yet,  our websites are terrible.\r\nHow can we change it? How do we convince others that it\'s important?', 1, 6.75, 5),
-(62, 3, 2, 'Why or Why not move from Windows 7 to Windows 10', '', 1, 11.75, 8),
-(63, 1, 1, 'Is computer Encryption still a valid way of protecting your data', 'or are there other ways to keep privacy ', 1, 15, 13),
-(64, NULL, NULL, 'Implementing CiviCRM', 'Participants of the workshop will have more opportunity to share questions, to try out features etc.', 1, 0.25, NULL),
-(65, NULL, NULL, 'Drupal CMS', 'Users or people considering to use it, share experience ', 1, 0, NULL),
-(66, NULL, NULL, 'User Interface Design', 'How do you know your user interface is good or bad and how do you get better? What resources have helped you?', 1, 3.5, NULL),
-(67, 1, 2, 'Demo to OwnCloud', 'What is OwnCloud...', 1, 7, 4);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-INSERT INTO `workshop_participant` (`id`, `workshop_id`, `participant_id`, `leader`, `participant`) VALUES
-(839, 52, 95, 0, 0),
-(840, 61, 95, 0, 0),
-(841, 67, 95, 0, 0.25),
-(842, 57, 95, 0, 0),
-(843, 47, 95, 0, 0),
-(844, 65, 95, 0, 0),
-(845, 60, 95, 0, 0),
-(846, 56, 95, 0, 1),
-(847, 53, 95, 0, 1),
-(848, 55, 95, 0, 0),
-(849, 51, 95, 0, 0.25),
-(850, 63, 95, 0, 0.25),
-(851, 50, 95, 0, 0),
-(852, 54, 95, 0, 1),
-(853, 59, 95, 0, 0),
-(854, 58, 95, 0, 0),
-(855, 49, 95, 0, 0.25),
-(856, 66, 95, 0, 0),
-(857, 62, 95, 0, 0.25),
-(858, 54, 115, 0, 0.25),
-(859, 53, 115, 0, 1),
-(860, 56, 115, 0, 1),
-(861, 57, 115, 0, 0.25),
-(862, 47, 115, 0, 1),
-(863, 63, 97, 0, 1),
-(864, 62, 97, 0, 1),
-(865, 47, 97, 0, 1),
-(866, 53, 110, 0, 0.25),
-(867, 54, 110, 0, 0.25),
-(868, 47, 110, 0, 1),
-(869, 56, 110, 0, 0.25),
-(870, 63, 110, 0, 1),
-(871, 62, 110, 0, 1),
-(872, 49, 110, 0, 0.25),
-(873, 67, 110, 0, 0.25),
-(874, 58, 110, 0, 0.25),
-(875, 47, 83, 0, 1),
-(876, 56, 83, 0, 0.25),
-(877, 63, 83, 0, 0.25),
-(878, 62, 83, 0, 1),
-(879, 51, 83, 0, 0.25),
-(880, 67, 83, 0, 1),
-(881, 64, 83, 0, 0.25),
-(882, 56, 98, 0, 0.25),
-(883, 60, 98, 0, 0.25),
-(884, 61, 98, 0, 1),
-(885, 55, 98, 1, 1),
-(886, 66, 98, 0, 1),
-(887, 47, 116, 0, 0),
-(888, 62, 116, 0, 0),
-(889, 63, 116, 0, 1),
-(890, 56, 116, 0, 1),
-(891, 53, 116, 0, 0.25),
-(892, 54, 116, 0, 0),
-(893, 67, 116, 0, 0),
-(894, 49, 116, 0, 0),
-(895, 48, 116, 0, 0.25),
-(896, 51, 116, 0, 0),
-(897, 57, 116, 0, 0),
-(898, 60, 116, 0, 0),
-(899, 64, 116, 0, 0),
-(900, 58, 116, 0, 1),
-(901, 52, 116, 0, 0),
-(902, 61, 116, 0, 0),
-(903, 65, 116, 0, 0),
-(904, 55, 116, 0, 0.25),
-(905, 50, 116, 0, 0.25),
-(906, 59, 116, 0, 0.25),
-(907, 66, 116, 0, 0),
-(921, 56, 117, 0, 1),
-(922, 63, 117, 0, 1),
-(923, 67, 117, 0, 1),
-(924, 47, 117, 0, 0.25),
-(925, 62, 117, 0, 0.25),
-(926, 53, 117, 0, 0.25),
-(927, 58, 117, 0, 0.25),
-(928, 61, 117, 0, 0.25),
-(929, 66, 117, 0, 0.25),
-(930, 51, 117, 0, 0.25),
-(931, 60, 117, 0, 0.25),
-(932, 50, 117, 0, 0.25),
-(933, 63, 89, 1, 1),
-(934, 62, 89, 0, 1),
-(935, 50, 89, 0, 1),
-(936, 56, 120, 0, 1),
-(937, 63, 120, 0, 1),
-(938, 47, 120, 0, 1),
-(939, 56, 119, 0, 1),
-(940, 63, 119, 0, 0.25),
-(941, 47, 119, 0, 1),
-(942, 62, 119, 0, 1),
-(943, 47, 111, 0, 0.25),
-(944, 53, 111, 0, 0.25),
-(945, 63, 111, 0, 0.25),
-(946, 54, 111, 0, 0.25),
-(947, 62, 111, 0, 0.25),
-(948, 56, 111, 0, 1),
-(949, 49, 111, 0, 1),
-(950, 48, 111, 0, 1),
-(951, 67, 111, 0, 0.25),
-(952, 60, 111, 0, 0.25),
-(953, 58, 111, 0, 0.25),
-(954, 61, 111, 0, 0.25),
-(955, 59, 111, 0, 0.25),
-(956, 53, 100, 0, 0.25),
-(957, 54, 100, 0, 0.25),
-(958, 61, 100, 0, 1),
-(959, 55, 100, 0, 1),
-(960, 60, 100, 0, 1),
-(961, 49, 92, 0, 1),
-(962, 48, 92, 0, 1),
-(963, 51, 92, 0, 0.25),
-(964, 59, 92, 0, 1),
-(965, 56, 121, 0, 1),
-(966, 60, 121, 0, 1),
-(967, 61, 109, 1, 1),
-(968, 50, 109, 0, 1),
-(969, 66, 109, 0, 1),
-(970, 56, 96, 0, 0),
-(971, 63, 96, 0, 1),
-(972, 47, 96, 0, 1),
-(973, 62, 96, 0, 0.25),
-(974, 53, 96, 0, 0),
-(975, 49, 96, 0, 0),
-(976, 48, 96, 0, 0),
-(977, 60, 96, 0, 0),
-(978, 54, 96, 0, 0),
-(979, 67, 96, 0, 1),
-(980, 61, 96, 0, 0),
-(981, 55, 96, 0, 0),
-(982, 58, 96, 0, 0.25),
-(983, 50, 96, 0, 0),
-(984, 59, 96, 0, 0),
-(985, 51, 96, 0, 0),
-(986, 66, 96, 0, 0),
-(987, 57, 96, 0, 0),
-(988, 64, 96, 0, 0),
-(989, 52, 96, 0, 0),
-(990, 65, 96, 0, 0),
-(991, 60, 122, 0, 1),
-(992, 55, 122, 0, 1),
-(993, 63, 123, 0, 1),
-(994, 49, 123, 0, 1),
-(995, 54, 123, 0, 1),
-(996, 49, 105, 1, 1),
-(997, 54, 105, 1, 1),
-(998, 59, 105, 1, 1),
-(999, 63, 103, 0, 0.25),
-(1000, 56, 103, 0, 1),
-(1001, 47, 103, 0, 1),
-(1002, 62, 103, 0, 1),
-(1003, 49, 103, 0, 0.25),
-(1004, 54, 103, 0, 0.25),
-(1005, 53, 103, 0, 0.25),
-(1006, 58, 103, 0, 0.25),
-(1007, 57, 103, 0, 0.25),
-(1008, 63, 107, 0, 1),
-(1009, 62, 107, 0, 1),
-(1010, 49, 107, 0, 0.25),
-(1011, 61, 107, 0, 1),
-(1012, 54, 90, 0, 0.25),
-(1013, 60, 90, 0, 1),
-(1014, 67, 90, 0, 1),
-(1015, 55, 90, 0, 0.25),
-(1016, 63, 108, 0, 0.25),
-(1017, 62, 108, 0, 1),
-(1018, 60, 108, 1, 1),
-(1019, 67, 108, 0, 0.25),
-(1020, 61, 108, 0, 1),
-(1024, 55, 114, 0, 1),
-(1025, 50, 114, 0, 1),
-(1026, 66, 114, 1, 1),
-(1027, 63, 124, 0, 1),
-(1028, 56, 124, 0, 1),
-(1029, 47, 124, 0, 1),
-(1030, 63, 84, 0, 1),
-(1031, 47, 84, 0, 1),
-(1032, 62, 84, 0, 1),
-(1033, 57, 84, 0, 0.25),
-(1034, 49, 87, 0, 1),
-(1035, 48, 87, 0, 1),
-(1036, 59, 87, 0, 1),
-(1039, 49, 125, 1, 1),
-(1040, 61, 125, 1, 1),
-(1041, 48, 86, 1, 1),
-(1042, 49, 86, 0, 1),
-(1043, 54, 86, 0, 1),
-(1044, 63, 86, 0, 0.25),
-(1045, 62, 86, 0, 0.25),
-(1046, 60, 86, 0, 0.25),
-(1047, 53, 86, 0, 0.25),
-(1048, 51, 86, 0, 0.25),
-(1049, 56, 86, 0, 0),
-(1050, 58, 86, 0, 0.25),
-(1051, 47, 93, 0, 0.25),
-(1052, 62, 93, 0, 1),
-(1053, 61, 93, 0, 0.25),
-(1054, 67, 93, 0, 1),
-(1055, 55, 93, 0, 1),
-(1056, 66, 93, 0, 0.25),
-(1057, 63, 126, 1, 1),
-(1058, 47, 126, 1, 1),
-(1059, 56, 126, 1, 1),
-(1060, 63, 94, 0, 1),
-(1061, 47, 94, 0, 0.25),
-(1062, 56, 94, 0, 0.25),
-(1063, 62, 94, 0, 0.25),
-(1064, 61, 94, 0, 0),
-(1065, 67, 94, 0, 0),
-(1066, 60, 94, 0, 0),
-(1067, 55, 94, 0, 0),
-(1068, 54, 94, 0, 0.25),
-(1069, 48, 94, 0, 0),
-(1070, 53, 94, 0, 0.25),
-(1071, 50, 94, 0, 0),
-(1072, 59, 94, 0, 0),
-(1073, 66, 94, 0, 0),
-(1074, 58, 94, 0, 0),
-(1075, 51, 94, 1, 1),
-(1076, 57, 94, 0, 0),
-(1077, 64, 94, 0, 0),
-(1078, 52, 94, 0, 0),
-(1079, 65, 94, 0, 0),
-(1080, 63, 127, 0, 0.25),
-(1081, 47, 127, 0, 0.25),
-(1082, 62, 127, 0, 0.25),
-(1083, 49, 127, 0, 1),
-(1084, 67, 127, 0, 1),
-(1085, 57, 127, 0, 0.25);
+--
+-- Table structure for table `bof_archive`
+--
 
+DROP TABLE IF EXISTS `bof_archive`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bof_archive` (
+  `archive_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `year` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `iccm_edition` varchar(3) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`archive_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bof_archive`
+--
+
+LOCK TABLES `bof_archive` WRITE;
+/*!40000 ALTER TABLE `bof_archive` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bof_archive` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bof_archive_leader`
+--
+
+DROP TABLE IF EXISTS `bof_archive_leader`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bof_archive_leader` (
+  `leader_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `bof_id` int(10) unsigned DEFAULT NULL,
+  `leader` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`leader_id`),
+  KEY `bof_id` (`bof_id`),
+  CONSTRAINT `bof_archive_leader_ibfk_1` FOREIGN KEY (`bof_id`) REFERENCES `bof_archive_session` (`bof_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bof_archive_leader`
+--
+
+LOCK TABLES `bof_archive_leader` WRITE;
+/*!40000 ALTER TABLE `bof_archive_leader` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bof_archive_leader` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bof_archive_session`
+--
+
+DROP TABLE IF EXISTS `bof_archive_session`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bof_archive_session` (
+  `bof_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `archive_id` int(10) unsigned DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
+  `description` text CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
+  `votes` float DEFAULT NULL,
+  PRIMARY KEY (`bof_id`),
+  KEY `archive_id` (`archive_id`),
+  CONSTRAINT `bof_archive_session_ibfk_1` FOREIGN KEY (`archive_id`) REFERENCES `bof_archive` (`archive_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=164 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bof_archive_session`
+--
+
+LOCK TABLES `bof_archive_session` WRITE;
+/*!40000 ALTER TABLE `bof_archive_session` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bof_archive_session` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bof_metadata`
+--
+
+DROP TABLE IF EXISTS `bof_metadata`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bof_metadata` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `iccm_edition` varchar(3) COLLATE utf8_unicode_ci NOT NULL,
+  `year` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `maxvotes` int(10) NOT NULL,
+  `force_bof` tinyint(1) NOT NULL DEFAULT '0',
+  `location` int(10) unsigned NOT NULL,
+  `round` int(10) unsigned NOT NULL,
+  `bof_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bof_metadata`
+--
+
+LOCK TABLES `bof_metadata` WRITE;
+/*!40000 ALTER TABLE `bof_metadata` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bof_metadata` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `config`
+--
+
+DROP TABLE IF EXISTS `config`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `config` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `item` varchar(30) COLLATE latin1_general_ci NOT NULL,
+  `value` varchar(30) COLLATE latin1_general_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `config`
+--
+
+LOCK TABLES `config` WRITE;
+/*!40000 ALTER TABLE `config` DISABLE KEYS */;
+INSERT INTO `config` VALUES (1,'nomination_begins','2019-02-13 21:45:36'),(2,'nomination_ends','2019-02-14 21:45:36'),(3,'voting_begins','2019-02-14 23:45:36'),(4,'voting_ends','2019-02-16 21:45:36');
+/*!40000 ALTER TABLE `config` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `config_old`
+--
+
+DROP TABLE IF EXISTS `config_old`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `config_old` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `voting_begins` datetime NOT NULL,
+  `voting_ends` datetime NOT NULL,
+  `nomination_begins` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `nomination_ends` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `config_old`
+--
+
+LOCK TABLES `config_old` WRITE;
+/*!40000 ALTER TABLE `config_old` DISABLE KEYS */;
+/*!40000 ALTER TABLE `config_old` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `location`
+--
+
+DROP TABLE IF EXISTS `location`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `location` (
+  `id` int(10) unsigned NOT NULL,
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `location`
+--
+
+LOCK TABLES `location` WRITE;
+/*!40000 ALTER TABLE `location` DISABLE KEYS */;
+INSERT INTO `location` VALUES (0,'Room A'),(1,'Room B'),(2,'Room C');
+/*!40000 ALTER TABLE `location` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `participant`
+--
+
+DROP TABLE IF EXISTS `participant`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `participant` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE latin1_general_ci NOT NULL,
+  `password` varchar(255) COLLATE latin1_general_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=MyISAM AUTO_INCREMENT=460 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `participant`
+--
+
+LOCK TABLES `participant` WRITE;
+/*!40000 ALTER TABLE `participant` DISABLE KEYS */;
+INSERT INTO `participant` VALUES (1,'admin','*14E65567ABDB5135D0CFD9A70B3032C179A49EE7'),(401,'user1','*44B12B1BDDF86F44053DCE4518183FA802AC3B8A'),(402,'user2','*38366FDA01695B6A5A9DD4E428D9FB8F7EB75512'),(403,'user3','*A21F1460C5CCDB575E0A7A3B35600BF918CAEA38'),(404,'user4','*4E832DC6A6F24719A68C1242068114AA77CA60D0'),(405,'user5','*DD1C34CA72B473341A6C0EAB6878F07BC45D7854'),(406,'user6','*E910F0D3DC558D1115C9B4BD45C2F44088F66C96'),(407,'user7','*FD0F8AD20F0EB9F9A0B6FC53DC7673D26996C3EA'),(408,'user8','*42FADAA2E05943A4323EFFFC874E9F163242C9C6'),(409,'user9','*DAC8BA74183A661DFFC0E1944C5820D3EBD6B3C2'),(410,'user10','*CE0A63F5EA889D8C8D72E58ED9FEA2332B4D307F'),(411,'user11','*7934597A1AD071FA4B214CAE1C4D7A64DE09B6ED'),(412,'user12','*EADCD2B7B33EF52874137B89730CF8B4F4078603'),(413,'user13','*7117496641C600793D33A887CD563CBF83AD29D3'),(414,'user14','*5FA32D49A387DC30A52BB1F9AD3FBCD8D3703898'),(415,'user15','*D9FDC506A48230E0087F61B1578199A196333EA8'),(416,'user16','*E194CF10D12074C4EF5F552084708BCCECCBC836'),(417,'user17','*C1CC54FDC05E66666AC04A2374D178446C536DB6'),(418,'user18','*7ED8E9B6E2F294FC89FF72915E635022D266A6F2'),(419,'user19','*B1794037FD6CFB11825F2B4E2EF4FE9CD1A3B169'),(420,'user20','*9AD0814019EA37123B2EF368F234DFD84852D192'),(421,'user21','*21072693D5D0223757AB74F4656BEC894A4694F6'),(422,'user22','*EE186682D9A89D80CEF633EAC940C1AB08AA37EE'),(423,'user23','*3484AD6FBB9254AA0C1365BCF65ED1D81AE64D17'),(424,'user24','*9445D437B753DF717C0DD6A9EA76D9D878FA5649'),(425,'user25','*9E007541A7C1B11EF1D8892B9F3037EDEFA7BA5B'),(426,'user26','*A5FDB650B165260B0AA5A4CFB36019C3B2464C58'),(427,'user27','*2BF2D675C4E2567EBA3E131CD907A3E635C1F88A'),(428,'user28','*242589121B19289DB327548954442C46ECFCDBE2'),(429,'user29','*556D58EFA1A1CE9D5B6AD8DC20700CA90069DD6E'),(430,'user30','*87BC5DBAAE1CB9CF22CEA4D9AE5F22559333EB60'),(431,'user31','*938E59A0D702AD8DB63E67F974D50016066B3D37'),(432,'user32','*FBEA3E5CA555B16CC9531CDE2B5F45A6CD7B6A2E'),(433,'user33','*7173DA85DF2516A1FD7C95EF5D2E932296380BCD'),(434,'user34','*A0841EC8D0F5B4726999F51DD9C0BCFDB73CD30B'),(435,'user35','*043BC39E237E172E8A4D891A5B7808FBB36344E7'),(436,'user36','*0C32EBD1AE316E3772C801761F9BDDDE8D4C5BC5'),(437,'user37','*90F469B35EB8CFDF3044ACE6FFCD75A5F17999B4'),(438,'user38','*5A217317332E3ACDF175A29811A341ECA69C1467'),(439,'user39','*B98DEA9696BA2CCA1F5A64C8D4E8875037747276'),(440,'user40','*9DE0B6D04267B2C19B3BD2F9F56BDEA3189D6D74'),(441,'user41','*C80C0CBB7A0F5EC7EC21B5122CAE38DDDDC4E5FB'),(442,'user42','*B4836F3CCFBF6142147121E3142DF796441A25DD'),(443,'user43','*A1035A7B0013E167386321184E1798EC0ADF7003'),(444,'user44','*9A267D355CC6067101EEEF1BDF3FA8CED9176602'),(445,'user45','*5F503ED32873D37A7FC932786C76E6F8258DDCC7'),(446,'user46','*02A00519D2F36A59AEA4F17A762CF8EC7366BC86'),(447,'user47','*1B10EAC76D0DD416A960B72057CD6C35BAA4B20F'),(448,'user48','*AB787E48FFEE2E672C70E567EF6EE1D8C683163B'),(449,'user49','*D0E46F408D6F79BB307FF29FB90548A140C3CE60'),(450,'user50','*C23C80E9347AD5D9F1FA23E5A7833B4FF07828A1'),(451,'user51','*89A3485751FF5483C26102E2BD8C8E6DCBAB9480'),(452,'user52','*0900C08D8D8866E6FE933347AD6496EBC0F844F0'),(453,'user53','*0F0B61F30639372BC44BF7C82F1F64E16412F2C2'),(454,'user54','*9DAEEF473A1225F30791FBE361B75E915C2E232E'),(455,'user55','*C4C709BD11323232E67A19AD327B56C2FE4D2297'),(456,'user56','*2F2099B7B1E16E3E02FF17818AA8F9B61987752C'),(457,'user57','*D87C976D5DA7B8AC0516045EA53AE807D3DF7D56'),(458,'user58','*90423DC31B77FEDB8746844032F3455A3257C390'),(459,'user59','*5D0BF2D1A5CC52B559E4AB77D71CDABC630E405D');
+/*!40000 ALTER TABLE `participant` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `round`
+--
+
+DROP TABLE IF EXISTS `round`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `round` (
+  `id` int(10) unsigned NOT NULL,
+  `time_period` varchar(50) COLLATE latin1_general_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `round`
+--
+
+LOCK TABLES `round` WRITE;
+/*!40000 ALTER TABLE `round` DISABLE KEYS */;
+INSERT INTO `round` VALUES (0,'first'),(1,'second'),(2,'third');
+/*!40000 ALTER TABLE `round` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `workshop`
+--
+
+DROP TABLE IF EXISTS `workshop`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `workshop` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `creator_id` int(10) unsigned DEFAULT NULL,
+  `round_id` int(10) unsigned DEFAULT NULL,
+  `location_id` int(10) unsigned DEFAULT NULL,
+  `name` varchar(255) COLLATE latin1_general_ci NOT NULL,
+  `description` text COLLATE latin1_general_ci NOT NULL,
+  `published` tinyint(1) NOT NULL,
+  `votes` float DEFAULT NULL,
+  `available` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=MyISAM AUTO_INCREMENT=110 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `workshop`
+--
+
+LOCK TABLES `workshop` WRITE;
+/*!40000 ALTER TABLE `workshop` DISABLE KEYS */;
+INSERT INTO `workshop` VALUES (1,NULL,NULL,NULL,'Prep Team','The Prep Team is a handful of people who plan these annual conferences. If you might be interested in joining this team please come to this BOF. We\'re always looking for new ideas and help to make ICCM special every year!',0,NULL,NULL),(96,401,NULL,NULL,'topic1','description for topic1',0,NULL,NULL),(97,401,NULL,NULL,'topic2','description for topic2',0,NULL,NULL),(98,401,NULL,NULL,'topic3','description for topic3',0,NULL,NULL),(99,401,NULL,NULL,'topic4','description for topic4',0,NULL,NULL),(100,401,NULL,NULL,'topic5','description for topic5',0,NULL,NULL),(101,401,NULL,NULL,'topic6','description for topic6',0,NULL,NULL),(102,401,NULL,NULL,'topic7','description for topic7',0,NULL,NULL),(103,401,NULL,NULL,'topic8','description for topic8',0,NULL,NULL),(104,401,NULL,NULL,'topic9','description for topic9',0,NULL,NULL),(105,401,NULL,NULL,'topic10','description for topic10',0,NULL,NULL),(106,401,NULL,NULL,'topic11','description for topic11',0,NULL,NULL),(107,401,NULL,NULL,'topic12','description for topic12',0,NULL,NULL),(108,401,NULL,NULL,'topic13','description for topic13',0,NULL,NULL),(109,401,NULL,NULL,'topic14','description for topic14',0,NULL,NULL);
+/*!40000 ALTER TABLE `workshop` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `workshop_participant`
+--
+
+DROP TABLE IF EXISTS `workshop_participant`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `workshop_participant` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `workshop_id` int(10) unsigned NOT NULL,
+  `participant_id` int(10) unsigned NOT NULL,
+  `leader` tinyint(1) NOT NULL DEFAULT '0',
+  `participant` float NOT NULL DEFAULT '0.25',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `workshop_participant are unique` (`workshop_id`,`participant_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1772 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `workshop_participant`
+--
+
+LOCK TABLES `workshop_participant` WRITE;
+/*!40000 ALTER TABLE `workshop_participant` DISABLE KEYS */;
+INSERT INTO `workshop_participant` VALUES (1333,96,401,0,0.25),(1334,97,401,0,0.25),(1335,98,401,0,0.25),(1336,101,401,1,1),(1337,102,401,1,1),(1338,103,401,1,1),(1339,105,401,0,0.25),(1340,1,402,0,0.25),(1341,96,402,1,1),(1342,99,402,0,0.25),(1343,100,402,1,1),(1344,103,402,0,0.25),(1345,104,402,1,1),(1346,106,402,0,0.25),(1347,107,402,0,0.25),(1348,1,403,1,0.25),(1349,99,403,0,0.25),(1350,100,403,0,0.25),(1351,102,403,0,1),(1352,105,403,0,0.25),(1353,107,403,0,0.25),(1354,108,403,0,0.25),(1355,96,404,0,0.25),(1356,99,404,0,0.25),(1357,100,404,0,1),(1358,101,404,0,1),(1359,102,404,0,1),(1360,103,404,0,0.25),(1361,104,404,0,0.25),(1362,100,405,0,1),(1363,101,405,0,0.25),(1364,103,405,0,0.25),(1365,104,405,0,0.25),(1366,105,405,0,0.25),(1367,106,405,0,0.25),(1368,108,405,1,1),(1369,98,406,0,0.25),(1370,99,406,0,0.25),(1371,100,406,0,0.25),(1372,102,406,0,0.25),(1373,103,406,0,1),(1374,104,406,0,1),(1375,106,406,0,0.25),(1376,100,407,0,1),(1377,101,407,0,0.25),(1378,102,407,0,0.25),(1379,103,407,0,0.25),(1380,106,407,0,0.25),(1381,107,407,0,0.25),(1382,108,407,0,1),(1383,1,408,0,0.25),(1384,97,408,1,1),(1385,98,408,1,1),(1386,101,408,0,1),(1387,102,408,0,0.25),(1388,104,408,0,0.25),(1389,108,408,0,0.25),(1390,1,409,0,0.25),(1391,97,409,0,1),(1392,102,409,0,0.25),(1393,103,409,0,0.25),(1394,105,409,1,1),(1395,106,409,0,0.25),(1396,108,409,0,1),(1397,1,410,0,0.25),(1398,96,410,1,1),(1399,97,410,0,1),(1400,98,410,0,0.25),(1401,100,410,0,0.25),(1402,101,410,0,0.25),(1403,102,410,0,1),(1404,1,411,0,0.25),(1405,97,411,0,1),(1406,99,411,1,1),(1407,101,411,0,0.25),(1408,103,411,0,0.25),(1409,104,411,0,1),(1410,105,411,0,0.25),(1411,1,412,1,0.25),(1412,98,412,1,1),(1413,99,412,0,0.25),(1414,102,412,0,0.25),(1415,103,412,0,0.25),(1416,104,412,0,0.25),(1417,105,412,0,0.25),(1418,106,412,1,1),(1419,1,413,0,0.25),(1420,98,413,0,0.25),(1421,100,413,0,1),(1422,103,413,0,1),(1423,105,413,0,1),(1424,107,413,0,0.25),(1425,108,413,0,0.25),(1426,97,414,0,0.25),(1427,98,414,0,1),(1428,100,414,0,1),(1429,101,414,0,0.25),(1430,102,414,0,0.25),(1431,103,414,0,1),(1432,105,414,0,0.25),(1433,1,415,0,0.25),(1434,96,415,0,0.25),(1435,99,415,0,0.25),(1436,100,415,0,1),(1437,101,415,0,0.25),(1438,102,415,0,0.25),(1439,103,415,0,1),(1440,97,416,0,0.25),(1441,98,416,0,0.25),(1442,100,416,0,0.25),(1443,101,416,0,1),(1444,102,416,0,1),(1445,106,416,0,0.25),(1446,107,416,0,0.25),(1447,108,416,0,1),(1448,1,417,0,0.25),(1449,96,417,0,0.25),(1450,99,417,0,0.25),(1451,102,417,0,0.25),(1452,105,417,0,1),(1453,106,417,0,0.25),(1454,107,417,1,1),(1455,108,417,0,0.25),(1456,96,418,0,1),(1457,100,418,0,0.25),(1458,101,418,0,0.25),(1459,102,418,0,0.25),(1460,106,418,0,1),(1461,107,418,0,0.25),(1462,108,418,0,1),(1463,1,419,0,0.25),(1464,96,419,0,0.25),(1465,97,419,0,0.25),(1466,98,419,0,0.25),(1467,99,419,0,1),(1468,107,419,0,1),(1469,108,419,0,0.25),(1470,1,420,0,0.25),(1471,99,420,0,1),(1472,102,420,0,0.25),(1473,103,420,0,0.25),(1474,104,420,0,1),(1475,105,420,0,1),(1476,106,420,0,0.25),(1477,107,420,0,0.25),(1478,96,421,0,0.25),(1479,97,421,0,0.25),(1480,99,421,0,1),(1481,100,421,0,0.25),(1482,102,421,0,0.25),(1483,103,421,0,1),(1484,105,421,0,1),(1485,108,421,0,0.25),(1486,96,422,0,0.25),(1487,99,422,0,0.25),(1488,100,422,0,0.25),(1489,101,422,0,1),(1490,105,422,0,0.25),(1491,106,422,0,0.25),(1492,108,422,0,1),(1493,97,423,0,0.25),(1494,98,423,0,0.25),(1495,99,423,0,1),(1496,103,423,0,0.25),(1497,104,423,0,0.25),(1498,105,423,0,1),(1499,106,423,0,0.25),(1500,1,424,0,0.25),(1501,96,424,0,1),(1502,99,424,0,0.25),(1503,100,424,0,0.25),(1504,101,424,0,1),(1505,103,424,0,0.25),(1506,107,424,0,0.25),(1507,108,424,0,0.25),(1508,1,425,0,0.25),(1509,97,425,0,0.25),(1510,99,425,0,0.25),(1511,100,425,0,1),(1512,105,425,0,0.25),(1513,106,425,0,1),(1514,107,425,0,0.25),(1515,1,426,0,0.25),(1516,97,426,0,1),(1517,98,426,0,0.25),(1518,101,426,0,0.25),(1519,102,426,0,1),(1520,103,426,0,1),(1521,105,426,0,0.25),(1522,107,426,0,0.25),(1523,1,427,0,0.25),(1524,96,427,0,1),(1525,99,427,0,0.25),(1526,101,427,0,1),(1527,104,427,0,1),(1528,105,427,0,0.25),(1529,106,427,0,0.25),(1530,107,427,0,0.25),(1531,1,428,0,0.25),(1532,96,428,0,1),(1533,99,428,0,0.25),(1534,102,428,0,0.25),(1535,103,428,0,0.25),(1536,105,428,0,1),(1537,106,428,0,0.25),(1538,107,428,0,0.25),(1539,97,429,0,0.25),(1540,98,429,0,0.25),(1541,101,429,0,0.25),(1542,103,429,0,1),(1543,104,429,0,1),(1544,105,429,0,1),(1545,106,429,0,0.25),(1546,1,430,0,0.25),(1547,96,430,0,1),(1548,101,430,0,1),(1549,102,430,0,0.25),(1550,104,430,0,0.25),(1551,105,430,0,0.25),(1552,106,430,0,0.25),(1553,107,430,0,0.25),(1554,97,431,0,1),(1555,98,431,0,0.25),(1556,99,431,0,0.25),(1557,101,431,0,1),(1558,104,431,0,1),(1559,105,431,0,0.25),(1560,107,431,0,0.25),(1561,108,431,0,0.25),(1562,1,432,0,0.25),(1563,96,432,0,0.25),(1564,97,432,0,0.25),(1565,98,432,0,0.25),(1566,99,432,0,0.25),(1567,105,432,0,0.25),(1568,107,432,0,1),(1569,1,433,0,0.25),(1570,98,433,0,0.25),(1571,100,433,0,0.25),(1572,101,433,0,0.25),(1573,102,433,0,0.25),(1574,103,433,0,1),(1575,105,433,0,1),(1576,108,433,0,0.25),(1577,1,434,0,0.25),(1578,96,434,0,1),(1579,97,434,0,0.25),(1580,98,434,0,0.25),(1581,100,434,0,1),(1582,107,434,0,1),(1583,108,434,0,0.25),(1584,97,435,0,1),(1585,98,435,0,0.25),(1586,100,435,0,0.25),(1587,101,435,0,1),(1588,105,435,0,0.25),(1589,106,435,0,0.25),(1590,107,435,0,0.25),(1591,1,436,0,0.25),(1592,96,436,0,0.25),(1593,97,436,0,1),(1594,99,436,0,1),(1595,100,436,0,0.25),(1596,101,436,0,0.25),(1597,102,436,0,0.25),(1598,103,436,0,0.25),(1599,1,437,0,0.25),(1600,102,437,0,0.25),(1601,103,437,0,0.25),(1602,104,437,0,1),(1603,105,437,0,1),(1604,106,437,0,0.25),(1605,107,437,0,1),(1606,108,437,0,0.25),(1607,96,438,0,1),(1608,98,438,0,1),(1609,99,438,0,0.25),(1610,101,438,0,0.25),(1611,102,438,0,0.25),(1612,103,438,0,1),(1613,105,438,0,0.25),(1614,108,438,0,0.25),(1615,96,439,0,0.25),(1616,97,439,0,0.25),(1617,101,439,0,1),(1618,102,439,0,0.25),(1619,104,439,0,1),(1620,106,439,0,1),(1621,107,439,0,0.25),(1622,1,440,0,0.25),(1623,98,440,0,1),(1624,100,440,0,0.25),(1625,102,440,0,0.25),(1626,105,440,0,1),(1627,107,440,0,1),(1628,108,440,0,0.25),(1629,1,441,0,0.25),(1630,98,441,0,1),(1631,102,441,0,0.25),(1632,103,441,0,1),(1633,105,441,0,0.25),(1634,106,441,0,0.25),(1635,108,441,0,0.25),(1636,1,442,0,0.25),(1637,97,442,0,1),(1638,98,442,0,0.25),(1639,99,442,0,1),(1640,100,442,0,1),(1641,107,442,0,0.25),(1642,108,442,0,0.25),(1643,97,443,0,0.25),(1644,98,443,0,1),(1645,101,443,0,0.25),(1646,102,443,0,1),(1647,104,443,0,1),(1648,105,443,0,0.25),(1649,107,443,0,0.25),(1650,96,444,0,1),(1651,97,444,0,1),(1652,98,444,0,0.25),(1653,101,444,0,0.25),(1654,104,444,0,0.25),(1655,105,444,0,1),(1656,107,444,0,0.25),(1657,108,444,0,0.25),(1658,1,445,0,0.25),(1659,96,445,0,0.25),(1660,97,445,0,0.25),(1661,98,445,0,1),(1662,99,445,0,1),(1663,101,445,0,0.25),(1664,107,445,0,1),(1665,108,445,0,0.25),(1666,1,446,0,0.25),(1667,96,446,0,0.25),(1668,97,446,0,0.25),(1669,99,446,0,1),(1670,104,446,0,0.25),(1671,105,446,0,1),(1672,107,446,0,1),(1673,1,447,0,0.25),(1674,98,447,0,1),(1675,99,447,0,0.25),(1676,101,447,0,0.25),(1677,102,447,0,0.25),(1678,105,447,0,1),(1679,107,447,0,1),(1680,108,447,0,0.25),(1681,96,448,0,0.25),(1682,97,448,0,0.25),(1683,100,448,0,0.25),(1684,102,448,0,1),(1685,105,448,0,0.25),(1686,106,448,0,1),(1687,107,448,0,0.25),(1688,108,448,0,1),(1689,1,449,0,0.25),(1690,98,449,0,1),(1691,100,449,0,0.25),(1692,102,449,0,0.25),(1693,103,449,0,0.25),(1694,105,449,0,1),(1695,107,449,0,1),(1696,108,449,0,0.25),(1697,1,450,0,0.25),(1698,96,450,0,0.25),(1699,102,450,0,1),(1700,103,450,0,1),(1701,104,450,0,0.25),(1702,105,450,0,0.25),(1703,106,450,0,1),(1704,108,450,0,0.25),(1705,1,451,0,0.25),(1706,97,451,0,0.25),(1707,99,451,0,1),(1708,100,451,0,0.25),(1709,101,451,0,0.25),(1710,102,451,0,0.25),(1711,104,451,0,1),(1712,105,451,0,0.25),(1713,96,452,0,0.25),(1714,97,452,0,0.25),(1715,98,452,0,1),(1716,101,452,0,0.25),(1717,103,452,0,1),(1718,104,452,0,0.25),(1719,105,452,0,0.25),(1720,107,452,0,1),(1721,96,453,0,0.25),(1722,98,453,0,0.25),(1723,99,453,0,1),(1724,101,453,0,0.25),(1725,102,453,0,1),(1726,105,453,0,0.25),(1727,107,453,0,0.25),(1728,108,453,0,1),(1729,1,454,0,0.25),(1730,96,454,0,0.25),(1731,98,454,0,1),(1732,100,454,0,0.25),(1733,104,454,0,1),(1734,106,454,0,1),(1735,108,454,0,0.25),(1736,96,455,0,0.25),(1737,99,455,0,0.25),(1738,100,455,0,0.25),(1739,101,455,0,1),(1740,102,455,0,1),(1741,105,455,0,1),(1742,107,455,0,0.25),(1743,96,456,0,1),(1744,97,456,0,0.25),(1745,100,456,0,0.25),(1746,102,456,0,0.25),(1747,103,456,0,1),(1748,106,456,0,0.25),(1749,108,456,0,1),(1750,1,457,0,0.25),(1751,96,457,0,0.25),(1752,97,457,0,0.25),(1753,99,457,0,0.25),(1754,103,457,0,1),(1755,105,457,0,0.25),(1756,107,457,0,1),(1757,108,457,0,1),(1758,1,458,0,0.25),(1759,97,458,0,0.25),(1760,100,458,0,1),(1761,101,458,0,0.25),(1762,102,458,0,0.25),(1763,103,458,0,1),(1764,104,458,0,0.25),(1765,1,459,0,0.25),(1766,96,459,0,0.25),(1767,100,459,0,0.25),(1768,102,459,0,1),(1769,103,459,0,0.25),(1770,104,459,0,1),(1771,108,459,0,0.25);
+/*!40000 ALTER TABLE `workshop_participant` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2019-02-16  5:14:40
