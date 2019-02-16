@@ -5,7 +5,7 @@
     <h1>{{ topic.name }}</h1>
     <p>{{ topic.description }}</p>
     {% if topic.leader %}
-    <p>Facilitator: {{ topic.leader }}</p>
+    <p>{{'Facilitator'|trans}}: {{ topic.leader }}</p>
     {% endif %}
 
     {% if stage == "voting" %}
@@ -14,14 +14,14 @@
       <input type="hidden" name="leader" value="{{username in topic.leader ? '0' : '1'}}" />
       <input type="hidden" name="vote" value="1" />
       <input type="submit" class="facilitation__btn" value="{{username in topic.leader ? '✔️' : ''}}">
-      <label class="facilitation__lbl">I can facilitate this session</label>
+      <label class="facilitation__lbl">{{'I can facilitate this session'|trans}}</label>
     </form>
     {% endif %}
   </div>
 
   {% if topic.votes %}
     <div class="topic__vote-count">
-      Votes: {{ topic.votes }}
+      {{'Votes'|trans}}: {{ topic.votes }}
     </div>
   {% endif %}
 
@@ -30,19 +30,19 @@
     <form action="{{ path_for('votesaddpost')}}" class="fullvote" method="POST">
       <input type="hidden" name="vote" value="1" />
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
-      <input type="submit" class="btn btn--primary {{topic.fullvote ? 'btn--toggled' : ''}}" value="Full vote" {{left_votes == 0 ? 'disabled' : ''}}/>
+      <input type="submit" class="btn btn--primary {{topic.fullvote ? 'btn--toggled' : ''}}" value="{{'Full vote'|trans}}" {{left_votes == 0 ? 'disabled' : ''}}/>
     </form>
 
     <form action="{{ path_for('votesaddpost') }}" class="quartervote" method="POST">
       <input type="hidden" name="vote" value="0.25" />
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
-      <input type="submit" class="btn btn--secondary {{topic.quartervote ? 'btn--toggled' : ''}}" value="1⁄4 vote" />
+      <input type="submit" class="btn btn--secondary {{topic.quartervote ? 'btn--toggled' : ''}}" value="{{'1⁄4 vote'|trans}}" />
     </form>
 
     <form action="{{ path_for('votesaddpost') }}" class="clearvote" method="POST">
       <input type="hidden" name="vote" value="0.0" />
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
-      <input type="submit" class="btn btn--danger" value="Clear vote" />
+      <input type="submit" class="btn btn--danger" value="{{'Clear vote'|trans}}" />
     </form>
   </div>
   {% endif %}

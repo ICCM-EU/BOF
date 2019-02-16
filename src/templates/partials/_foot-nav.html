@@ -1,26 +1,26 @@
 <ul class="foot-nav">
   {% if (stage == 'nominating') %}
   <li>
-    <a href="{{ path_for('nomination')}}">Nominate topic</a>
+    <a href="{{ path_for('nomination')}}">{{'Nominate topic'|trans}}</a>
   </li>
   {% endif %}
   {% if (is_admin and (stage=='nomination' or stage=='locked' or stage=='finished')) %}
   <li>
-    <a href="{{ path_for('moderation') }}">Moderate topics</a>
+    <a href="{{ path_for('moderation') }}">{{'Moderate topics'|trans}}</a>
   </li>  
   {% endif %}
   {% if (is_admin and stage=='finished') %}
   <li>
-    <a href="{{ path_for('result') }}">Calculate result</a>
+    <a href="{{ path_for('result') }}">{{'Calculate result'|trans}}</a>
   </li>
   {% endif %}
   <li>
-    <a href="{{ path_for('topics') }}">All topics</a>
+    <a href="{{ path_for('topics') }}">{{'All topics'|trans}}</a>
   </li>
   <li>
-    <a href="{{ path_for('projector') }}">Projector</a>
+    <a href="{{ path_for('projector') }}">{{'Projector'|trans}}</a>
   </li>
   <li>
-    <a href="{{ path_for('logout')}}">Logout</a>
+    <a href="{{ path_for('logout')}}">{{'Logout'|trans}}</a>
   </li>
 </ul>
