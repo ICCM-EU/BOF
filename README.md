@@ -3,7 +3,7 @@ Birds of a feather flock together: this is a software that can be used for propo
 
 # Installation
 
-## Via Vagrant…
+## Via Vagrant… (with Ansible in the background)
 
 Install [Vagrant](https://www.vagrantup.com/downloads.html), [Virtual Box](https://www.virtualbox.org/wiki/Downloads) and [Ansible](http://docs.ansible.com/ansible/latest/intro_installation.html#installing-the-control-machine).
 
@@ -13,9 +13,9 @@ Everything should be accessible at [http://192.168.33.153] (or [http://bof.local
 
 * Install [Vagrant HostManager](https://github.com/devopsgroup-io/vagrant-hostmanager) to make this happen automagically
 
-## On any Ubuntu machine via Ansible…
+## Or setup directly on any Ubuntu machine via Ansible…
 
-Setup an Ubuntu 16.04 machine:
+Setup an Ubuntu 18.04 machine:
 
 ```
 # set password for root:
@@ -31,9 +31,18 @@ chmod 600 /home/deploy/.ssh/authorized_keys
 Then call with your IP address (and port if other than 22) of your test machine:
 
 ```
+cd ansible
 TARGET_MACHINE=192.168.124.235:22
 ansible-playbook playbook.yml --user=deploy --ask-become-pass --become-method=su -i $TARGET_MACHINE,
 ```
+
+The initial password for the user admin is: `secret`
+
+You can change the password, see SQL commands below.
+
+The website lives in `/var/www/bof`
+
+The configuration for the database is in `/var/www/bof/cfg/settings.php`
 
 # Deployment and build
 
@@ -41,42 +50,18 @@ To bundle frontend items properly run:
 
 `node_modules/.bin/gulp deploy`
 
-# Resetting the database
+# Resetting the database for real use or for testing
 
 ```
 UPDATE participant SET password=PASSWORD('bofadminpwd') WHERE name = 'admin';
 DELETE FROM participant;
 INSERT INTO participant(name, password) VALUES('admin', PASSWORD('bofadminpwd'));
 
-DELETE FROM config;
-INSERT INTO config (item, value) VALUES('nomination_begins', '2018-01-25 13:00:00');
-INSERT INTO config (item, value) VALUES('nomination_ends', '2018-01-28 13:00:00');
-INSERT INTO config (item, value) VALUES('voting_begins', '2018-01-28 13:00:00');
-INSERT INTO config (item, value) VALUES('voting_ends', '2018-01-28 18:00:00');
-
 DELETE FROM workshop;
 DELETE FROM workshop_participant;
 ```
 
-Set dates for testing the nomination:
-
-```
-DELETE FROM config;
-INSERT INTO config (item, value) VALUES('nomination_begins', DATE_ADD(NOW(), INTERVAL -1 DAY));
-INSERT INTO config (item, value) VALUES('nomination_ends', DATE_ADD(NOW(), INTERVAL +1 DAY));
-INSERT INTO config (item, value) VALUES('voting_begins', DATE_ADD(NOW(), INTERVAL +1 DAY));
-INSERT INTO config (item, value) VALUES('voting_ends', DATE_ADD(NOW(), INTERVAL +2 DAY));
-```
-
-Set dates for testing the voting:
-
-```
-DELETE FROM config;
-INSERT INTO config (item, value) VALUES('nomination_begins', DATE_ADD(NOW(), INTERVAL -2 DAY));
-INSERT INTO config (item, value) VALUES('nomination_ends', DATE_ADD(NOW(), INTERVAL -1 DAY));
-INSERT INTO config (item, value) VALUES('voting_begins', DATE_ADD(NOW(), INTERVAL -1 DAY));
-INSERT INTO config (item, value) VALUES('voting_ends', DATE_ADD(NOW(), INTERVAL +1 DAY));
-```
+Set dates for testing the nomination or voting in the UI.
 
 # Running the tests with Cypress
 
