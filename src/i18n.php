@@ -17,7 +17,7 @@ $translator->setFallbackLocales([$settings['settings']['fallback_language']]);
 $translator->addLoader('php', new PhpFileLoader());
 
 // Add language files here
-$translator->addResource('php', '../lang/de.php', 'en'); // English
+$translator->addResource('php', '../lang/en.php', 'en'); // English
 $translator->addResource('php', '../lang/fr.php', 'fr'); // French
 $translator->addResource('php', '../lang/de.php', 'de'); // German
 
