@@ -26,22 +26,10 @@ Everything should be accessible at [http://192.168.33.153] (or [http://bof.local
 Setup an Ubuntu 18.04 machine:
 
 ```
-# set password for root:
-passwd
-adduser deploy
-mkdir -p /home/deploy/.ssh
-# insert your public ssh key
-vi /home/deploy/.ssh/authorized_keys
-chown -R deploy:deploy /home/deploy/.ssh
-chmod 600 /home/deploy/.ssh/authorized_keys
-```
-
-Then call with your IP address (and port if other than 22) of your test machine:
-
-```
-cd ansible
-TARGET_MACHINE=192.168.124.235:22
-ansible-playbook playbook.yml --user=deploy --ask-become-pass --become-method=su -i $TARGET_MACHINE,
+apt-get install git ansible
+git clone https://github.com/ICCM-EU/BOF.git
+cd BOF/ansible
+ansible-playbook playbook.yml -i localhost
 ```
 
 The initial password for the user admin is: `secret`

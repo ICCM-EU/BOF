@@ -1,6 +1,6 @@
 --- 
 - name: Setup server
-  hosts: all
+  hosts: localhost
   become: true # become sudo
   gather_facts: False
   pre_tasks:
