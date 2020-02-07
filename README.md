@@ -29,7 +29,11 @@ Setup an Ubuntu 18.04 machine:
 apt-get install git ansible
 git clone https://github.com/ICCM-EU/BOF.git
 cd BOF/ansible
+# perhaps update group_vars/all.yml with the actual timezone
 ansible-playbook playbook.yml -i localhost
+cd /root
+rm -Rf BOF
+ln -s /var/www/bof
 ```
 
 The initial password for the user admin is: `secret`

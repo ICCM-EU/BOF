@@ -30,6 +30,7 @@ class Admin
 			$config[$row->item."_time"] = date("H:i", strtotime($row->value));
 		}
 		$config['loggedin'] = true;
+		$config['localservertime'] = date("Y-m-d H:m:s");
 		$stage =new Stage($this->db);
 		$config['stage'] = $stage->getstage();
 		return $this->view->render($response, 'admin.html', $config);

@@ -3,6 +3,8 @@
 {% block body %}
 <h1>Admin</h1>
 
+local time on server: {{localservertime}}
+
 <div>
 	<form action="{{ path_for( 'admin_config' )}}" method="POST">
 		<div class="bof-form__item2">

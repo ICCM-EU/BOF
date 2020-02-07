@@ -1,6 +1,6 @@
 # Server setup
 locale: en_GB.UTF-8
-timezone: Europe/London
+timezone: Europe/Brussels
 
 web_directory: /var/www/bof
 
