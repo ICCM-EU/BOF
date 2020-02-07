@@ -42,6 +42,17 @@ class Admin
 
 		$data = $request->getParsedBody();
 
+		if (!empty($data["password1"])) {
+			if ($data["password1"] != $data["password2"]) {
+				die("passwords do not match");
+			} else {
+				$sql = "UPDATE `participant` SET `password`=PASSWORD(?) WHERE name = 'admin'";
+				$query=$this->db->prepare($sql);
+				$param = array($data['password1']);
+				$query->execute($param);
+			}
+		}
+
 		$sql = "UPDATE `config` SET value=? WHERE item = 'nomination_begins'";
 		$query=$this->db->prepare($sql);
 		if (empty($data['time_nomination_begins'])) die("invalid time");

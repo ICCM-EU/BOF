@@ -38,7 +38,7 @@ ln -s /var/www/bof
 
 The initial password for the user admin is: `secret`
 
-You can change the password, see SQL commands below.
+You can change the password on the admin page.
 
 The website lives in `/var/www/bof`
 

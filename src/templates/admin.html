@@ -3,7 +3,9 @@
 {% block body %}
 <h1>Admin</h1>
 
-local time on server: {{localservertime}}
+<div class="bof-form__label">local time on server</div><input type="text" readonly value="{{localservertime}}"/>
+<br/>
+<br/>
 
 <div>
 	<form action="{{ path_for( 'admin_config' )}}" method="POST">
@@ -21,6 +23,13 @@ local time on server: {{localservertime}}
 			<input type="date" name="voting_ends" value="{{voting_ends}}" class="bof-form__input2"/>
 			<input type="time" name="time_voting_ends" value="{{voting_ends_time}}"/><br/>
 		</div>
+		<br/>
+		<label for="password1" class="bof-form__label">New Admin Password</label>
+		<input type="password" name="password1" class="bof-form-input2"/>
+		<label for="password2" class="bof-form__label">Confirm Password</label>
+		<input type="password" name="password2" class="bof-form-input2"/>
+		<br/>
+		<br/>
 		<input type="submit" value="Save" class="btn btn--primary"/>
 	</form>
 
