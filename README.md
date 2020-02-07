@@ -52,14 +52,7 @@ To bundle frontend items properly run:
 
 # Resetting the database for real use or for testing
 
-```
-UPDATE participant SET password=PASSWORD('bofadminpwd') WHERE name = 'admin';
-DELETE FROM participant;
-INSERT INTO participant(name, password) VALUES('admin', PASSWORD('bofadminpwd'));
-
-DELETE FROM workshop;
-DELETE FROM workshop_participant;
-```
+There is now a button on the admin page, that will reset the database. It will keep the admin user, and the prep workshop.
 
 Set dates for testing the nomination or voting in the UI.
 

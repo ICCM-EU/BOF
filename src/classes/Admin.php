@@ -62,15 +62,12 @@ class Admin
 			$query=$this->db->prepare($sql);
 			$param = array();
 			$query->execute($param);
-			$sql = "DELETE FROM workshop";
+			# keep the prep workshop
+			$sql = "DELETE FROM workshop where id<>1";
 			$query=$this->db->prepare($sql);
 			$param = array();
 			$query->execute($param);
 			$sql = "DELETE FROM workshop_participant";
-			$query=$this->db->prepare($sql);
-			$param = array();
-			$query->execute($param);
-			$sql = "insert into workshop(id, name, description) values(1, 'Prep Team', 'The Prep Team is a handful of people who plan these annual conferences. If you might be interested in joining this team please come to this BOF. We\'re always looking for new ideas and help to make ICCM special every year!')";
 			$query=$this->db->prepare($sql);
 			$param = array();
 			$query->execute($param);
