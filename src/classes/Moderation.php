@@ -74,6 +74,7 @@ class Moderation
 		}
 
 		return $this->view->render($response, 'moderation.html',[
+			'loggedin' => true,
 			'bofs' => $bofs,
 			'participants' => $participants
 			]);
