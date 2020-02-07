@@ -78,6 +78,27 @@ class Admin
 			return $this->showAdminView($request, $response, $args);
 		}
 
+		if (!empty($data["download_database"])) {
+			if ($data["download_database"] != "yes") {
+				die("invalid request");
+			}
+
+			$settings = require __DIR__.'/../../cfg/settings.php';
+			$settings = $settings['settings'];
+			$dbhost=$settings['db']['host'];
+			$dbname=$settings['db']['name'];
+			$dbuser=$settings['db']['user'];
+			$dbpassword=$settings['db']['pass'];
+			$dumpfile="/tmp/mysqldump.sql";
+			passthru("mysqldump --user=$dbuser --password=$dbpassword --host=$dbhost $dbname > $dumpfile");
+
+			Header('Content-type: application/octet-stream');
+			Header('Content-Disposition: attachment; filename=db-backup-BOF-'.date('Y-m-d_hi').'.sql');
+
+			echo file_get_contents($dumpfile);
+			die();
+		}
+
 		$sql = "UPDATE `config` SET value=? WHERE item = 'nomination_begins'";
 		$query=$this->db->prepare($sql);
 		if (empty($data['time_nomination_begins'])) die("invalid time");

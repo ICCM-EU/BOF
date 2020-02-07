@@ -43,6 +43,14 @@
 
 	<br/>
 	<br/>
+	<form action="{{ path_for( 'admin_config' )}}" method="POST">
+		<input type="hidden" name="download_database" value="yes"/>
+		<input type="submit" value="Download Database" class="btn btn--primary"/>
+	</form>
+
+
+	<br/>
+	<br/>
 </div>
 
 {% endblock %}
