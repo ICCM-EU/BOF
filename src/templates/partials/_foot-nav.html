@@ -4,7 +4,7 @@
     <a href="{{ path_for('nomination')}}">{{'Nominate topic'|trans}}</a>
   </li>
   {% endif %}
-  {% if (is_admin and (stage=='nomination' or stage=='locked' or stage=='finished')) %}
+  {% if (is_admin and (stage=='nominating' or stage=='locked' or stage=='finished')) %}
   <li>
     <a href="{{ path_for('moderation') }}">{{'Moderate topics'|trans}}</a>
   </li>  
