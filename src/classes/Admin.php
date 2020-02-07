@@ -53,6 +53,31 @@ class Admin
 			}
 		}
 
+		if (!empty($data["reset_database"])) {
+			if ($data["reset_database"] != "yes") {
+				die("invalid request");
+			}
+
+			$sql = "DELETE FROM participant where name <> 'admin'";
+			$query=$this->db->prepare($sql);
+			$param = array();
+			$query->execute($param);
+			$sql = "DELETE FROM workshop";
+			$query=$this->db->prepare($sql);
+			$param = array();
+			$query->execute($param);
+			$sql = "DELETE FROM workshop_participant";
+			$query=$this->db->prepare($sql);
+			$param = array();
+			$query->execute($param);
+			$sql = "insert into workshop(id, name, description) values(1, 'Prep Team', 'The Prep Team is a handful of people who plan these annual conferences. If you might be interested in joining this team please come to this BOF. We\'re always looking for new ideas and help to make ICCM special every year!')";
+			$query=$this->db->prepare($sql);
+			$param = array();
+			$query->execute($param);
+
+			return $this->showAdminView($request, $response, $args);
+		}
+
 		$sql = "UPDATE `config` SET value=? WHERE item = 'nomination_begins'";
 		$query=$this->db->prepare($sql);
 		if (empty($data['time_nomination_begins'])) die("invalid time");

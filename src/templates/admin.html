@@ -33,6 +33,16 @@
 		<input type="submit" value="Save" class="btn btn--primary"/>
 	</form>
 
+	<br/>
+	<br/>
+	<form action="{{ path_for( 'admin_config' )}}" method="POST"
+		onsubmit="return confirm('This will delete all participants apart from admin, and all nominations and votes. Do you really want to delete the database?');">
+		<input type="hidden" name="reset_database" value="yes"/>
+		<input type="submit" value="Reset Database" class="btn btn--danger"/>
+	</form>
+
+	<br/>
+	<br/>
 </div>
 
 {% endblock %}
