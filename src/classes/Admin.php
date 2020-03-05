@@ -31,6 +31,17 @@ class Admin
 		}
 		$config['loggedin'] = true;
 		$config['localservertime'] = date("Y-m-d H:m:s");
+		$sql = "SELECT id, time_period FROM `round`";
+		$query = $this->db->prepare($sql);
+		$param = array ();
+		$query->execute($param);
+		$config['rounds'] = array ();
+		$count = 0;
+		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+			$config['rounds'][$row->id] = $row->time_period;
+			$count++;
+		}
+		$config['num_rounds'] = $count;
 		$stage =new Stage($this->db);
 		$config['stage'] = $stage->getstage();
 		return $this->view->render($response, 'admin.html', $config);
@@ -119,6 +130,25 @@ class Admin
 		if (empty($data['time_voting_ends'])) die("invalid time");
 		$param = array($data['voting_ends']." ".$data['time_voting_ends']);
 		$query->execute($param);
+
+		# Delete everything from round
+		$sql = "DELETE FROM `round`";
+		$query=$this->db->prepare($sql);
+		$query->execute($param);
+		# Now add the data for the sessions
+		$round_id = 0;
+		$this->db->beginTransaction();
+		$sql = "INSERT INTO round(id,time_period) VALUES(:id,:time_period)";
+		$query=$this->db->prepare($sql);
+		foreach ($data['rounds'] as $round)
+		{
+			$query->bindValue(':id', $round_id);
+			$query->bindValue(':time_period', $round);
+			$query->execute();
+			$round_id++;
+		}
+		$query = null;
+		$this->db->commit();
 
 		return $this->showAdminView($request, $response, $args);
 	}

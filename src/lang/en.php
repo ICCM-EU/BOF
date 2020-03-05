@@ -30,5 +30,8 @@ return array(
     'All topics' => 'All topics',
     'Projector' => 'Projector',
     'Logout' => 'Logout',
+    'Slots' => 'Slots',
+    'Delete' => 'Delete',
+    'Add Slot' => 'Add Slot',
     'dummy' => 'dummy'
 );

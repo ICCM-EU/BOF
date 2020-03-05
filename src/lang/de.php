@@ -30,5 +30,8 @@ return array(
     'All topics' => 'Alle Themen',
     'Projector' => 'Beamer',
     'Logout' => 'Abmelden',
+    'Slots' => 'Slot',
+    'Delete' => 'Löschen',
+    'Add Slot' => 'Slot Hinzufügen',
     'dummy' => 'dummy'
 );
