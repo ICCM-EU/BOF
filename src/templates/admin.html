@@ -2,33 +2,33 @@
 
 {% block body %}
 <script type="text/javascript">
-	function delete_round(round_id) {
-		var round = document.getElementById('round_'+round_id);
-		var delete_button = document.getElementById('delete_round_'+round_id);
-		var br = document.getElementById('br_round_'+round_id);
-		round.remove();
+	function delete_item(type, id) {
+		var item = document.getElementById(type + '_' + id);
+		var delete_button = document.getElementById('delete_' + type + '_' + id);
+		var br = document.getElementById('br_' + type + '_' + id);
+		item.remove();
 		delete_button.remove();
 		br.remove();
 	}
 
-	function add_round() {
-		var last_round_id_el = document.getElementById('last_round_id');
-		var last_id = parseInt(last_round_id_el.value);
-		var parent = document.getElementById('rounds');
-		var round = document.createElement('input');
+	function add_item(type) {
+		var last_id_el = document.getElementById('last_' + type + '_id');
+		var last_id = parseInt(last_id_el.value);
+		var parent = document.getElementById(type + 's');
+		var item = document.createElement('input');
 		var delete_button = document.createElement('button');
 		var br = document.createElement('br');
-		br.id = 'br_round_' + last_id;
-		round.id = 'round_' + last_id;
-		round.name = 'rounds[]';
-		round.className = 'bof-form-input2';
-		delete_button.id = 'delete_round_' + last_id;
+		br.id = 'br_' + type + '_' + last_id;
+		item.id = type + '_' + last_id;
+		item.name = type + 's[]';
+		item.className = 'bof-form-input2';
+		delete_button.id = 'delete_' + type + '_' + last_id;
 		delete_button.onclick = function() {
-			delete_round(last_id);
+			delete_item(type, last_id);
 			return false;
 		};
 		delete_button.innerHTML = "Delete";
-		parent.appendChild(round);
+		parent.appendChild(item);
 		parent.appendChild(delete_button);
 		parent.appendChild(br);
 		last_round_id_el.value = ++last_id;
@@ -68,6 +68,19 @@
 			</div>
 			<input type="button" value="{{'Add Slot'|trans}}" onclick="add_round()"/>
 			<input type="hidden" id="last_round_id" value="{{num_rounds}}"/>
+		</fieldset>
+		<br/>
+		<fieldset>
+			<legend tabindex="-1">{{'Rooms'|trans}}</legend>
+			<div class="bof-form__item2" id="locations">
+			{% for location in locations %}
+				<input type="text" id="location_{{loop.index0}}" name="locations[]" value="{{location}}" class="bof-form-input2"/>
+				<button id="delete_location_{{loop.index0}}" onclick="delete_item('location', {{loop.index0}} )">{{'Delete'|trans}}</button>
+				<br id="br_location_{{loop.index0}}"/>
+			{% endfor %}
+			</div>
+			<button onclick="add_item('location')">{{'Add Room'|trans}}</button>
+			<input type="hidden" id="last_location_id" value="{{num_locations}}"/>
 		</fieldset>
 		<br/>
 		<div class="bof-form__item2">

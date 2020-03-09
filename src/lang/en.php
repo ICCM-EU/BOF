@@ -33,5 +33,7 @@ return array(
     'Slots' => 'Slots',
     'Delete' => 'Delete',
     'Add Slot' => 'Add Slot',
+    'Rooms' => 'Rooms',
+    'Add Room' => 'Add Room',
     'dummy' => 'dummy'
 );
