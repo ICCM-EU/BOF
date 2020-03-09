@@ -58,15 +58,15 @@
 		</div>
 		<br/>
 		<fieldset>
-			<legend>{{'Slots'|trans}}</legend>
+			<legend tabindex="-1">{{'Slots'|trans}}</legend>
 			<div class="bof-form__item2" id="rounds">
 			{% for round in rounds %}
 				<input type="text" id="round_{{loop.index0}}" name="rounds[]" value="{{round}}" class="bof-form-input2"/>
-				<input id="delete_round_{{loop.index0}}" type="button" value="{{'Delete'|trans}}" onclick="delete_round( {{loop.index0}} )"/>
+				<button id="delete_round_{{loop.index0}}" onclick="delete_item('round', {{loop.index0}} )">{{'Delete'|trans}}</button>
 				<br id="br_round_{{loop.index0}}"/>
 			{% endfor %}
 			</div>
-			<input type="button" value="{{'Add Slot'|trans}}" onclick="add_round()"/>
+			<button onclick="add_item('round')">{{'Add Slot'|trans}}</button>
 			<input type="hidden" id="last_round_id" value="{{num_rounds}}"/>
 		</fieldset>
 		<br/>
