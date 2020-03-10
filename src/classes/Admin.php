@@ -42,6 +42,17 @@ class Admin
 			$count++;
 		}
 		$config['num_rounds'] = $count;
+		$sql = "SELECT id, name FROM `location`";
+		$query = $this->db->prepare($sql);
+		$param = array ();
+		$query->execute($param);
+		$config['locations'] = array ();
+		$count = 0;
+		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+			$config['locations'][$row->id] = $row->name;
+			$count++;
+		}
+		$config['num_locations'] = $count;
 		$stage =new Stage($this->db);
 		$config['stage'] = $stage->getstage();
 		return $this->view->render($response, 'admin.html', $config);
@@ -146,6 +157,25 @@ class Admin
 			$query->bindValue(':time_period', $round);
 			$query->execute();
 			$round_id++;
+		}
+		$query = null;
+		$this->db->commit();
+
+		# Delete everything from location
+		$sql = "DELETE FROM `location`";
+		$query=$this->db->prepare($sql);
+		$query->execute($param);
+		# Now add the data for the sessions
+		$location_id = 0;
+		$this->db->beginTransaction();
+		$sql = "INSERT INTO location(id,name) VALUES(:id,:name)";
+		$query=$this->db->prepare($sql);
+		foreach ($data['locations'] as $location)
+		{
+			$query->bindValue(':id', $location_id);
+			$query->bindValue(':name', $location);
+			$query->execute();
+			$location_id++;
 		}
 		$query = null;
 		$this->db->commit();
