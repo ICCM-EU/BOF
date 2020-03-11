@@ -1,0 +1,40 @@
+body {
+  font-family: 'Lato', sans-serif;
+}
+
+.container {
+  margin: 0 auto;
+  max-width: 920px;
+  width: 100%;
+  padding: 0 10px;
+
+  &--projector {
+    padding: 16px;
+    max-width: 1200px;
+  }
+}
+
+.title {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
+.potentialfacilitators {
+  font-size: 12px;
+}
+
+.logoheader {
+   background-color: siteColor(bof-logo-background);
+}
+
+.logo {
+   background: siteImage(bof-logo-image) no-repeat;
+   background-position: center left;
+   display: block;
+   -moz-box-sizing: border-box;
+   box-sizing: border-box;
+   height: siteSize(bof-logo-height);
+   width: siteSize(bof-logo-width);
+   margin: siteSize(bof-logo-margin);
+}

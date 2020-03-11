@@ -20,7 +20,7 @@ class Admin
 		$is_admin = $request->getAttribute('is_admin');
 		if (!$is_admin) die("you don't have permissions for this page");
 
-		$sql = "SELECT * FROM `config`";
+		$sql = "SELECT * FROM `config` WHERE item != 'branding'";
 		$query=$this->db->prepare($sql);
 		$param = array ();
 		$query->execute($param);
