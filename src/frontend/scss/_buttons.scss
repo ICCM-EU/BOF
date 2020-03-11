@@ -1,7 +1,7 @@
 .btn {
   appearance: none;
   border: 0;
-  color: white;
+  color: siteColor(bof-button-foreground);
   font-size: 16px;
   font-weight: bold;
   line-height: 20px;
@@ -13,41 +13,41 @@
   width: 100%;
 
   &:hover {
-    color: white;
+    color: siteColor(bof-button-foreground);
   }
 
   &--primary {
-    background: siteColor(bof-lilac);
-    border-bottom: 5px solid siteColor(bof-lilac-dark);
+    background: siteColor(bof-primary-background);
+    border-bottom: 5px solid siteColor(bof-primary-bottom);
 
     &:hover {
-      background: siteColor(bof-lilac-dark);
+      background: siteColor(bof-primary-hover);
     }
 
     &.btn--toggled {
-      background: siteColor(bof-lilac-dark);
+      background: siteColor(bof-primary-toggled);
     }
   }
 
   &--secondary {
-    background: siteColor(bof-sky-blue);
-    border-bottom: 5px solid siteColor(bof-sky-blue-dark);
+    background: siteColor(bof-secondary-background);
+    border-bottom: 5px solid siteColor(bof-secondary-bottom);
 
     &:hover {
-      background: siteColor(bof-sky-blue-dark);
+      background: siteColor(bof-secondary-hover);
     }
 
     &.btn--toggled {
-      background: siteColor(bof-sky-blue-dark);
+      background: siteColor(bof-secondary-toggled);
     }
   }
 
   &--danger {
-    background: siteColor(bof-danger-red);
-    border-bottom: 5px solid siteColor(bof-danger-red-dark);
+    background: siteColor(bof-danger-background);
+    border-bottom: 5px solid siteColor(bof-danger-bottom);
 
     &:hover {
-      background: siteColor(bof-danger-red-dark);
+      background: siteColor(bof-danger-hover);
     }
   }
 

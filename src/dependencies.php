@@ -17,6 +17,14 @@ $container['db'] = function ($c) {
 };
 
 $container['view'] = function ($container) {
+    $sql = "SELECT item, value from `config` WHERE item = 'branding'";
+    $query=$container['db']->prepare($sql);
+    $query->execute();
+    $cfg = array();
+    while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+        $cfg[$row->item] = $row->value;
+    }
+
     $view = new \Slim\Views\Twig('../templates/', [
         # we could use the caching by setting a path here, eg. ../cache
         'cache' => false
@@ -25,6 +33,7 @@ $container['view'] = function ($container) {
     // Instantiate and add Slim specific extension
     $basePath = rtrim(str_ireplace('index.php', '', $container['request']->getUri()->getBasePath()), '/');
     $view->addExtension(new Slim\Views\TwigExtension($container['router'], $basePath));
+    $view->getEnvironment()->addGlobal('branding', $cfg['branding']);
 
     return $view;
 };

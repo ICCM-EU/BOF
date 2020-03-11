@@ -19,10 +19,10 @@
   }
 
   &--success {
-    background-color: siteColor(bof-grass-green);
+    background-color: siteColor(bof-success-background);
   }
 
   &--warning {
-    background-color: siteColor(bof-mustard);
+    background-color: siteColor(bof-warning-background);
   }
 }

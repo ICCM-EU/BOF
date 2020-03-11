@@ -1,5 +1,5 @@
 .topic {
-  background-color: white;
+  background-color: siteColor(bof-topic-background);
   margin-bottom: 16px;
 
   form {
@@ -9,12 +9,12 @@
 }
 
 .topic__tally {
-  background-color: siteColor(deviant-grey);
+  background-color: siteColor(bof-topic-tally-background);
   font-size: 15px;
   width: 100%;
 
   &__inner {
-    background: siteColor(bof-grass-green);
+    background: siteColor(bof-topic-tally-inner-background);
     height: 9px;
   }
 
@@ -48,7 +48,7 @@
 .topic__vote-count {
   padding: 16px;
   font-size: 16px;
-  background: siteColor(bof-sky-blue);
+  background: siteColor(bof-secondary-background);
   width: 15%;
   text-align: right;
 }

@@ -41,8 +41,8 @@ html, body {
 }
 
 body {
-  background-color: siteColor(simple-grey);
-  color: black;
+  background-color: siteColor(bof-body-background);
+  color: siteColor(bof-body);
   font-family: fontFamily(main);
   font-size: 20px;
   line-height: 1.7;
@@ -66,19 +66,19 @@ a {
   color: inherit;
 
   &:hover {
-    color: siteColor(bof-lilac-dark);
+    color: siteColor(bof-primary-hover);
   }
 }
 
 hr {
   background-color: transparent;
-  border-bottom: 1px solid siteColor(petrel);
+  border-bottom: 1px solid siteColor(bof-hr-bottom);
   clear: both;
   margin: 5px 0;
 }
 
 abbr, acronym {
-  border-bottom: 1px dotted grey;
+  border-bottom: 1px dotted siteColor(bof-abbr-bottom);
 }
 
 em {
