@@ -143,7 +143,7 @@ class Results
         }
 
         //loop through remaining possible slots
-        for ($i=$rounds+1 ; $i <= $rounds * $locations ; $i++) {
+        for ($i=$rounds+1 ; $i < $rounds * $locations ; $i++) {
 
             //get highest # votes for unscheduled bof
             $sql="SELECT max(votes) as maxvote
