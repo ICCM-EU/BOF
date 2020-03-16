@@ -220,6 +220,152 @@ class Results
 
         $this->db->commit();
 
+        // Find minimum number of conflicts; limit to $triesLeft
+        $triesLeft = $rounds * $locations; // Total number of sessions...
+        $numNewConflicts = 0;
+        $numConflicts = 0;
+        // sqlConflicts is a query string that returns a row for every conflict
+        // I.e. there's a participant for a scheduled workshop who is marked
+        //  as the only leader for more than one in a single round.
+        $sqlConflicts = "SELECT c.participant_id, c.round_id
+                           FROM
+                            (SELECT wp.participant_id, w.round_id
+                               FROM workshop_participant AS wp
+                               JOIN workshop AS w
+                                 ON w.id=wp.workshop_id
+                              WHERE leader=1
+                                AND w.id NOT IN
+                                 (SELECT w.id
+                                    FROM workshop AS w
+                                    JOIN workshop_participant AS wp
+                                      ON w.id=wp.workshop_id
+                                   WHERE leader=1
+                                GROUP BY w.id
+                                  HAVING COUNT(*) > 1)
+                           ORDER BY wp.participant_id) AS c
+              GROUP BY c.participant_id, c.round_id HAVING COUNT(1) > 1";
+        $queryConflicts = $this->db->prepare($sqlConflicts);
+        // SQL to find the workshop and location IDs of the conflicting
+        // workshops
+        $sqlFindWorkshop = "SELECT w.id, w.location_id
+                              FROM workshop AS w
+                              JOIN workshop_participant AS wp
+                                ON w.id=wp.workshop_id
+                             WHERE wp.leader=1
+                               AND wp.participant_id=:participant_id
+                               AND w.round_id=:round_id
+                               AND w.location_id!=0";
+        $queryFindWorkshop = $this->db->prepare($sqlFindWorkshop);
+        // SQL to find something to switch our conflict with.  Note that
+        // we NEVER switch with something in location 0, because that
+        // location has all our top vote getters, and we never switch with
+        // the Prep BOF.
+        $sqlFindSwitchTarget = "SELECT w.id, w.round_id, w.location_id
+                                  FROM workshop AS w
+                                  JOIN workshop_participant AS wp
+                                    ON w.id=wp.workshop_id
+                                 WHERE wp.leader=1
+                                   AND w.location_id!=0
+                                   AND w.round_id!=:round_id
+                                   AND w.id NOT IN
+                                    (SELECT w.id
+                                       FROM workshop AS w
+                                       JOIN workshop_participant AS wp
+                                         ON w.id=wp.workshop_id
+                                      WHERE wp.leader=1
+                                        AND w.round_id=:round_id
+                                        AND wp.participant_id!=:participant_id
+                                        AND w.id!=:prep_bof_id)";
+        $queryFindSwitchTarget = $this->db->prepare($sqlFindSwitchTarget);
+        // SQL to make the switch; execute twice!
+        $sqlUpdateRound = "UPDATE workshop
+                              SET round_id=:round_id, location_id=:location_id
+                            WHERE id=:id";
+        $queryUpdateRound = $this->db->prepare($sqlUpdateRound);
+        // Execute the conflicts query and count up the conflicts (we'll do
+        // this in the loop, too, in order to see if the switch is better or
+        // worse.  Also note that for every loop after making a change,
+        // $conflicts is also re-created!
+        $queryConflicts->execute();
+        $conflicts=$queryConflicts->fetchAll(PDO::FETCH_OBJ);
+        if ($conflicts)
+            $numNewConflicts = count($conflicts);
+        $conflictIndex = 0;
+
+        // Loop up to $triesLeft times; no infinite loops here!
+        while (($numNewConflicts > 0) && ($triesLeft > 0)) {
+            $this->log("Found $numNewConflicts conflicts, checking conflict: $conflictIndex");
+            // Make sure we don't go past the number of conflicts!
+            if ($conflictIndex >= $numNewConflicts) {
+                break;
+            }
+
+            // Find the workshop IDs of the first conflict in our array
+            $this->log("Looking for workshop with leader: '{$conflicts[$conflictIndex]->participant_id}' and round: '{$conflicts[$conflictIndex]->round_id}'");
+            $queryFindWorkshop->bindValue(':round_id', (int) $conflicts[$conflictIndex]->round_id, PDO::PARAM_INT);
+            $queryFindWorkshop->bindValue(':participant_id', (int) $conflicts[$conflictIndex]->participant_id);
+            $queryFindWorkshop->execute();
+            // Move the first result...
+            if ($row=$queryFindWorkshop->fetch(PDO::FETCH_OBJ)) {
+                // Note that we start a transaction here, so if this switch is
+                // worse, we can roll it back easily!
+                $this->db->beginTransaction();
+                $this->log("Found conflict in round: '{$conflicts[$conflictIndex]->round_id}', id: '{$row->id}', participant_id: '{$conflicts[$conflictIndex]->participant_id}'");
+                // Find something to switch it with...
+                $queryFindSwitchTarget->bindValue(':round_id', (int) $conflicts[$conflictIndex]->round_id, PDO::PARAM_INT);
+                $queryFindSwitchTarget->bindValue(':participant_id', (int) $conflicts[$conflictIndex]->participant_id);
+                $queryFindSwitchTarget->bindValue(':prep_bof_id', (int) $this->PrepBofId);
+                $queryFindSwitchTarget->execute();
+                if ($targetRow=$queryFindSwitchTarget->fetch(PDO::FETCH_OBJ)) {
+                    $this->log("Swapping workshop '{$row->id}' in round '{$conflicts[$conflictIndex]->round_id}' with workshop '{$targetRow->id} in round '{$targetRow->round_id}'");
+                    // Switch the workshops!n
+                    $queryUpdateRound->bindValue(':id', (int) $targetRow->id, PDO::PARAM_INT);
+                    $queryUpdateRound->bindValue(':round_id', (int) $conflicts[$conflictIndex]->round_id, PDO::PARAM_INT);
+                    $queryUpdateRound->bindValue(':location_id', (int) $row->location_id, PDO::PARAM_INT);
+                    $queryUpdateRound->execute();
+                    $queryUpdateRound->bindValue(':id', (int) $row->id, PDO::PARAM_INT);
+                    $queryUpdateRound->bindValue(':round_id', (int) $targetRow->round_id, PDO::PARAM_INT);
+                    $queryUpdateRound->bindValue(':location_id', (int) $targetRow->location_id, PDO::PARAM_INT);
+                    $queryUpdateRound->execute();
+                }
+                else {
+                    $this->log("Couldn't find something to switch '{$row->id}' in round '{$conflicts[$conflictIndex]->round_id}' with; checking next conflict.");
+                    // We couldn't find something to switch it with!
+                    // Advance to the next conflict, and try to resolve it
+                    $conflictIndex++;
+                    $this->db->rollBack();
+                    continue;
+                }
+            }
+            else {
+                $this->log("Failed to find a conflicting workshop?");
+                $conflictIndex++;
+                continue;
+            }
+
+            // Now, determine how many conflicts exist -- this resets
+            // $conflicts, so be sure to set $conflictIndex back to 0!
+            $queryConflicts->execute();
+            $conflicts=$queryConflicts->fetchAll(PDO::FETCH_OBJ);
+            $conflictIndex = 0;
+            if ($conflicts)
+                $numNewConflicts = count($conflicts);
+            else
+                $numNewConflicts = 0;
+            $this->log("numNewConflicts: $numNewConflicts");
+            // If we now have fewer conflicts, commit the transaction,
+            // and let's try to handle the next conflict....
+            if ($numNewConflicts < $numConflicts) {
+                $numConflicts = $numNewConflicts;
+                $this->db->commit();
+                continue;
+            }
+            // Otherwise, we need to rollback the transaction, and try again;
+            // be sure to count this as a try, by decrementing $triesLeft.
+            $this->db->rollBack();
+            $triesLeft--;
+        }
+
         return $this->exportResult($request, $response, $args);
     }
 
