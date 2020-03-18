@@ -3,15 +3,39 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}ICCM BOF app{% endblock %}</title>
-        <link rel="stylesheet" href="/assets/css/main.css">
-	    <meta http-equiv="refresh" content="5" />
+        <link rel="stylesheet" href="/assets/css/{{branding}}.css">
+	    <meta http-equiv="refresh" content="500" />
     </head>
     <body>
+        {% if stage == 'finished' %}
+        {% for round in rounds %}
+        <table class="projectortable">
+            <caption>{{ round.name }}</caption>
+            <thead>
+                <tr>
+                    <th>Room</th>
+                    <th>Topic</th>
+                    <th>Facilitators</th>
+                    <th>Votes</th>
+                </tr>
+            </thead>
+            {% for room in round.rooms %}
+            <tr>
+                <td>{{ room.name }}</td>
+                <td>{{ room.topic }}<br/>{{ room.description }}</td>
+                <td>{{ room.facilitators }}</td>
+                <td>{{ room.votes }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endfor %}
+        {% else %}
         <div class="container container--projector">
             {% for topic in bofs %}
                 {% include 'partials/_topic_projector.html' %}
             {% endfor %}
         </div>
+        {% endif %}
 
         <script src="/assets/js/vendors.js" crossorigin="anonymous"></script>
         <script src="/assets/js/bundle.js" crossorigin="anonymous"></script>
