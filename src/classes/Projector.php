@@ -17,7 +17,7 @@ class Projector
 	}
 
 	// Returns a comma-delimited string of facilitators
-	function _getFacilitators() {
+	function _getFacilitators($id) {
 		static $queryFacilitators = null;
 		if ($queryFacilitators == null) {
 			$sqlFacilitators = "SELECT p.`name`
@@ -25,10 +25,10 @@ class Projector
 				WHERE wp.`participant_id` = p.`id`
 				AND wp.`leader` = 1
 				AND wp.workshop_id = :id";
-			$this->db->prepare($sqlFacilitators);
+			$queryFacilitators = $this->db->prepare($sqlFacilitators);
 		}
 
-		$queryFacilitators->bindValue(':id', $row->id);
+		$queryFacilitators->bindValue(':id', $id);
 		$queryFacilitators->execute();
 		$facilitators="";
 
@@ -78,8 +78,7 @@ class Projector
 					$bof['rooms'][$location->id]['topic'] = $row->name;
 					$bof['rooms'][$location->id]['description'] = $row->description;
 					$bof['rooms'][$location->id]['votes'] = $row->votes;
-					$workshop = new Workshop($this->db, $id);
-					$bof['rooms'][$location->id]['facilitators'] = $this->_getFacilitators($this->db, $row->id);
+					$bof['rooms'][$location->id]['facilitators'] = $this->_getFacilitators($row->id);
 				}
 			}
 			$bofs[$round->id] = $bof;
@@ -92,6 +91,13 @@ class Projector
 				'stage' => $stage2,
 				'locked' => $stage2=='locked',
 		]);
+	}
+
+	public static function cmpVotes($a, $b)
+	{
+		if ($a->votes > $b->votes) return -1;
+		if ($a->votes < $b->votes) return 1;
+		return 0;
 	}
 
 	function _showVotingStage($response, $stage2) {
@@ -114,21 +120,14 @@ class Projector
 		$query->execute($param);
 		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
 			$bofs[$row->id]->votes = $row->votes;
-			$bofs[$row->id]->leader = $this->_getFacilitators($this->db, $row->id);
+			$bofs[$row->id]->leader = $this->_getFacilitators($row->id);
 		}
 		$bofs2 = array();
 		foreach ($bofs as $bof) {
 			$bofs2[] = $bof;
 		}
 
-		function cmp($a, $b)
-		{
-			if ($a->votes > $b->votes) return -1;
-			if ($a->votes < $b->votes) return 1;
-			return 0;
-		}
-
-		usort($bofs2, "cmp");
+		usort($bofs2, array("ICCM\BOF\Projector", "cmpVotes"));
 		return $this->view->render($response, 'proj_layout.html', [
 				'bofs' => $bofs2,
 				'stage' => $stage2,

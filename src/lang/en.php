@@ -35,5 +35,7 @@ return array(
     'Add Slot' => 'Add Slot',
     'Rooms' => 'Rooms',
     'Add Room' => 'Add Room',
+    'Room' => 'Room',
+    'Topic' => 'Topic',
     'dummy' => 'dummy'
 );
