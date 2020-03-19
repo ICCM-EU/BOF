@@ -3,14 +3,18 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}ICCM BOF app{% endblock %}</title>
-        <link rel="stylesheet" href="/assets/css/main.css">
+        <link rel="stylesheet" href="/assets/css/{{branding}}.css">
 	    <meta http-equiv="refresh" content="5" />
     </head>
     <body>
         <div class="container container--projector">
+        {% if stage == 'finished' %}
+            {% include 'partials/_results_projector.html' %}
+        {% else %}
             {% for topic in bofs %}
                 {% include 'partials/_topic_projector.html' %}
             {% endfor %}
+        {% endif %}
         </div>
 
         <script src="/assets/js/vendors.js" crossorigin="anonymous"></script>

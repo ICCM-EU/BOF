@@ -25,16 +25,54 @@ body {
 }
 
 .logoheader {
-   background-color: siteColor(bof-logo-background);
+  background-color: siteColor(bof-logo-background);
 }
 
 .logo {
-   background: siteImage(bof-logo-image) no-repeat;
-   background-position: center left;
-   display: block;
-   -moz-box-sizing: border-box;
-   box-sizing: border-box;
-   height: siteSize(bof-logo-height);
-   width: siteSize(bof-logo-width);
-   margin: siteSize(bof-logo-margin);
+  background: siteImage(bof-logo-image) no-repeat;
+  background-position: center left;
+  display: block;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  height: siteSize(bof-logo-height);
+  width: siteSize(bof-logo-width);
+  margin: siteSize(bof-logo-margin);
+}
+
+.projectortable {
+  border: 2px solid siteColor(bof-body);
+  border-collapse: collapse;
+  //table-layout: fixed;
+  width: 100%;
+  thead {
+    th:nth-child(1) {
+      border: 2px solid siteColor(bof-body);
+      width: 20%;
+    }
+    th:nth-child(2) {
+      border: 2px solid siteColor(bof-body);
+      width: 50%;
+    }
+    th:nth-child(3) {
+      border: 2px solid siteColor(bof-body);
+      width: 20%;
+    }
+    th:nth-child(4) {
+      border: 2px solid siteColor(bof-body);
+      width: 10%;
+    }
+  }
+  tbody {
+    tr:nth-child(odd) {
+      background-color: siteColor(bof-secondary-background);
+      border: 2px solid siteColor(bof-body);
+    }
+    tr:nth-child(even) {
+      background-color: siteColor(bof-secondary-bottom);
+      border: 2px solid siteColor(bof-body);
+    }
+  }
+  td {
+    border: 2px solid siteColor(bof-body);
+  }
 }

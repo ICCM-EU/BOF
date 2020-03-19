@@ -1,0 +1,22 @@
+
+{% for round in rounds %}
+<table class="projectortable">
+    <caption>{{ round.name }}</caption>
+    <thead>
+        <tr>
+            <th>{{'Room'|trans}}</th>
+            <th>{{'Topic'|trans}}</th>
+            <th>{{'Facilitator'|trans}}</th>
+            <th>{{'Votes'|trans}}</th>
+        </tr>
+    </thead>
+    {% for room in round.rooms %}
+    <tr>
+        <td>{{ room.name }}</td>
+        <td>{{ room.topic }}<br/>{{ room.description }}</td>
+        <td>{{ room.facilitators }}</td>
+        <td>{{ room.votes }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endfor %}
