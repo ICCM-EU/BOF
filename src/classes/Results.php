@@ -288,6 +288,12 @@ class Results
         // $conflicts is also re-created!
         $queryConflicts->execute();
         $conflicts=$queryConflicts->fetchAll(PDO::FETCH_OBJ);
+        // TODO: This isn't quite right -- we need to know how many conflicts
+        // there are for a single leader.  If a leader has all the locations
+        // in a single round, it counts as one conflict, but it should count
+        // as more.  Since it's only counting as one, we'll never resolve it,
+        // because the conflict count won't be reduced; we'll resolve one
+        // conflict, but still see one conflict.
         if ($conflicts)
             $numNewConflicts = count($conflicts);
         $conflictIndex = 0;
