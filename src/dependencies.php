@@ -57,6 +57,11 @@ $container['ICCM\BOF\Admin'] = function ($c) {
         $app->getContainer()->get('router'));
 };
 
+$container['ICCM\BOF\DBO'] = function ($c) {
+    global $app;
+    return new \ICCM\BOF\DBO($c['db']);
+};
+
 $container['ICCM\BOF\Nomination'] = function ($c) {
     global $app;
     global $settings;
