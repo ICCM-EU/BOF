@@ -12,6 +12,8 @@ $container = $app->getContainer();
 require __DIR__ . '/../dependencies.php';
 require __DIR__.'/../classes/Stage.php';
 require __DIR__.'/../classes/Results.php';
+require __DIR__.'/../classes/DBO.php';
+require __DIR__.'/../classes/Logger.php';
 
 // Register middleware
 require __DIR__ . '/../middleware.php';
