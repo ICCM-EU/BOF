@@ -1,275 +1,216 @@
 <?php
 
 namespace ICCM\BOF;
+
+use ErrorException;
 use \PDO;
+use RuntimeException;
+use Twig\Error\RuntimeError;
 
 class Results
 {
-    private $db;
+    private $dbo;
     private $view;
     private $router;
-    private $logbuffer;
-    private $debug=0;
-    private $PrepBofId = 1;
+    private $logger;
 
-    function __construct($view, $db, $router) {
+    function __construct($view, $router, $dbo, $logger) {
         $this->view = $view;
-        $this->db = $db;
         $this->router = $router;
-
-        $settings = require __DIR__.'/../../cfg/settings.php';
-        $this->PrepBofId = $settings['settings']['PrepBofId'];
+        $this->dbo = $dbo;
+        $this->logger = $logger;
     }
 
-    function log($msg) {
-        if ($this->debug) echo $msg."<br/>\n";
-        $this->logbuffer .= $msg."\n";
+    /**
+     * Books location 1 of the last round for the Prep BoF
+     *
+     * @param int $rounds The total number of rounds
+     */
+    private function bookPrepBoF($rounds) {
+        if ($row = $this->dbo->getPrepBoF()) {
+            $this->dbo->bookWorkshop($row->id, $row->name, $rounds - 1, 1, $row->available, "Prep BoF", $this->logger);
+        }
     }
 
-    public function calculateResults($request, $response, $args) {
-        $this->logbuffer = '';
-        $this->db->beginTransaction();
-
-        $sql="SELECT COUNT(*) FROM round";
-        $query=$this->db->prepare($sql);
-        $query->execute();
-        $rounds=$query->fetchColumn();
-
-        $sql="SELECT COUNT(*) FROM location";
-        $query=$this->db->prepare($sql);
-        $query->execute();
-        $locations=$query->fetchColumn();
-
-        // validate that we have consecutive location ids starting with 0
-        $sql="SELECT id FROM location WHERE id >= ".$locations;
-        $query=$this->db->prepare($sql);
-        $query->execute();
-        if ($row=$query->fetch(PDO::FETCH_OBJ)) {
-            die("locations must have consecutive ids starting with 0");
-        }
-
-        // validate that we have consecutive round ids starting with 0
-        $sql="SELECT id FROM round WHERE id >= ".$rounds;
-        $query=$this->db->prepare($sql);
-        $query->execute();
-        if ($row=$query->fetch(PDO::FETCH_OBJ)) {
-            die("rounds must have consecutive ids starting with 0");
-        }
-
-        // translate location id to a real name (for logging purposes)
-        $sql="SELECT id, name FROM location";
-        $query=$this->db->prepare($sql);
-        $query->execute();
-
+    /**
+     * Books the top vote-getting workshops into location 0 of each round.
+     *
+     * @param int $rounds The total number of rounds
+     */
+    private function bookTopVotes($rounds) {
+        $topWorkshops = $this->dbo->getTopWorkshops($rounds);
         $count = 0;
-        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
-            $location_names[$row->id]=$row->name;
-            $count++;
-        }
-
-        // translate round id to a real name (for logging purposes)
-        $sql="SELECT id, time_period FROM round";
-        $query=$this->db->prepare($sql);
-        $query->execute();
-
-        $count = 0;
-        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
-            $round_names[$row->id] = $row->time_period;
-            $count++;
-        }
-
-        //calculate # votes
-        $sql="UPDATE workshop
-                 SET votes = (SELECT SUM(participant)
-                                FROM workshop_participant 
-                               WHERE workshop.id=workshop_participant.workshop_id),
-                     round_id = NULL,
-                     location_id = NULL,
-                     available = NULL";
-        $sth = $this->db->prepare($sql);
-        $sth->execute();
-
-        //place top in each round
-        $sql="SELECT id,name, votes
-                FROM workshop
-               -- WHERE published=1
-               ORDER BY votes desc
-               LIMIT :rounds";
-        $qry_top3 = $this->db->prepare($sql);
-        $qry_top3->bindValue(':rounds', (int) $rounds, PDO::PARAM_INT);
-        $qry_top3->execute();
-
-        $count=0;
-        while ($row=$qry_top3->fetch(PDO::FETCH_OBJ))
-        {
-            $sql2="UPDATE workshop
-                      SET round_id = ?,
-                          location_id = 0,
-                          available=(SELECT COUNT(ID)
-                                       FROM workshop_participant 
-                                      WHERE workshop.id=workshop_participant.workshop_id
-                                        AND participant=1)
-                    WHERE id = ?";
-
-            $this->log("Putting workshop '{$row->name}' in round '{$round_names[$count]}' at location '{$location_names[0]}'. Reason: {$row->votes} votes");
-            $updatequery = $this->db->prepare($sql2);
-            $params = array($count, $row->id);
-            $updatequery->execute($params);
-
+        foreach ($topWorkshops as $workshop) {
+            $this->dbo->bookWorkshop($workshop->id, $workshop->name, $count, 0, $workshop->available, "{$workshop->votes} votes", $this->logger);
             $count += 1;
         }
+    }
 
-        // now reserve the prep team BOF, id 1, room B
-        $sql="SELECT name
-                FROM workshop
-                WHERE id = ".$this->PrepBofId;
-        $qry_top3 = $this->db->prepare($sql);
-        $qry_top3->execute();
+    /**
+     * Books workshops, and resolves facilitator conflicts.
+     *
+     * @param int $rounds The total number of rounds.
+     * @param int $locations The total number locations.
+     */
+    private function bookWorkshops($rounds, $locations) {
+        $this->logger->clearLog();
 
-        $count=0;
-        if ($row=$qry_top3->fetch(PDO::FETCH_OBJ)) {
-            $sql2="UPDATE workshop
-                      SET round_id = 2,
-                          location_id = 1,
-                          available=(SELECT COUNT(ID)
-                                       FROM workshop_participant 
-                                      WHERE workshop.id=workshop_participant.workshop_id
-                                        AND participant>0)
-                    WHERE id = ".$this->PrepBofId;
+        $this->dbo->beginTransaction();
+        $this->dbo->calculateVotes();
+        $this->bookTopVotes($rounds);
+        $this->bookPrepBoF($rounds);
+        $this->fillBooking($rounds, $locations);
+        $this->dbo->commit();
 
-            $this->log("Putting workshop '{$row->name}' in round '{$round_names[2]}' at location '{$location_names[1]}'. Reason: Prep Team");
-            $updatequery = $this->db->prepare($sql2);
-            $updatequery->execute(array());
-        }
+        $this->resolveConflicts($rounds, $locations);
+    }
 
+    /**
+     * Helper for bookWorkshops() to book the rest of the workshops based on
+     * votes and availability.
+     *
+     * @param int $rounds The total number of rounds.
+     * @param int $locations The total number locations.
+     */
+    private function fillBooking($rounds, $locations) {
         //loop through remaining possible slots
         for ($i=$rounds+1 ; $i < $rounds * $locations ; $i++) {
-
             //get highest # votes for unscheduled bof
-            $sql="SELECT max(votes) as maxvote
-                    FROM workshop 
-                   WHERE round_id IS NULL 
-                     -- AND published=1";
-            $query = $this->db->prepare($sql);
-            $query->execute();
-            if (!($maxvote = $query->fetchColumn())) {
+            if (!($maxvote = $this->dbo->getMaxVote())) {
                 // there are none left, we are done
                 break;
             }
 
-            //find next bof to book
-            $sql = "SELECT s.id id,s.name,
-                           roundsTable.round_id round,
-                           roundsTable.last_location last_location,
-                           available,  
-                           (SELECT count(*) 
-                              FROM workshop_participant
-                             WHERE workshop_id = s.id
-                               AND participant=1
-                               AND participant_id NOT IN
-                                           (SELECT participant_id
-                                              FROM workshop_participant
-                                              JOIN workshop ON workshop.id=workshop_participant.workshop_id
-                                             WHERE workshop.round_id=roundsTable.round_id
-                                               AND (workshop_participant.participant=1 or
-                                                    -- special treatment of workshop 0. prep team
-                                                    (workshop_participant.workshop_id = ".$this->PrepBofId." and workshop_participant.participant > 0))
-                           )) AS available,
-                           (SELECT count(*) 
-                              FROM workshop_participant
-                             WHERE workshop_id = s.id
-                               AND leader=1
-                               AND participant_id NOT IN
-                                   (SELECT participant_id
-                                      FROM workshop_participant
-                                      JOIN workshop ON workshop.id=workshop_participant.workshop_id
-                                     WHERE workshop.round_id=roundsTable.round_id
-                                       AND workshop_participant.leader=1)
-                            ) AS facilitators
-                    FROM workshop AS s
-                    LEFT JOIN (SELECT round_id, max(location_id) last_location
-                               FROM workshop
-                               WHERE round_id IS NOT NULL
-                               GROUP BY round_id) AS roundsTable 
-                         ON roundsTable.last_location < ?
-                    WHERE s.round_id is null
-                      -- AND published=1
-                      AND s.votes = ?
-                    ORDER BY available DESC, facilitators DESC, round ASC
-                    LIMIT 0,1";
-            $query = $this->db->prepare($sql);
-            $params = array($locations-1, $maxvote);
-            $query->execute($params);
-
-            while ($row=$query->fetch(PDO::FETCH_OBJ))
-            {
-                $sql2="UPDATE workshop
-                              SET round_id = ?,
-                                  location_id = ?,
-                                  available = ?
-                            WHERE id=?";
-
-                $updatequery = $this->db->prepare($sql2);
-                $params = array($row->round, $row->last_location + 1, $row->available, $row->id);
-                $updatequery->execute($params);
-
-                $this->log("Putting workshop '{$row->name}' in round '{$round_names[$row->round]}' at location '" . $location_names[$row->last_location+1] . "'. Reason: Vote count = {$row->available}, {$row->facilitators} facilitators");
-
+            if ($row = $this->dbo->getWorkshopToBook($locations - 1, $maxvote)) {
+                $this->dbo->bookWorkshop($row->id, $row->name, $row->round, $row->last_location + 1, $row->available, "{$maxvote} votes, {$row->available} available, {$row->facilitators} facilitators", $this->logger);
             }
         }
-
-        $this->db->commit();
-
-        return $this->exportResult($request, $response, $args);
     }
 
-    public function exportResult($request, $response, $args) {
-        $csvout = "";
+    /**
+     * Resolve conflicts with facilitators.  Conflicts might not be resolvable!
+     *
+     * @param int $rounds The total number of rounds.
+     * @param int $locations The total number locations.
+     */
+    private function resolveConflicts($rounds, $locations) {
+        // Find minimum number of conflicts; limit to $triesLeft
+        $conflictArr=$this->dbo->findConflicts($this->logger);
+        $conflictIndex = 0;
 
-        $sql = "SELECT w.id id, w.name, w.description,
-                       round.time_period,
-                       location.name as location_name,
-                       votes,
-                       available
-                FROM workshop AS w JOIN round ON round_id = round.id JOIN location ON location_id=location.id
-                WHERE w.round_id is NOT null
-                ORDER BY round.id, location.id";
-        $query = $this->db->prepare($sql);
-        $query->execute();
+        // Loop to resolve conflicts.
+        // Make sure we don't walk off the end of the
+        // $conflictsArr['conflicts'] array, too.
+        // Note that we might change $conflictArr INSIDE the
+        // loop!
+        while (($conflictArr['count'] > 0)
+               && ($conflictIndex < count($conflictArr['conflicts']))) {
+            $this->logger->log("Resolving {$conflictArr['count']} conflicts!");
 
-        while ($row=$query->fetch(PDO::FETCH_OBJ))
-        {
-            $facilitators = "";
-
-            $sql = 'SELECT p.`name`
-                FROM `workshop_participant` wp, `participant` p
-                WHERE wp.`participant_id` = p.`id`
-                AND wp.`leader` = 1
-                AND wp.workshop_id = '.$row->id;
-            $query2=$this->db->prepare($sql);
-            $query2->execute(array());
-            while ($frow=$query2->fetch(PDO::FETCH_OBJ)) {
-                foreach ($frow as $facilitator) {
-                    if ($facilitators != "") {
-                           $facilitators .= ', ';
+            // Find the workshop IDs of the first conflict in our array
+            if ($row=$this->dbo->getConflict($conflictArr['conflicts'][$conflictIndex])) {
+                // Find something to switch it with...
+                $targetRows = $this->dbo->getConflictSwitchTargets($conflictArr['conflicts'][$conflictIndex]);
+                if (count($targetRows) > 0) {
+                    foreach ($targetRows as $targetRow) {
+                        // If $conflictArr2 is not false, then we made good
+                        // progress, so reset our control variables, and break
+                        // this innermost loop.
+                        if (($conflictArr2 = $this->trySwitch($conflictArr['conflicts'][$conflictIndex], $row, $targetRow, $conflictArr['count'])) != false) {
+                            $conflictArr = $conflictArr2;
+                            // Set the index to -1 here because it gets
+                            // incremented below.
+                            $conflictIndex = -1;
+                            break;
+                        }
+                        /*else {
+                            $this->logger->log('Switching targets failed!');
+                        }*/
                     }
-                    $facilitators .= $frow->name;
                 }
+                /*else {
+                    $this->logger->log("Couldn't find anything to switch with!");
+                }*/
             }
+            // Advance to the next conflict, and try to resolve it
+            $conflictIndex++;
+        }
+    }
 
-            $csvout .= $row->location_name.",".
-                        '"'.str_replace('"', "'", strip_tags($row->name)).'",'.
-                        '"'.$facilitators.'",'.
-                        '"'.str_replace('"', "'", strip_tags($row->description)).'",'.
-                        $row->votes.",".
-                        $row->available."\n";
+    /**
+     * Helper for resolveConflicts. This switches the bookings for two
+     * workshops and checks if there are now fewer conflicts. If there are
+     * fewer conflicts, the switch is kept by commiting the database
+     * transaction, if there are not fewer conflicts, the switch is rejected.
+     *
+     * @param stdClass $conflict Information about the conflict workshop to
+     * switch
+     * @param stdClass $row Information about the conflict workshop to switch
+     * @param stdClass $targetRow Information about the workshop to switch with
+     * @param int $numConflicts The number of conflicts before trying this
+     * change.
+     */
+    private function trySwitch($conflict, $row, $targetRow, $numConflicts) {
+        // Note that we start a transaction here, so if this
+        // switch is worse, we can roll it back easily!
+        // Find something to switch it with...
+        $this->dbo->beginTransaction();
+        // Switch the workshops!
+        $this->dbo->switchBookings($row->id,
+            $conflict->round_id,
+            $row->location_id,
+            $targetRow->id,
+            $targetRow->round_id,
+            $targetRow->location_id);
+        $this->logger->logSwitchedWorkshops($this->dbo, $row->id,
+            $targetRow->round_id,
+            $targetRow->location_id,
+            $targetRow->id,
+            $conflict->round_id,
+            $row->location_id);
+        $conflictArr2=$this->dbo->findConflicts($this->logger);
+        // If we now have fewer conflicts, commit the
+        // transaction, and let's try to handle the next
+        // conflict....
+        if ($conflictArr2['count'] < $numConflicts) {
+            $this->logger->log('Keeping switch!');
+            $this->dbo->commit();
+            return $conflictArr2;
+        }
+        // Otherwise, we need to rollback the transaction, and
+        // try again
+        $this->logger->log("Switching {$row->id} and {$targetRow->id} resulted in more conflicts, rolling back changes.");
+        $this->dbo->rollBack();
+        return false;
+    }
+
+    /**
+     * Entry point for the class -- books workshops and displays a page with
+     * the booked workshops in CSV format along with some log data about what
+     * was done and why.
+     */
+    public function calculateResults($request, $response, $stage, $args) {
+        $rounds = $this->dbo->getNumRounds();
+        $locations = $this->dbo->getNumLocations();
+
+        if ($locations < 2) {
+            throw new RuntimeException("There must be at least two locations!");
         }
 
+        if (! $this->dbo->validateLocations($locations)) {
+            throw new RuntimeException("locations must have consecutive ids starting with 0");
+        }
+
+        if (! $this->dbo->validateRounds($rounds)) {
+            throw new RuntimeException("rounds must have consecutive ids starting with 0");
+        }
+
+        $this->bookWorkshops($rounds, $locations);
+
         $config['loggedin'] = true;
-        $stage =new Stage($this->db);
         $config['stage'] = $stage->getstage();
-        $config['csvdata'] = $csvout;
-        $config['log'] = $this->logbuffer;
+        $config['csvdata'] = $this->dbo->exportWorkshops();
+        $config['log'] = $this->logger->getLog();
         return $this->view->render($response, 'results.html', $config);
     }
 }

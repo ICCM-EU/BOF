@@ -3,6 +3,7 @@
 namespace ICCM\BOF;
 use \Firebase\JWT\JWT;
 use \PDO;
+use RuntimeException;
 
 class Admin
 {
@@ -184,13 +185,18 @@ class Admin
 	}
 
 	public function calcResult($request, $response, $args) {
+		global $app;
 		$is_admin = $request->getAttribute('is_admin');
 		if (!$is_admin) die("you don't have permissions for this page");
 
-		$results = new Results($this->view, $this->db, $this->router);
-		return $results->calculateResults($request, $response, $args);
+		try {
+			$results = new Results($this->view, $this->router, $app->getContainer()->get('ICCM\BOF\DBO'), new Logger());
+			return $results->calculateResults($request, $response, new Stage($this->db), $args);
+		}
+		catch (RuntimeException $re) {
+			die($re->getMessage());
+		}
 	}
-
 }
 
 ?>
