@@ -5,20 +5,9 @@
     creates: /etc/apt/sources.list.d/nodesource.list
 
 - name: "Install Apache"
-  apt: pkg={{ item }} state=present
-  with_items:
-  - apache2
-  - libapache2-mod-php7.2
-  - php
-  - php-mysql
-  - python-mysqldb
-  - mariadb-server
-  - php-zip
-  - ca-certificates
-  - composer
-  - php-dom
-  - php-mbstring
-  - nodejs
+  apt:
+    pkg: ['apache2', 'libapache2-mod-php', 'php', 'php-mysql', 'python3-mysqldb', 'mariadb-server', 'php-zip', 'ca-certificates', 'composer', 'php-dom', 'php-mbstring', 'nodejs']
+    state: present
 
 - name: "Set up the logs directory"
   file:
