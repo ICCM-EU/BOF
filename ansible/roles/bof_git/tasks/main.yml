@@ -1,7 +1,13 @@
 ---
+- name: check if the working tree exists
+    # this is useful for the test runs where we want to work with a different branch, on LightBuildServer
+    stat:
+      path: '{{ web_directory }}'
+    register: file_details
 - name: "git clone"
   git:
     repo: 'https://github.com/ICCM-EU/BOF.git'
     dest: '{{ web_directory }}'
     # don't complain if there are local changes
     update: no
+  when: file_details.stat.exists == False
