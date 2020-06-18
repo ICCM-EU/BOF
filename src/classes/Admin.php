@@ -31,7 +31,7 @@ class Admin
 			$config[$row->item."_time"] = date("H:i", strtotime($row->value));
 		}
 		$config['loggedin'] = true;
-		$config['localservertime'] = date("Y-m-d H:m:s");
+		$config['localservertime'] = date("Y-m-d H:i:s");
 		$sql = "SELECT id, time_period FROM `round`";
 		$query = $this->db->prepare($sql);
 		$param = array ();
