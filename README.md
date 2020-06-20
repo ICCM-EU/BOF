@@ -70,6 +70,7 @@ LANG=en CYPRESS_baseUrl=http://localhost ./node_modules/.bin/cypress run --confi
 
 ```
 cd /var/www/bof/src
+# need to run composer install again, because ansible does not include the dev dependancies by default when calling composer install
 composer install
 apt-get install php-xdebug php-pdo-sqlite
 ./vendor/bin/phpunit -c phpunit.xml
