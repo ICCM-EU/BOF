@@ -65,3 +65,12 @@ apt-get install xvfb gconf2 libgtk2.0-0 libxtst6 libxss1 libnss3 libasound2
 LANG=en CYPRESS_baseUrl=http://localhost ./node_modules/.bin/cypress run --config video=false --spec 'cypress/integration/nomination.js'
 LANG=en CYPRESS_baseUrl=http://localhost ./node_modules/.bin/cypress run --config video=false --spec 'cypress/integration/voting.js'
 ```
+
+# Running the PHPUnit Tests
+
+```
+cd /var/www/bof/src
+composer install
+apt-get install php-xdebug php-pdo-sqlite
+./vendor/bin/phpunit -c phpunit.xml
+```
