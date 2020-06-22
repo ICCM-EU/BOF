@@ -31,6 +31,8 @@ git clone https://github.com/ICCM-EU/BOF.git
 cd BOF/ansible
 # perhaps update group_vars/all.yml with the actual timezone
 ansible-playbook playbook.yml -i localhost
+# for dev environment, i.e. for running the tests
+ansible-playbook playbook.yml -i localhost --extra-vars "dev=1"
 cd /root
 rm -Rf BOF
 ln -s /var/www/bof
@@ -64,4 +66,14 @@ npm install cypress
 apt-get install xvfb gconf2 libgtk2.0-0 libxtst6 libxss1 libnss3 libasound2
 LANG=en CYPRESS_baseUrl=http://localhost ./node_modules/.bin/cypress run --config video=false --spec 'cypress/integration/nomination.js'
 LANG=en CYPRESS_baseUrl=http://localhost ./node_modules/.bin/cypress run --config video=false --spec 'cypress/integration/voting.js'
+```
+
+# Running the PHPUnit Tests
+
+```
+cd /var/www/bof/src
+# need to run composer install again, because ansible does not include the dev dependancies by default when calling composer install
+composer install --dev
+apt-get install php-xdebug php-pdo-sqlite
+./vendor/bin/phpunit -c phpunit.xml
 ```

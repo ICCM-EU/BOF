@@ -44,6 +44,24 @@ class Projector
 		return $facilitators;
 	}
 
+	function _showNominationStage($response, $stage2) {
+		$sql = "SELECT workshop.name, workshop.id, 0 as votes, '' as leader
+				FROM workshop ORDER BY id DESC";
+		$query=$this->db->prepare($sql);
+		$param = array ();
+		$query->execute($param);
+		$bofs = array ();
+		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+			$bofs [$row->id] = $row;
+		}
+
+		return $this->view->render($response, 'proj_layout.html', [
+				'bofs' => $bofs,
+				'stage' => $stage2,
+				'locked' => $stage2=='locked',
+		]);
+	}
+
 	function _showFinishedStage($response, $stage2) {
 		$sqlRooms = "SELECT id, name FROM `location`";
 		$queryRooms = $this->db->prepare($sqlRooms);
@@ -154,6 +172,9 @@ class Projector
 		$stage =new Stage($this->db);
 		$stage2 =$stage->getstage();
 
+		if ($stage2 == "nominating") {
+			return $this->_showNominationStage($response, $stage2);
+		}
 		if ($stage2 == "voting" || $stage2 == "locked") {
 			return $this->_showVotingStage($response, $stage2);
 		}

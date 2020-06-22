@@ -39,6 +39,13 @@ body {
   margin: siteSize(bof-logo-margin);
 }
 
+@media (max-width: 500px) {
+  .logo {
+    margin: siteSize(bof-logo-margin-mobile);
+  }
+}
+
+
 .projectortable {
   border: 2px solid siteColor(bof-body);
   border-collapse: collapse;
