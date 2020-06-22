@@ -10,16 +10,12 @@ use ICCM\BOF\Projector;
 use ICCM\BOF\DBO;
 use Slim\Views\Twig;
 use Psr\Http\Message\ResponseInterface;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Prophecy\Argument;
 
 /**
  * @covers ICCM\BOF\Projector
  */
 class TestProjector extends TestCase
 {
-    use ProphecyTrait;
-
     /**
      * Note: cmpVotes is explictly backwards to do reverse sorts.
      * @covers ICCM\BOF\Projector::cmpVotes
