@@ -6,7 +6,7 @@
 
 - name: "Install Apache"
   apt:
-    pkg: ['apache2', 'libapache2-mod-php', 'php', 'php-mysql', 'python3-mysqldb', 'mariadb-server', 'php-zip', 'ca-certificates', 'composer', 'php-dom', 'php-mbstring', 'php-xdebug', 'php-pdo-sqlite', 'nodejs']
+    pkg: ['apache2', 'libapache2-mod-php', 'php', 'php-mysql', 'python3-mysqldb', 'mariadb-server', 'php-zip', 'ca-certificates', 'composer', 'php-dom', 'php-mbstring', 'nodejs']
     state: present
 
 - name: "Install Packages required for Testing"
