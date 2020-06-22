@@ -804,6 +804,46 @@ EOF;
     }
  
     /**
+     * @covers ICCM\BOF\DBO::getBookedWorkshop
+     * @test
+     */
+    public function getBookedWorkshopReturnsExpectedData() {
+        $this->_setupWorkshops(3, 4, true, 0);
+        $this->_setVotes([9, 21.75, 15.75, 19.75, 18.75, 15.75]);
+        $this->_setBooking([
+            [102, 1, 0],
+            [101, 0, 1]
+        ]);
+        $dbo = new DBO(self::$pdo);
+        $row = $dbo->getBookedWorkshop(1, 0);
+        $this->assertEquals(102, $row->id);
+        $this->assertEquals("topic2", $row->name);
+        $this->assertEquals("Description for topic2", $row->description);
+        $this->assertEquals(15.75, $row->votes);
+
+        $row = $dbo->getBookedWorkshop(0, 1);
+        $this->assertEquals(101, $row->id);
+        $this->assertEquals("topic1", $row->name);
+        $this->assertEquals("Description for topic1", $row->description);
+        $this->assertEquals(21.75, $row->votes);
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::getBookedWorkshop
+     * @test
+     */
+    public function getBookedWorkshopReturnsFalseForNoBooking() {
+        $this->_setupWorkshops(3, 4, true, 0);
+        $this->_setVotes([9, 21.75, 15.75, 19.75, 18.75, 15.75]);
+        $this->_setBooking([
+            [102, 1, 0],
+            [101, 0, 1]
+        ]);
+        $dbo = new DBO(self::$pdo);
+        $this->assertFalse($dbo->getBookedWorkshop(0, 0));
+    }
+
+    /**
      * @covers ICCM\BOF\DBO::getConflict
      * @test
      */
@@ -951,6 +991,119 @@ EOF;
         $conflict->round_id = 2;
         $targetRows = $dbo->getConflictSwitchTargets($conflict);
         $this->assertEquals(0, count($targetRows));
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::getCurrentVotes
+     * @test
+     */
+    public function getCurrentVotes() {
+        $this->_setupWorkshops(3, 4, true, 1);
+        $dbo = new DBO(self::$pdo);
+        $setFacilitators = self::$pdo->prepare("UPDATE workshop_participant SET leader=1 WHERE workshop_id = 113 AND participant_id > 106");
+        $setFacilitators->execute();
+        $rows = $dbo->getCurrentVotes();
+        $this->assertEquals(17, count($rows));
+        $this->assertEquals('topic6', $rows[0]->name);
+        $this->assertEquals(106, $rows[0]->id);
+        $this->assertEquals(15.25, $rows[0]->votes);
+        $this->assertEquals('user6', $rows[0]->leader);
+        $this->assertEquals('topic13', $rows[1]->name);
+        $this->assertEquals(113, $rows[1]->id);
+        $this->assertEquals(12.75, $rows[1]->votes);
+        $this->assertEquals('user13, user20, user30, user43, user46, user47, user6, user61, user62, user64, user65, user7, user74, user77, user81, user84', $rows[1]->leader);
+        $this->assertEquals('topic4', $rows[2]->name);
+        $this->assertEquals(104, $rows[2]->id);
+        $this->assertEquals(12.5, $rows[2]->votes);
+        $this->assertEquals('user4', $rows[2]->leader);
+        $this->assertEquals('topic12', $rows[3]->name);
+        $this->assertEquals(112, $rows[3]->id);
+        $this->assertEquals(12.0, $rows[3]->votes);
+        $this->assertEquals('user5', $rows[3]->leader);
+        $this->assertEquals('topic5', $rows[4]->name);
+        $this->assertEquals(105, $rows[4]->id);
+        $this->assertEquals(12.0, $rows[4]->votes);
+        $this->assertEquals('user5', $rows[4]->leader);
+        $this->assertEquals('topic7', $rows[5]->name);
+        $this->assertEquals(107, $rows[5]->id);
+        $this->assertEquals(11.75, $rows[5]->votes);
+        $this->assertEquals('user7', $rows[5]->leader);
+        $this->assertEquals('topic2', $rows[6]->name);
+        $this->assertEquals(102, $rows[6]->id);
+        $this->assertEquals(11.5, $rows[6]->votes);
+        $this->assertEquals('user2', $rows[6]->leader);
+        $this->assertEquals('topic8', $rows[7]->name);
+        $this->assertEquals(108, $rows[7]->id);
+        $this->assertEquals(11.25, $rows[7]->votes);
+        $this->assertEquals('user1', $rows[7]->leader);
+        $this->assertEquals('topic1', $rows[8]->name);
+        $this->assertEquals(101, $rows[8]->id);
+        $this->assertEquals(11.25, $rows[8]->votes);
+        $this->assertEquals('user1', $rows[8]->leader);
+        $this->assertEquals('topic16', $rows[9]->name);
+        $this->assertEquals(116, $rows[9]->id);
+        $this->assertEquals(10.75, $rows[9]->votes);
+        $this->assertEquals('user2', $rows[9]->leader);
+        $this->assertEquals('topic3', $rows[10]->name);
+        $this->assertEquals(103, $rows[10]->id);
+        $this->assertEquals(10.75, $rows[10]->votes);
+        $this->assertEquals('user3', $rows[10]->leader);
+        $this->assertEquals('topic9', $rows[11]->name);
+        $this->assertEquals(109, $rows[11]->id);
+        $this->assertEquals(9.75, $rows[11]->votes);
+        $this->assertEquals('user2', $rows[11]->leader);
+        $this->assertEquals('topic14', $rows[12]->name);
+        $this->assertEquals(114, $rows[12]->id);
+        $this->assertEquals(9.5, $rows[12]->votes);
+        $this->assertEquals('user7', $rows[12]->leader);
+        $this->assertEquals('topic10', $rows[13]->name);
+        $this->assertEquals(110, $rows[13]->id);
+        $this->assertEquals(9.0, $rows[13]->votes);
+        $this->assertEquals('user3', $rows[13]->leader);
+        $this->assertEquals('topic11', $rows[14]->name);
+        $this->assertEquals(111, $rows[14]->id);
+        $this->assertEquals(8.5, $rows[14]->votes);
+        $this->assertEquals('user4', $rows[14]->leader);
+        $this->assertEquals('topic15', $rows[15]->name);
+        $this->assertEquals(115, $rows[15]->id);
+        $this->assertEquals(7.25, $rows[15]->votes);
+        $this->assertEquals('user1', $rows[15]->leader);
+        $this->assertEquals('Prep Team', $rows[16]->name);
+        $this->assertEquals(1, $rows[16]->id);
+        $this->assertEquals(2.5, $rows[16]->votes);
+        $this->assertEquals('user1, user2', $rows[16]->leader);
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::getFacilitators
+     * @test
+     */
+    public function getFacilitators() {
+        $this->_setupWorkshops(3, 4, true, 1);
+        // Make sure we have lots of facilitators for workshop IDs greater than
+        // 101. That will leave 101 with one facilitator, and 1 with 2
+        // facilitators.
+        $setFacilitators = self::$pdo->prepare("UPDATE workshop_participant SET leader=1 WHERE workshop_id > 101");
+        $setFacilitators->execute();
+        $dbo = new DBO(self::$pdo);
+        $this->assertEquals("user1, user2", $dbo->getFacilitators(1));
+        $this->assertEquals("user1", $dbo->getFacilitators(101));
+        $this->assertEquals("user19, user2, user31, user33, user36, user44, user5, user50, user53, user69, user70, user76, user78", $dbo->getFacilitators(102));
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::getFacilitators
+     * @test
+     */
+    public function getFacilitatorsReturnsEmptyStringForNoLeaders() {
+        $this->_setupWorkshops(3, 4, true, 1);
+        // Make sure we have lots of facilitators for workshop IDs greater than
+        // 101. That will leave 101 with one facilitator, and 1 with 2
+        // facilitators.
+        $setFacilitators = self::$pdo->prepare("UPDATE workshop_participant SET leader=0 WHERE workshop_id = 102");
+        $setFacilitators->execute();
+        $dbo = new DBO(self::$pdo);
+        $this->assertEquals("", $dbo->getFacilitators(102));
     }
 
     /**
@@ -1135,6 +1288,35 @@ EOF;
         $this->assertEquals('topic11', $workshops[7]->name);
         $this->assertEquals(9.0, $workshops[7]->votes);
         $this->assertEquals(12, $workshops[7]->available);
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::getWorkshops
+     * @test
+     */
+    public function getWorkshopsReturnsAllWorkshopsInDescendingOrder() {
+        $this->_setupWorkshops(2, 2, true, 0);
+        $dbo = new DBO(self::$pdo);
+        $workshops = $dbo->getWorkshops();
+        $this->assertEquals(9, count($workshops));
+        $this->assertEquals(108, $workshops[0]->id);
+        $this->assertEquals('topic8', $workshops[0]->name);
+        $this->assertEquals(107, $workshops[1]->id);
+        $this->assertEquals('topic7', $workshops[1]->name);
+        $this->assertEquals(106, $workshops[2]->id);
+        $this->assertEquals('topic6', $workshops[2]->name);
+        $this->assertEquals(105, $workshops[3]->id);
+        $this->assertEquals('topic5', $workshops[3]->name);
+        $this->assertEquals(104, $workshops[4]->id);
+        $this->assertEquals('topic4', $workshops[4]->name);
+        $this->assertEquals(103, $workshops[5]->id);
+        $this->assertEquals('topic3', $workshops[5]->name);
+        $this->assertEquals(102, $workshops[6]->id);
+        $this->assertEquals('topic2', $workshops[6]->name);
+        $this->assertEquals(101, $workshops[7]->id);
+        $this->assertEquals('topic1', $workshops[7]->name);
+        $this->assertEquals(1, $workshops[8]->id);
+        $this->assertEquals('Prep Team', $workshops[8]->name);
     }
 
     /**
