@@ -85,8 +85,14 @@ $container['ICCM\BOF\Projector'] = function ($c) {
     global $settings;
     return new \ICCM\BOF\Projector(
         $c['view'],
-        $c['db'],
-        $app->getContainer()->get('router'));
+        $app->getContainer()->get('router'),
+        $app->getContainer()->get('ICCM\BOF\DBO'));
 };
+
+$container['ICCM\BOF\Stage'] = function ($c) {
+    global $app;
+    return new \ICCM\BOF\Stage($c['db']);
+};
+
 
 ?>

@@ -198,7 +198,7 @@ class DBO
             'conflicts' => $queryConflicts->fetchAll(PDO::FETCH_OBJ),
             'count' => 0
         );
-        $tmp = count($resultsArray['conflicts']);
+        //$tmp = count($resultsArray['conflicts']);
         foreach ($resultsArray['conflicts'] as $conflict) {
             $queryCountWorkshops->bindValue('participant_id', (int) $conflict->participant_id, PDO::PARAM_INT);
             $queryCountWorkshops->bindValue('round_id', (int) $conflict->round_id, PDO::PARAM_INT);
@@ -211,6 +211,31 @@ class DBO
         $logger->log("Found {$resultsArray['count']} conflicts");
 
         return $resultsArray;
+    }
+
+    /**
+     * Gets the workshop details (id, name, description and number of votes)
+     * for the workshop booked for a specific location and round.
+     * 
+     * @param int $roundId The id of the round to retrieve workshop info
+     * @param int $locationId The id of the location to retrieve workshop info
+     *
+     * @return stdClass containing the workshop details.
+     */
+    public function getBookedWorkshop($roundId, $locationId) {
+        static $queryWorkshop = null;
+        if ($queryWorkshop == null) {
+            $sqlWorkshop = "SELECT id, name, description, votes
+                            FROM workshop
+                            WHERE location_id=:room
+                            AND round_id=:round";
+            $queryWorkshop = $this->db->prepare($sqlWorkshop);
+        }
+        $queryWorkshop->bindValue(':room', $locationId);
+        $queryWorkshop->bindValue(':round', $roundId);
+        $queryWorkshop->execute();
+        
+        return $queryWorkshop->fetch(PDO::FETCH_OBJ);
     }
 
     // Note that return value is an array with the first conflict found, and
@@ -307,6 +332,79 @@ class DBO
         $queryFindSwitchTarget->bindValue(':participant_id', (int) $conflict->participant_id);
         $queryFindSwitchTarget->execute();
         return $queryFindSwitchTarget->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
+     * Returns the current number of votes for each workshop, as well as some
+     * detailed information about the workshop.
+     * 
+     * @return array An array whose elements are an object representing the
+     * name, id, number of votes, and leader of each workshop. The leader
+     * member is a comma-delimited list of users' names as a string.
+     */
+    public function getCurrentVotes() {
+        $groupConcat = "GROUP_CONCAT(leader ORDER BY leader ASC SEPARATOR ', ')";
+        if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            // Note that we can't make ORDER BY work inside the GROUP_CONCAT,
+            // and the trick used in getFacilitiators doesn't work, either. To
+            // get around these problems, we use a subquery and sort the
+            // subquery by p.name. But we still have to specify ORDER BY in the
+            // GROUP_CONCAT for mysql!
+            $groupConcat = "GROUP_CONCAT(leader, ', ')";
+        }
+        $sql = "SELECT name, id, SUM(vote) as votes, "
+                       . $groupConcat . " AS leader
+                  FROM (SELECT w.name AS name, w.id AS id,
+                               wp.participant AS vote, p.name AS leader
+                          FROM workshop w
+                     LEFT JOIN workshop_participant wp
+                            ON wp.workshop_id = w.id
+                     LEFT JOIN participant p
+                            ON wp.participant_id = p.id
+                           AND wp.leader = 1
+                      ORDER BY p.name) AS t
+              GROUP BY id
+              ORDER BY votes DESC, id DESC";
+        $query = $this->db->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    // Returns a comma-delimited string of facilitators
+    /**
+     * Gets the names of the facilitators for the specified workshop.
+     * 
+     * @param int $workshopId The ID of the workshop for which to get the
+     * facilitators.
+     *
+     * @return string The list of facilitators, as a comma-delimited string,
+     * or an empty string if there are no leaders.
+     */
+    public function getFacilitators($workshopId) {
+        static $queryFacilitators = null;
+        if ($queryFacilitators == null) {
+            $groupConcat = "GROUP_CONCAT(p.name ORDER BY p.name ASC SEPARATOR ', ')";
+            // Ugly, but it works for SQLITE to force ordering in the
+            // GROUP_CONCAT to be what we want.
+            if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+                $groupConcat = "GROUP_CONCAT(p.name, ', ') OVER (ORDER BY p.name ASC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)";
+            }
+            $sqlFacilitators =
+                "SELECT DISTINCT " . $groupConcat . " AS leaders
+                   FROM participant p
+                   JOIN workshop_participant wp
+                     ON p.id = wp.participant_id
+                  where wp.leader = 1
+                    AND wp.workshop_id = :id";
+            $queryFacilitators = $this->db->prepare($sqlFacilitators);
+        }
+
+        $queryFacilitators->bindValue(':id', $workshopId);
+        $queryFacilitators->execute();
+        if ($row = $queryFacilitators->fetch(PDO::FETCH_OBJ)) {
+            return $row->leaders;
+        }
+        return "";
     }
 
     /**
@@ -435,6 +533,17 @@ class DBO
         $qry_top3->execute();
 
         return $qry_top3->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
+     * Gets the workshop names and ids for all workshops, in descending order
+     * according to id.
+     */
+    public function getWorkshops() {
+        $sql = "SELECT workshop.name, workshop.id FROM workshop ORDER BY id DESC";
+        $query=$this->db->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     /**
