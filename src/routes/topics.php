@@ -81,14 +81,15 @@ $app->get('/topics', function (Request $request, Response $response, array $args
 
     usort($bofs, "cmp");
 
-    $stage =new ICCM\BOF\Stage($this->db);
-    $stage2 =$stage->getstage();
+    global $app;
+    $dbo = $app->getContainer()->get('ICCM\BOF\DBO');
+    $stage =$dbo->getStage();
     $params = $request->getQueryParams();
     $show_vote_message = array_key_exists('voted', $params) && $params['voted'] === '1';
     return $this->view->render($response, 'topics.html', [
         'bofs' => $bofs,
-        'stage' => $stage2,
-        'locked' =>  $stage2=='locked',
+        'stage' => $stage,
+        'locked' =>  $stage=='locked',
         'newuser' => $params['newuser'],
         'loggedin' => True,
         'left_votes' => $fullvotesleft,

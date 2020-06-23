@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../../classes/Projector.php';
-require_once __DIR__ . '/../../classes/Stage.php';
 require_once __DIR__ . '/../../classes/DBO.php';
 require_once __DIR__ . '/../../vendor/slim/twig-view/src/Twig.php';
 
@@ -74,7 +73,12 @@ class TestProjector extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
+            ->setMethods(['getStage'])
             ->getMock();
+
+        $dbo->expects($this->once())
+            ->method('getStage')
+            ->willReturn('blah');
 
         // ResponseInterface mock
         $response = $this->getMockBuilder(ResponseInterface::class)
@@ -92,18 +96,8 @@ class TestProjector extends TestCase
             ->with($response, 'proj_layout.html', $config)
             ->willReturn(4);
 
-        // Stage mock
-        $stage = $this->getMockBuilder(Stage::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getstage'])
-            ->getMock();
-
-        $stage->expects($this->once())
-            ->method('getstage')
-            ->willReturn('blah');
-
-        $projector = new Projector($view, null, $dbo, $stage);
-        $this->assertEquals(4, $projector->showProjectorView(null, $response, $stage, null));
+        $projector = new Projector($view, null, $dbo);
+        $this->assertEquals(4, $projector->showProjectorView(null, $response, null));
     }
 
     /**
@@ -139,7 +133,7 @@ class TestProjector extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getWorkshops'])
+            ->setMethods(['getStage', 'getWorkshops'])
             ->getMock();
 
         $config = [
@@ -147,6 +141,10 @@ class TestProjector extends TestCase
             'stage' => 'nominating',
             'locked' => false,
         ];
+
+        $dbo->expects($this->once())
+            ->method('getStage')
+            ->willReturn('nominating');
 
         $dbo->expects($this->once())
             ->method('getWorkshops')
@@ -167,18 +165,8 @@ class TestProjector extends TestCase
             ->with($response, 'proj_layout.html', $config)
             ->willReturn(4);
 
-        // Stage mock
-        $stage = $this->getMockBuilder(Stage::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getstage'])
-            ->getMock();
-
-        $stage->expects($this->once())
-            ->method('getstage')
-            ->willReturn('nominating');
-
-        $projector = new Projector($view, null, $dbo, $stage);
-        $this->assertEquals(4, $projector->showProjectorView(null, $response, $stage, null));
+        $projector = new Projector($view, null, $dbo);
+        $this->assertEquals(4, $projector->showProjectorView(null, $response, null));
     }
 
     /**
@@ -238,7 +226,7 @@ class TestProjector extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getBookedWorkshop', 'getCurrentVotes', 'getFacilitators', 'getLocationNames', 'getRoundNames'])
+            ->setMethods(['getBookedWorkshop', 'getCurrentVotes', 'getFacilitators', 'getLocationNames', 'getRoundNames', 'getStage'])
             ->getMock();
 
         $dbo->expects($this->exactly(4))
@@ -283,6 +271,10 @@ class TestProjector extends TestCase
             ->method('getRoundNames')
             ->willReturn($rounds);
 
+        $dbo->expects($this->once())
+            ->method('getStage')
+            ->willReturn('finished');
+
         $config = [
             'bofs' => $bofs,
             'stage' => 'finished',
@@ -304,23 +296,14 @@ class TestProjector extends TestCase
             ->with($response, 'proj_layout.html', $config)
             ->willReturn(4);
 
-        // Stage mock
-        $stage = $this->getMockBuilder(Stage::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getstage'])
-            ->getMock();
-        $stage->expects($this->once())
-            ->method('getstage')
-            ->willReturn('finished');
-
-        $projector = new Projector($view, null, $dbo, $stage);
-        $this->assertEquals(4, $projector->showProjectorView(null, $response, $stage, null));
+        $projector = new Projector($view, null, $dbo);
+        $this->assertEquals(4, $projector->showProjectorView(null, $response, null));
     }
 
-    private function _showProjectorViewShowsVotingStageForStage($stage2) {
+    private function _showProjectorViewShowsVotingStageForStage($stage) {
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getCurrentVotes'])
+            ->setMethods(['getCurrentVotes', 'getStage'])
             ->getMock();
 
         $bofs = [
@@ -402,13 +385,17 @@ class TestProjector extends TestCase
 
         $config = [
             'bofs' => $bofs,
-            'stage' => $stage2,
-            'locked' => $stage2=='locked'
+            'stage' => $stage,
+            'locked' => $stage=='locked'
         ];
 
         $dbo->expects($this->once())
             ->method('getCurrentVotes')
             ->willReturn($currentVotes);
+
+        $dbo->expects($this->once())
+            ->method('getStage')
+            ->willReturn($stage);
 
         // ResponseInterface mock
         $response = $this->getMockBuilder(ResponseInterface::class)
@@ -425,17 +412,8 @@ class TestProjector extends TestCase
             ->with($response, 'proj_layout.html', $config)
             ->willReturn(4);
 
-        // Stage mock
-        $stage = $this->getMockBuilder(Stage::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getstage'])
-            ->getMock();
-        $stage->expects($this->once())
-            ->method('getstage')
-            ->willReturn($stage2);
-
-        $projector = new Projector($view, null, $dbo, $stage);
-        $this->assertEquals(4, $projector->showProjectorView(null, $response, $stage, null));
+        $projector = new Projector($view, null, $dbo);
+        $this->assertEquals(4, $projector->showProjectorView(null, $response, null));
     }
 
     /**

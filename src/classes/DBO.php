@@ -510,6 +510,30 @@ class DBO
     }
 
     /**
+     * Returns the current stage based on the current time and the data in the
+     * config table.
+     * 
+     * @returns a string representing the current stage.
+     */
+    public function getStage() {
+        $now = 'now()';
+        if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            $now = "DateTime('Now')";
+        }
+        $sql = "SELECT CASE
+            WHEN ".$now." > (SELECT value FROM config WHERE item = 'nomination_begins')
+             AND ".$now." < (SELECT value FROM config WHERE item = 'nomination_ends') THEN 'nominating'
+            WHEN ".$now." > (SELECT value FROM config WHERE item = 'voting_begins')
+             AND ".$now." < (SELECT value FROM config WHERE item = 'voting_ends') THEN 'voting'
+            WHEN ".$now." > (SELECT value FROM config WHERE item = 'voting_ends') THEN 'finished'
+            ELSE 'locked'
+            END AS stage";
+        $query = $this->db->prepare($sql);
+        $query->execute();
+        return $query->fetchColumn(0);
+    }
+
+    /**
      * Returns information for the top vote-getting workshops.
      *
      * @param int $workshops The total number of workshops to return

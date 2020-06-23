@@ -89,10 +89,4 @@ $container['ICCM\BOF\Projector'] = function ($c) {
         $app->getContainer()->get('ICCM\BOF\DBO'));
 };
 
-$container['ICCM\BOF\Stage'] = function ($c) {
-    global $app;
-    return new \ICCM\BOF\Stage($c['db']);
-};
-
-
 ?>

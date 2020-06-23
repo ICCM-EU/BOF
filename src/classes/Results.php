@@ -189,7 +189,7 @@ class Results
      * the booked workshops in CSV format along with some log data about what
      * was done and why.
      */
-    public function calculateResults($request, $response, $stage, $args) {
+    public function calculateResults($request, $response, $args) {
         $rounds = $this->dbo->getNumRounds();
         $locations = $this->dbo->getNumLocations();
 
@@ -208,7 +208,7 @@ class Results
         $this->bookWorkshops($rounds, $locations);
 
         $config['loggedin'] = true;
-        $config['stage'] = $stage->getstage();
+        $config['stage'] = $this->dbo->getStage();
         $config['csvdata'] = $this->dbo->exportWorkshops();
         $config['log'] = $this->logger->getLog();
         return $this->view->render($response, 'results.html', $config);

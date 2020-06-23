@@ -15,11 +15,12 @@ class Projector
 		$this->router = $router;
 		$this->dbo = $dbo;
 	}
-	function _getNominationStage($response, $stage2) {
+
+	function _getNominationStage() {
 		return $this->dbo->getWorkshops();
 	}
 
-	function _getFinishedStage($response, $stage2) {
+	function _getFinishedStage() {
 		$locations = $this->dbo->getLocationNames();
 		$rounds = $this->dbo->getRoundNames();
 
@@ -54,44 +55,46 @@ class Projector
 		return 0;
 	}
 
-	function _getVotingStage($response, $stage2) {
+	function _getVotingStage() {
 		$bofs = $this->dbo->getCurrentVotes();
 		usort($bofs, array("ICCM\BOF\Projector", "cmpVotes"));
 		return $bofs;
 	}
 
-	/* 
-	* gets topics list and generate the projector phase.
-	* depending on the stage we're in we see topics and will be able to nominate a new one
-	* or the possibility to vote for topics
-	* in the last stage the list of selected topics will be there and location and time slot
-	* 
-	* 'stage' can be: 'nominating', 'voting', 'finished'
-	* System can be locked down with variable 'locked'
-	* 
-	* voting and nominating stages are configured in the config table by timestamps
-	* finished is when voting is over.
-	* locked is automatically when out of periods of voting and nominating and finished
-	* TODO: config item for locked False/True
-	* 
-	*/
-	public function showProjectorView($request, $response, $stage, $args) {
-		$stage2 = $stage->getstage();
+	/** 
+	 * Gets topics list and generates the projector phase, depending on the
+	 * stage we're in we see topics and will be able to nominate a new one or
+	 * the possibility to vote for topics in the last stage the list of
+	 * selected topics will be there and location and time slot
+	 * 
+	 * 'stage' can be: 'nominating', 'voting', 'finished'
+	 * System can be locked down with variable 'locked'
+	 * 
+	 * voting and nominating stages are configured in the config table by
+	 * timestamps
+	 * finished is when voting is over.
+	 * locked is automatically when out of periods of voting and nominating and
+	 * finished
+	 * TODO: config item for locked False/True
+	 */
+	public function showProjectorView($request, $response, $args) {
+		$stage = $this->dbo->getStage();
+		$bofs = array();
 
-		if ($stage2 == "nominating") {
-			$bofs = $this->_getNominationStage($response, $stage2);
+		if ($stage == "nominating") {
+			$bofs = $this->_getNominationStage();
 		}
-		else if ($stage2 == "voting" || $stage2 == "locked") {
-			$bofs = $this->_getVotingStage($response, $stage2);
+		else if ($stage == "voting" || $stage == "locked") {
+			$bofs = $this->_getVotingStage();
 		}
-		else if ($stage2 == "finished") {
-			$bofs = $this->_getFinishedStage($response, $stage2);
+		else if ($stage == "finished") {
+			$bofs = $this->_getFinishedStage();
 		}
 
 		return $this->view->render($response, 'proj_layout.html', [
 				'bofs' => $bofs,
-				'stage' => $stage2,
-				'locked' => $stage2=='locked',
+				'stage' => $stage,
+				'locked' => $stage=='locked',
 		]);
 	}
 }
