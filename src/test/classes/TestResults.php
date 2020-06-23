@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../../classes/Results.php';
-require_once __DIR__ . '/../../classes/Stage.php';
 require_once __DIR__ . '/../../classes/DBO.php';
 require_once __DIR__ . '/../../classes/Logger.php';
 require_once __DIR__ . '/../../vendor/slim/twig-view/src/Twig.php';
@@ -192,6 +191,10 @@ EOF;
 
         // DBO mock
         $dbo = $this->prophesize(DBO::class);
+        $dbo->getStage()
+            ->willReturn('stage')
+            ->shouldBeCalledTimes(1);
+
         $dbo->exportWorkshops()
             ->willReturn($exportedData)
             ->shouldBeCalledTimes(1);
@@ -304,19 +307,10 @@ EOF;
             ->with($response, 'results.html', $config)
             ->willReturn(4);
 
-        // Stage mock
-        $stage = $this->getMockBuilder(Stage::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getstage'])
-            ->getMock();
-        $stage->expects($this->once())
-            ->method('getstage')
-            ->willReturn('stage');
-
         $results = new Results($view, null, $dbo->reveal(), $logger);
         // This ensures the ultimate return value is correct (i.e. whatever
         // $view->render returns), and calls the function under test.
-        $this->assertEquals(4, $results->calculateResults(null, $response, $stage, null));
+        $this->assertEquals(4, $results->calculateResults(null, $response, null));
     }
 
     /**

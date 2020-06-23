@@ -409,6 +409,7 @@ class TestDBO extends TestCase
     protected function setUp(): void {
         // Clear out everything
         $this->_resetWorkshops();
+        self::$pdo->query("DELETE FROM config");
     }
 
     /**
@@ -1220,6 +1221,91 @@ EOF;
 
         $dbo = new DBO(self::$pdo);
         $this->assertEquals($expected, $dbo->getRoundNames());
+    }
+
+    private function _checkStage($expected, $lockedType) {
+        $sql = null;
+        /*$sql = "INSERT INTO config (item, value) VALUES
+            (nomination_begins, DATE_ADD(NOW(), INTERVAL - 1 DAY)),
+            (nomination_ends, DATE_ADD(NOW(), INTERVAL + 1 DAY)),
+            (voting_begins, DATE_ADD(NOW(), INTERVAL + 2 DAY)),
+            (voting_ends, DATE_ADD(NOW(), INTERVAL + 3 DAY))";*/
+        switch ($expected) {
+            case 'locked':
+                if ($lockedType == 0) {
+                    $sql = "INSERT INTO config (id, item, value) VALUES
+                        (0, 'nomination_begins', DateTime('Now', 'LocalTime', '+1 Day')),
+                        (1, 'nomination_ends', DateTime('Now', 'LocalTime', '+2 Day')),
+                        (2, 'voting_begins', DateTime('Now', 'LocalTime', '+3 Day')),
+                        (3, 'voting_ends', DateTime('Now', 'LocalTime', '+4 Day'))";
+                }
+                else {
+                    $sql = "INSERT INTO config (id, item, value) VALUES
+                        (0, 'nomination_begins', DateTime('Now', 'LocalTime', '-2 Day')),
+                        (1, 'nomination_ends', DateTime('Now', 'LocalTime', '-1 Day')),
+                        (2, 'voting_begins', DateTime('Now', 'LocalTime', '+1 Day')),
+                        (3, 'voting_ends', DateTime('Now', 'LocalTime', '+2 Day'))";
+                }
+                break;
+            case 'nominating':
+                $sql = "INSERT INTO config (id, item, value) VALUES
+                    (0, 'nomination_begins', DateTime('Now', 'LocalTime', '-1 Day')),
+                    (1, 'nomination_ends', DateTime('Now', 'LocalTime', '+1 Day')),
+                    (2, 'voting_begins', DateTime('Now', 'LocalTime', '+2 Day')),
+                    (3, 'voting_ends', DateTime('Now', 'LocalTime', '+3 Day'))";
+                break;
+            case 'voting':
+                $sql = "INSERT INTO config (id, item, value) VALUES
+                    (0, 'nomination_begins', DateTime('Now', 'LocalTime', '-3 Day')),
+                    (1, 'nomination_ends', DateTime('Now', 'LocalTime', '-2 Day')),
+                    (2, 'voting_begins', DateTime('Now', 'LocalTime', '-1 Day')),
+                    (3, 'voting_ends', DateTime('Now', 'LocalTime', '+1 Day'))";
+                break;
+            case 'finished':
+                $sql = "INSERT INTO config (id, item, value) VALUES
+                    (0, 'nomination_begins', DateTime('Now', 'LocalTime', '-4 Day')),
+                    (1, 'nomination_ends', DateTime('Now', 'LocalTime', '-3 Day')),
+                    (2, 'voting_begins', DateTime('Now', 'LocalTime', '-2 Day')),
+                    (3, 'voting_ends', DateTime('Now', 'LocalTime', '-1 Day'))";
+                break;
+        }
+        self::$pdo->query($sql);
+
+        $dbo = new DBO(self::$pdo);
+        $this->assertEquals($expected, $dbo->getStage());
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::getStage
+     * @test
+     */
+    public function getStageReturnsLockedWhenConfigIsEmpty() {
+        $dbo = new DBO(self::$pdo);
+        $this->assertEquals('locked', $dbo->getStage());
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::getStage
+     * @test
+     */
+    public function getStageReturnsLockedBeforeNominations() {
+        $this->_checkStage('locked', 0);
+    }
+
+    public function getStageReturnsNominating() {
+        $this->_checkStage('nominating', 0);
+    }
+
+    public function getStageReturnsLockedBetweenNominatingAndVoting() {
+        $this->_checkStage('locked', 1);
+    }
+
+    public function getStageReturnsVoting() {
+        $this->_checkStage('voting', 0);
+    }
+
+    public function getStageReturnsFinished() {
+        $this->_checkStage('finished', 0);
     }
 
     /**

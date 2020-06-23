@@ -54,8 +54,9 @@ class Admin
 			$count++;
 		}
 		$config['num_locations'] = $count;
-		$stage =new Stage($this->db);
-		$config['stage'] = $stage->getstage();
+		global $app;
+		$dbo = $app->getContainer()->get('ICCM\BOF\DBO');
+		$config['stage'] = $dbo->getStage();
 		return $this->view->render($response, 'admin.html', $config);
 	}
 
@@ -191,7 +192,7 @@ class Admin
 
 		try {
 			$results = new Results($this->view, $this->router, $app->getContainer()->get('ICCM\BOF\DBO'), new Logger());
-			return $results->calculateResults($request, $response, new Stage($this->db), $args);
+			return $results->calculateResults($request, $response, $args);
 		}
 		catch (RuntimeException $re) {
 			die($re->getMessage());
