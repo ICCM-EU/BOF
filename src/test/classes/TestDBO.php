@@ -371,10 +371,8 @@ class TestDBO extends TestCase
     }
     */
 
-    /**
-     * @beforeClass
-     */
-    public static function setUpBeforeClass() : void {
+    public static function initializeDatabase() {
+        self::$pdo = null;
         self::$pdo = new PDO('sqlite::memory:');
         self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $sql = file_get_contents(dirname(__FILE__).'/../../../sql/createtables.sql');
@@ -388,12 +386,22 @@ class TestDBO extends TestCase
             "/\s\sKEY.*,/"), "", $sql);
         $sql = preg_replace("/UNIQUE KEY `.*?`/", "UNIQUE", $sql);
         $sql = str_replace("unsigned", "", $sql);
+        $sql = str_replace("int(10)  NOT NULL AUTO_INCREMENT", "INTEGER NOT NULL", $sql);
+        $sql = str_replace("int(10)  NOT NULL", "INTEGER NOT NULL", $sql);
         $sql = str_replace("AUTO_INCREMENT", "", $sql);
         $sql = str_replace("DEFAULT", "", $sql);
         $sql = str_replace("CHARACTER SET latin1 ", "", $sql);
         $sql = str_replace("ENGINE=InnoDB", "", $sql);
         $sql = str_replace("ENGINE=MyISAM", "", $sql);
+        $sql = preg_replace("/PRIMARY KEY \((.*)\)/", "PRIMARY KEY ($1 AUTOINCREMENT)", $sql);
         self::$pdo->exec($sql);
+    }
+
+    /**
+     * @beforeClass
+     */
+    public static function setUpBeforeClass() : void {
+        self::initializeDatabase();
     }
 
     /**
@@ -1562,6 +1570,32 @@ EOF;
             $this->assertNull($row->round);
             $this->assertNull($row->last_location);
         }
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::nominate
+     * @test
+     */
+    public function nominateInsertsNewWorkshop() {
+        // Warning! This test relies on the AUTOINCREMENT of the ID column of
+        // the workshop table, in order to find the row we just added.
+        // Because SQLite's AUTOINCREMENT uses the highest value ever seen for
+        // the column, we have to re-initialize the database before this test.
+        // Otherwise, the id is dependent on the order of the tests. :(
+        self::initializeDatabase();
+        $this->_setupWorkshops(2, 2, true, 0);
+        $dbo = new DBO(self::$pdo);
+        $name = 'Nominated Topic 1';
+        $description = 'Description for Nominated Topic 1';
+        $creator_id = 101;
+        $dbo->nominate($name, $description, $creator_id);
+        $query = self::$pdo->prepare("SELECT id,name,description,creator_id,published FROM workshop WHERE id=109");
+        $query->execute();
+        $row=$query->fetch(PDO::FETCH_OBJ);
+        $this->assertEquals($name, $row->name);
+        $this->assertEquals($description, $row->description);
+        $this->assertEquals($creator_id, $row->creator_id);
+        $this->assertEquals(0, $row->published);
     }
 
     /**

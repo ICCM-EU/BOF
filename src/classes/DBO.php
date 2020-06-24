@@ -637,6 +637,25 @@ class DBO
     }
 
     /**
+     * Inserts the given title as a new workshop, using the given creator.
+     * 
+     * @param string $name The name for the new workshop.
+     * @param string $description The description for the new workshop.
+     * @param int $creator_id The ID of the user submitting this workshop. 
+     */
+    public function nominate($name, $description, $creator_id) {
+        $sql = 'INSERT
+                  INTO workshop (`name`,`description`,`creator_id`, `published`)
+                VALUES (:name, :description, :creator_id, 0)';
+
+        $query=$this->db->prepare($sql);
+        $query->bindValue('name', $name, PDO::PARAM_STR);
+        $query->bindValue('description', $description, PDO::PARAM_STR);
+        $query->bindValue('creator_id', (int) $creator_id, PDO::PARAM_INT);
+        $query->execute();
+    }
+
+    /**
      * Rolls back (undoes) a transaction that hasn't been committed yet.
      */
     public function rollBack() {
