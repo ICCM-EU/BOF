@@ -67,8 +67,8 @@ $container['ICCM\BOF\Nomination'] = function ($c) {
     global $settings;
     return new \ICCM\BOF\Nomination(
         $c['view'],
-        $c['db'],
-        $app->getContainer()->get('router'));
+        $app->getContainer()->get('router'),
+        $app->getContainer()->get('ICCM\BOF\DBO'));
 };
 
 $container['ICCM\BOF\Moderation'] = function ($c) {
