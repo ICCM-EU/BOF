@@ -48,16 +48,8 @@ class Projector
 		return $bofs;
 	}
 
-	public static function cmpVotes($a, $b)
-	{
-		if ($a->votes > $b->votes) return -1;
-		if ($a->votes < $b->votes) return 1;
-		return 0;
-	}
-
 	function _getVotingStage() {
 		$bofs = $this->dbo->getCurrentVotes();
-		usort($bofs, array("ICCM\BOF\Projector", "cmpVotes"));
 		return $bofs;
 	}
 
