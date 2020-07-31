@@ -16,52 +16,6 @@ use Psr\Http\Message\ResponseInterface;
 class TestProjector extends TestCase
 {
     /**
-     * Note: cmpVotes is explictly backwards to do reverse sorts.
-     * @covers ICCM\BOF\Projector::cmpVotes
-     * @test
-     */
-    public function cmpVotesReturnsZero() {
-        $fiveVotes = (object) [
-            'votes' => 5
-        ];
-        $fiveVotes2 = (object) [
-            'votes' => 5
-        ];
-        $this->assertEquals(0, ICCM\BOF\Projector::cmpVotes($fiveVotes, $fiveVotes2));
-        $this->assertEquals(0, ICCM\BOF\Projector::cmpVotes($fiveVotes, $fiveVotes));
-    }
-
-    /**
-     * Note: cmpVotes is explictly backwards to do reverse sorts.
-     * @covers ICCM\BOF\Projector::cmpVotes
-     * @test
-     */
-    public function cmpVotesGreaterReturnsGreaterThanZero() {
-        $fiveVotes = (object) [
-            'votes' => 5
-        ];
-        $sixVotes = (object) [
-            'votes' => 6
-        ];
-        $this->assertGreaterThan(0, ICCM\BOF\Projector::cmpVotes($fiveVotes, $sixVotes));
-    }
-
-    /**
-     * Note: cmpVotes is explictly backwards to do reverse sorts.
-     * @covers ICCM\BOF\Projector::cmpVotes
-     * @test
-     */
-    public function cmpVotesLessReturnsLessThanZero() {
-        $fiveVotes = (object) [
-            'votes' => 5
-        ];
-        $sixVotes = (object) [
-            'votes' => 6
-        ];
-        $this->assertLessThan(0, Projector::cmpVotes($sixVotes, $fiveVotes));
-    }
-
-    /**
      * @test
      */
     public function showProjectorViewReturnsEmptyDataForBadStage() {
@@ -320,16 +274,16 @@ class TestProjector extends TestCase
                 'leader' => 'user4'
             ],
             (object) [
-                'name' => 'Topic3',
-                'id' => 103,
-                'votes' => 15.25,
-                'leader' => 'user3'
-            ],
-            (object) [
                 'name' => 'Topic5',
                 'id' => 105,
                 'votes' => 15.25,
                 'leader' => 'user5'
+            ],
+            (object) [
+                'name' => 'Topic3',
+                'id' => 103,
+                'votes' => 15.25,
+                'leader' => 'user3'
             ],
             (object) [
                 'name' => 'Topic2',
@@ -346,28 +300,10 @@ class TestProjector extends TestCase
         ];
         $currentVotes = [
             (object) [
-                'name' => 'Prep Team',
-                'id' => 1,
-                'votes' => 2.5,
-                'leader' => 'user1, user2'
-            ],
-            (object) [
                 'name' => 'Topic1',
                 'id' => 101,
                 'votes' => 19.5,
                 'leader' => 'user1'
-            ],
-            (object) [
-                'name' => 'Topic2',
-                'id' => 102,
-                'votes' => 10.5,
-                'leader' => 'user2'
-            ],
-            (object) [
-                'name' => 'Topic3',
-                'id' => 103,
-                'votes' => 15.25,
-                'leader' => 'user3'
             ],
             (object) [
                 'name' => 'Topic4',
@@ -380,6 +316,24 @@ class TestProjector extends TestCase
                 'id' => 105,
                 'votes' => 15.25,
                 'leader' => 'user5'
+            ],
+            (object) [
+                'name' => 'Topic3',
+                'id' => 103,
+                'votes' => 15.25,
+                'leader' => 'user3'
+            ],
+            (object) [
+                'name' => 'Topic2',
+                'id' => 102,
+                'votes' => 10.5,
+                'leader' => 'user2'
+            ],
+            (object) [
+                'name' => 'Prep Team',
+                'id' => 1,
+                'votes' => 2.5,
+                'leader' => 'user1, user2'
             ]
         ];
 
