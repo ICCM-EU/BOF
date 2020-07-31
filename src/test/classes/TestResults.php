@@ -8,6 +8,7 @@ require_once __DIR__ . '/../../vendor/slim/twig-view/src/Twig.php';
 use PHPUnit\Framework\TestCase;
 use ICCM\BOF\Results;
 use ICCM\BOF\DBO;
+use ICCM\BOF\Logger;
 use Slim\Views\Twig;
 use Psr\Http\Message\ResponseInterface;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -181,7 +182,8 @@ EOF;
 
         // Logger mock
         $logger = $this->getMockBuilder(Logger::class)
-              ->setMethods(['clearLog', 'getLog', 'log', 'logBookWorkshop', 'logSwitchedWorkshops'])
+              ->disableOriginalConstructor()
+              ->onlyMethods(['clearLog', 'getLog', 'log', 'logBookWorkshop', 'logSwitchedWorkshops'])
               ->getMock();
         $logger->expects($this->once())
             ->method('getLog')
@@ -300,7 +302,7 @@ EOF;
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
             ->disableOriginalConstructor()
-            ->setMethods(['render'])
+            ->onlyMethods(['render'])
             ->getMock();
         $view->expects($this->once())
             ->method('render')
@@ -404,7 +406,7 @@ EOF;
     public function calculateResultsThrowsExceptionIfInvalidLocations() {
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getNumLocations',
+            ->onlyMethods(['getNumLocations',
                           'getNumRounds',
                           'validateLocations',
                           'validateRounds'])
@@ -437,7 +439,7 @@ EOF;
     public function calculateResultsThrowsExceptionIfInvalidRounds() {
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getNumLocations',
+            ->onlyMethods(['getNumLocations',
                           'getNumRounds',
                           'validateLocations',
                           'validateRounds'])
@@ -470,7 +472,7 @@ EOF;
     public function calculateResultsThrowsExceptionIfTooFewLocations() {
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getNumLocations',
+            ->onlyMethods(['getNumLocations',
                           'getNumRounds',
                           'validateLocations',
                           'validateRounds'])

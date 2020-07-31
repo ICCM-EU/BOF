@@ -1,8 +1,10 @@
 <?php
 
+require_once __DIR__ . '/../../classes/DBO.php';
 require_once __DIR__ . '/../../classes/Logger.php';
 
 use PHPUnit\Framework\TestCase;
+use ICCM\BOF\DBO;
 use ICCM\BOF\Logger;
 
 /**
@@ -76,7 +78,7 @@ class TestLogger extends TestCase
     public function logBookWorkshop() {
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getLocationNames', 'getRoundNames'])
+            ->onlyMethods(['getLocationNames', 'getRoundNames'])
             ->getMock();
 
         $dbo->expects($this->once())
@@ -111,7 +113,7 @@ class TestLogger extends TestCase
     public function logSwitchedWorkshops() {
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getLocationNames', 'getRoundNames'])
+            ->onlyMethods(['getLocationNames', 'getRoundNames'])
             ->getMock();
 
         $dbo->expects($this->once())
