@@ -73,7 +73,7 @@ class TestProjector extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getStage'])
+            ->onlyMethods(['getStage'])
             ->getMock();
 
         $dbo->expects($this->once())
@@ -88,7 +88,7 @@ class TestProjector extends TestCase
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
             ->disableOriginalConstructor()
-            ->setMethods(['render'])
+            ->onlyMethods(['render'])
             ->getMock();
 
         $view->expects($this->once())
@@ -133,7 +133,7 @@ class TestProjector extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getStage', 'getWorkshops'])
+            ->onlyMethods(['getStage', 'getWorkshops'])
             ->getMock();
 
         $config = [
@@ -158,7 +158,7 @@ class TestProjector extends TestCase
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
             ->disableOriginalConstructor()
-            ->setMethods(['render'])
+            ->onlyMethods(['render'])
             ->getMock();
         $view->expects($this->once())
             ->method('render')
@@ -226,7 +226,7 @@ class TestProjector extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getBookedWorkshop', 'getCurrentVotes', 'getFacilitators', 'getLocationNames', 'getRoundNames', 'getStage'])
+            ->onlyMethods(['getBookedWorkshop', 'getCurrentVotes', 'getFacilitators', 'getLocationNames', 'getRoundNames', 'getStage'])
             ->getMock();
 
         $dbo->expects($this->exactly(4))
@@ -289,7 +289,7 @@ class TestProjector extends TestCase
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
             ->disableOriginalConstructor()
-            ->setMethods(['render'])
+            ->onlyMethods(['render'])
             ->getMock();
         $view->expects($this->once())
             ->method('render')
@@ -303,7 +303,7 @@ class TestProjector extends TestCase
     private function _showProjectorViewShowsVotingStageForStage($stage) {
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getCurrentVotes', 'getStage'])
+            ->onlyMethods(['getCurrentVotes', 'getStage'])
             ->getMock();
 
         $bofs = [
@@ -405,7 +405,7 @@ class TestProjector extends TestCase
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
             ->disableOriginalConstructor()
-            ->setMethods(['render'])
+            ->onlyMethods(['render'])
             ->getMock();
         $view->expects($this->once())
             ->method('render')

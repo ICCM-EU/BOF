@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use ICCM\BOF\Nomination;
 use ICCM\BOF\DBO;
 use Slim\Views\Twig;
+use Slim\Http\Request;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -27,18 +28,17 @@ class TestNomination extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['nominate'])
+            ->onlyMethods(['nominate'])
             ->getMock();
 
         $dbo->expects($this->once())
             ->method('nominate')
-            ->with($data['title'], $data['description'], $userid)
-            ->willReturn('blah');
+            ->with($data['title'], $data['description'], $userid);
 
-        // RequestInterface mock
-        $request = $this->getMockBuilder(RequestInterface::class)
+        // Request mock
+        $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getAttribute', 'getParsedBody'])
+            ->onlyMethods(['getAttribute', 'getParsedBody'])
             ->getMock();
 
         $request->expects($this->once())
@@ -57,7 +57,7 @@ class TestNomination extends TestCase
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
             ->disableOriginalConstructor()
-            ->setMethods(['render'])
+            ->onlyMethods(['render'])
             ->getMock();
 
         $view->expects($this->once())
@@ -82,16 +82,16 @@ class TestNomination extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['nominate'])
+            ->onlyMethods(['nominate'])
             ->getMock();
 
         $dbo->expects($this->never())
             ->method('nominate');
 
-        // RequestInterface mock
-        $request = $this->getMockBuilder(RequestInterface::class)
+        // Request mock
+        $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getAttribute', 'getParsedBody'])
+            ->onlyMethods(['getAttribute', 'getParsedBody'])
             ->getMock();
 
         $request->expects($this->once())
@@ -110,7 +110,7 @@ class TestNomination extends TestCase
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
             ->disableOriginalConstructor()
-            ->setMethods(['render'])
+            ->onlyMethods(['render'])
             ->getMock();
 
         $view->expects($this->never())
@@ -133,16 +133,16 @@ class TestNomination extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['nominate'])
+            ->onlyMethods(['nominate'])
             ->getMock();
 
         $dbo->expects($this->never())
             ->method('nominate');
 
-        // RequestInterface mock
-        $request = $this->getMockBuilder(RequestInterface::class)
+        // Request mock
+        $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getAttribute', 'getParsedBody'])
+            ->onlyMethods(['getAttribute', 'getParsedBody'])
             ->getMock();
 
         $request->expects($this->once())
@@ -161,7 +161,7 @@ class TestNomination extends TestCase
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
             ->disableOriginalConstructor()
-            ->setMethods(['render'])
+            ->onlyMethods(['render'])
             ->getMock();
 
         $view->expects($this->never())
@@ -184,16 +184,16 @@ class TestNomination extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['nominate'])
+            ->onlyMethods(['nominate'])
             ->getMock();
 
         $dbo->expects($this->never())
             ->method('nominate');
 
-        // RequestInterface mock
-        $request = $this->getMockBuilder(RequestInterface::class)
+        // Request mock
+        $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getAttribute', 'getParsedBody'])
+            ->onlyMethods(['getAttribute', 'getParsedBody'])
             ->getMock();
 
         $request->expects($this->once())
@@ -212,7 +212,7 @@ class TestNomination extends TestCase
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
             ->disableOriginalConstructor()
-            ->setMethods(['render'])
+            ->onlyMethods(['render'])
             ->getMock();
 
         $view->expects($this->never())
@@ -235,16 +235,16 @@ class TestNomination extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['nominate'])
+            ->onlyMethods(['nominate'])
             ->getMock();
 
         $dbo->expects($this->never())
             ->method('nominate');
 
-        // RequestInterface mock
-        $request = $this->getMockBuilder(RequestInterface::class)
+        // Request mock
+        $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getAttribute', 'getParsedBody'])
+            ->onlyMethods(['getAttribute', 'getParsedBody'])
             ->getMock();
 
         $request->expects($this->once())
@@ -263,7 +263,7 @@ class TestNomination extends TestCase
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
             ->disableOriginalConstructor()
-            ->setMethods(['render'])
+            ->onlyMethods(['render'])
             ->getMock();
 
         $view->expects($this->never())
@@ -286,16 +286,16 @@ class TestNomination extends TestCase
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['nominate'])
+            ->onlyMethods(['nominate'])
             ->getMock();
 
         $dbo->expects($this->never())
             ->method('nominate');
 
-        // RequestInterface mock
-        $request = $this->getMockBuilder(RequestInterface::class)
+        // Request mock
+        $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getAttribute', 'getParsedBody'])
+            ->onlyMethods(['getAttribute', 'getParsedBody'])
             ->getMock();
 
         $request->expects($this->once())
@@ -314,7 +314,7 @@ class TestNomination extends TestCase
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
             ->disableOriginalConstructor()
-            ->setMethods(['render'])
+            ->onlyMethods(['render'])
             ->getMock();
 
         $view->expects($this->never())
