@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../classes/Logger.php';
 
 use PHPUnit\Framework\TestCase;
 use ICCM\BOF\DBO;
+use ICCM\BOF\Logger;
 
 /**
  * @covers ICCM\BOF\DBO
@@ -421,13 +422,174 @@ class TestDBO extends TestCase
     }
 
     /**
+     * @covers ICCM\BOF\DBO::addUser
+     * @test
+     */
+    public function addUserFailsForExistingUser() {
+        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $users = 5;
+        $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
+        for ($count = 0; $count <= $users; $count++) {
+            if ($count != 0) {
+                $id= $count + 100;
+                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+            }
+            else {
+                $sql .= "(1, 'admin', '{$pass}')";
+            }
+        }
+        self::$pdo->query($sql);
+        $dbo = new DBO(self::$pdo);
+        $ret = $dbo->addUser('user1', 'blah');
+        $this->assertTrue(is_string($ret));
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::addUser
+     * @test
+     */
+    public function addUserSucceedsForNewUser() {
+        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $users = 5;
+        $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
+        for ($count = 0; $count <= $users; $count++) {
+            if ($count != 0) {
+                $id= $count + 100;
+                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+            }
+            else {
+                $sql .= "(1, 'admin', '{$pass}')";
+            }
+        }
+        self::$pdo->query($sql);
+        $dbo = new DBO(self::$pdo);
+        $ret = $dbo->addUser('newuser', 'blah');
+        $this->assertEquals(106, $ret);
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::authenticate
+     * @test
+     */
+    public function authenticateFailsForEmptyPassword() {
+        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $users = 5;
+        $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
+        for ($count = 0; $count <= $users; $count++) {
+            if ($count != 0) {
+                $id= $count + 100;
+                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+            }
+            else {
+                $sql .= "(1, 'admin', '{$pass}')";
+            }
+        }
+        self::$pdo->query($sql);
+        $dbo = new DBO(self::$pdo);
+        $row = $dbo->authenticate('admin', '');
+        $this->assertFalse($row->valid);
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::authenticate
+     * @test
+     */
+    public function authenticateFailsForEmptyUser() {
+        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $users = 5;
+        $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
+        for ($count = 0; $count <= $users; $count++) {
+            if ($count != 0) {
+                $id= $count + 100;
+                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+            }
+            else {
+                $sql .= "(1, 'admin', '{$pass}')";
+            }
+        }
+        self::$pdo->query($sql);
+        $dbo = new DBO(self::$pdo);
+        $row = $dbo->authenticate('', 'password');
+        $this->assertFalse($row->valid);
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::authenticate
+     * @test
+     */
+    public function authenticateFailsForUnknownUser() {
+        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $users = 5;
+        $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
+        for ($count = 0; $count <= $users; $count++) {
+            if ($count != 0) {
+                $id= $count + 100;
+                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+            }
+            else {
+                $sql .= "(1, 'admin', '{$pass}')";
+            }
+        }
+        self::$pdo->query($sql);
+        $dbo = new DBO(self::$pdo);
+        $row = $dbo->authenticate('nouser', 'password');
+        $this->assertFalse($row->valid);
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::authenticate
+     * @test
+     */
+    public function authenticateFailsForWrongPassword() {
+        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $users = 5;
+        $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
+        for ($count = 0; $count <= $users; $count++) {
+            if ($count != 0) {
+                $id= $count + 100;
+                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+            }
+            else {
+                $sql .= "(1, 'admin', '{$pass}')";
+            }
+        }
+        self::$pdo->query($sql);
+        $dbo = new DBO(self::$pdo);
+        $row = $dbo->authenticate('user1', 'Password');
+        $this->assertFalse($row->valid);
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::authenticate
+     * @test
+     */
+    public function authenticateSucceedsForKnownUser() {
+        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $users = 5;
+        $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
+        for ($count = 0; $count <= $users; $count++) {
+            if ($count != 0) {
+                $id= $count + 100;
+                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+            }
+            else {
+                $sql .= "(1, 'admin', '{$pass}')";
+            }
+        }
+        self::$pdo->query($sql);
+        $dbo = new DBO(self::$pdo);
+        $row = $dbo->authenticate('user1', 'password');
+        $this->assertTrue($row->valid);
+    }
+
+    /**
      * @covers ICCM\BOF\DBO::beginTransaction
      * @test
      */
     public function beginTransactionOnlyInvokesPDOBeginTransaction() {
         $pdoMock = $this->getMockBuilder(PDO::class)
                  ->disableOriginalConstructor()
-                 ->setMethods(['beginTransaction', 'commit', 'prepare', 'query', 'rollBack'])
+                 ->onlyMethods(['beginTransaction', 'commit', 'prepare', 'query', 'rollBack'])
                  ->getMock();
         $pdoMock->expects($this->once())
             ->method('beginTransaction');
@@ -451,7 +613,8 @@ class TestDBO extends TestCase
         $this->_setupWorkshops(12, 15, true, 0);
         $dbo = new DBO(self::$pdo);
         $logger = $this->getMockBuilder(Logger::class)
-            ->setMethods(['logBookWorkshop'])
+            ->disableOriginalConstructor()
+            ->onlyMethods(['logBookWorkshop'])
             ->getMock();
         $logger->expects($this->once())
             ->method('logBookWorkshop');
@@ -500,13 +663,57 @@ class TestDBO extends TestCase
     }
 
     /**
+     * @covers ICCM\BOF\DBO::checkForUser
+     * @test
+     */
+    public function checkForUserReturnsFalseForUserThatDoesntExist() {
+        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $users = 5;
+        $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
+        for ($count = 0; $count <= $users; $count++) {
+            if ($count != 0) {
+                $id= $count + 100;
+                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+            }
+            else {
+                $sql .= "(1, 'admin', '{$pass}')";
+            }
+        }
+        self::$pdo->query($sql);
+        $dbo = new DBO(self::$pdo);
+        $this->assertFalse($dbo->checkForUser('newuser'));
+    }
+
+    /**
+     * @covers ICCM\BOF\DBO::checkForUser
+     * @test
+     */
+    public function checkForUserReturnsTrueForUserThatExists() {
+        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $users = 5;
+        $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
+        for ($count = 0; $count <= $users; $count++) {
+            if ($count != 0) {
+                $id= $count + 100;
+                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+            }
+            else {
+                $sql .= "(1, 'admin', '{$pass}')";
+            }
+        }
+        self::$pdo->query($sql);
+        $dbo = new DBO(self::$pdo);
+        $this->assertTrue($dbo->checkForUser('admin'));
+    }
+
+    /**
      * @covers ICCM\BOF\DBO::commit
      * @test
      */
     public function commitOnlyInvokesPDOCommit() {
         $pdoMock = $this->getMockBuilder(PDO::class)
                  ->disableOriginalConstructor()
-                 ->setMethods(['beginTransaction', 'commit', 'prepare', 'query', 'rollBack'])
+                 ->onlyMethods(['beginTransaction', 'commit', 'prepare', 'query', 'rollBack'])
                  ->getMock();
         $pdoMock->expects($this->never())
             ->method('beginTransaction');
@@ -590,7 +797,8 @@ EOF;
         $this->_setBooking($bookedWorkshops);
 
         $logger = $this->getMockBuilder(Logger::class)
-            ->setMethods(['log'])
+            ->disableOriginalConstructor()
+            ->onlyMethods(['log'])
             ->getMock();
 
         $expectedConflicts = $rounds * ($locations - 1);
@@ -647,7 +855,8 @@ EOF;
             [111, 2, 3]
         ]);
         $logger = $this->getMockBuilder(Logger::class)
-            ->setMethods(['log'])
+            ->disableOriginalConstructor()
+            ->onlyMethods(['log'])
             ->getMock();
         $dbo = new DBO(self::$pdo);
         $conflictsArr = $dbo->findConflicts($logger);
@@ -678,7 +887,8 @@ EOF;
             [111, 2, 3]
         ]);
         $logger = $this->getMockBuilder(Logger::class)
-            ->setMethods(['log'])
+            ->disableOriginalConstructor()
+            ->onlyMethods(['log'])
             ->getMock();
         $dbo = new DBO(self::$pdo);
         $conflictsArr = $dbo->findConflicts($logger);
@@ -712,7 +922,8 @@ EOF;
             [112, 2, 3]
         ]);
         $logger = $this->getMockBuilder(Logger::class)
-            ->setMethods(['log'])
+            ->disableOriginalConstructor()
+            ->onlyMethods(['log'])
             ->getMock();
         $dbo = new DBO(self::$pdo);
         $conflictsArr = $dbo->findConflicts($logger);
@@ -743,7 +954,8 @@ EOF;
             [1, 4, 1]
         ]);
         $logger = $this->getMockBuilder(Logger::class)
-            ->setMethods(['log'])
+            ->disableOriginalConstructor()
+            ->onlyMethods(['log'])
             ->getMock();
         $dbo = new DBO(self::$pdo);
         $conflictsArr = $dbo->findConflicts($logger);
@@ -770,7 +982,8 @@ EOF;
             [1, 4, 1]
         ]);
         $logger = $this->getMockBuilder(Logger::class)
-            ->setMethods(['log'])
+            ->disableOriginalConstructor()
+            ->onlyMethods(['log'])
             ->getMock();
         $dbo = new DBO(self::$pdo);
         $conflictsArr = $dbo->findConflicts($logger);
@@ -801,7 +1014,8 @@ EOF;
             [112, 2, 3]
         ]);
         $logger = $this->getMockBuilder(Logger::class)
-            ->setMethods(['log'])
+            ->disableOriginalConstructor()
+            ->onlyMethods(['log'])
             ->getMock();
         $dbo = new DBO(self::$pdo);
         $conflictsArr = $dbo->findConflicts($logger);
@@ -1605,7 +1819,7 @@ EOF;
     public function rollbackOnlyInvokesPDOCommit() {
         $pdoMock = $this->getMockBuilder(PDO::class)
                  ->disableOriginalConstructor()
-                 ->setMethods(['beginTransaction', 'commit', 'prepare', 'query', 'rollBack'])
+                 ->onlyMethods(['beginTransaction', 'commit', 'prepare', 'query', 'rollBack'])
                  ->getMock();
         $pdoMock->expects($this->never())
             ->method('beginTransaction');

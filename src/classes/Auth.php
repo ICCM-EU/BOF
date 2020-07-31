@@ -2,36 +2,31 @@
 
 namespace ICCM\BOF;
 use \Firebase\JWT\JWT;
+use ICCM\BOF\Cookies;
 use \PDO;
 
 class Auth
 {
     private $view;
-    private $db;
+    private $dbo;
     private $router;
     private $secrettoken;
+    private $cookies;
+    private $translator;
 
-    function __construct($view, $db, $router, $secrettoken) {
+    function __construct($view, $router, $dbo, $secrettoken, $cookies, $translator) {
         $this->view = $view;
-        $this->db = $db;
+        $this->dbo = $dbo;
         $this->router = $router;
         $this->secrettoken = $secrettoken;
+        $this->cookies = $cookies;
+        $this->translator = $translator;
     }
 
     public function authenticate($request, $response, $args) {
         $data = $request->getParsedBody();
         $login = $data['user_name'];
-        $password = $data['password'];
-        $sql = 'SELECT * FROM `participant`
-            WHERE (
-                `name` = ?
-            ) AND (
-                `password` = PASSWORD(?)
-            )';
-        $query=$this->db->prepare($sql);
-        $param = array ($login, $password);
-        $query->execute($param);
-        if ($row=$query->fetch(PDO::FETCH_OBJ)) {
+        if (($row = $this->dbo->authenticate($login, $data['password'])) && $row->valid) {
             if ($login == "admin") {
                 $payload = array("is_admin" => true, "userid" => $row->id);
                 $goto = $this->router->pathFor("admin");
@@ -41,11 +36,11 @@ class Auth
                 $goto = $this->router->pathFor("topics");
             }
             $token = JWT::encode($payload, $this->secrettoken, "HS256");
-            setcookie("authtoken", $token, time()+3600);  // cookie expires in one hour
+            $this->cookies->set("authtoken", $token, time()+3600);  // cookie expires in one hour
             return $response->withRedirect($goto)->withStatus(302);
         } else {
             // echo json_encode("No valid user or password");
-	    return $response->withRedirect($this->router->pathFor("login") . "?message=invalid")->withStatus(302);
+            return $response->withRedirect($this->router->pathFor("login") . "?message=invalid")->withStatus(302);
         }
     }
     
@@ -60,47 +55,30 @@ class Auth
         $data = $request->getParsedBody();
         $login = $data['user_name'];
         $password = $data['password'];
-        $sql = 'SELECT * FROM `participant`
-            WHERE ( `name` = ? )';
-        $query=$this->db->prepare($sql);
-        $param = array ($login);
-        $query->execute($param);
         if (strlen($login) == 0 || strlen($password) == 0) {
-		global $translator;
-		print $translator->trans("Empty user or pass. Don't do that!");
-		return 0;
+            print $this->translator->trans("Empty user or pass. Don't do that!");
+            return 0;
         }
-        if ($row=$query->fetch(PDO::FETCH_OBJ)) {
-			# user already exist, so return with error code 0
-			global $translator;
-			print $translator->trans("User already exists");
-			return 0;
-		}
-		else {
-			$sql = 'INSERT INTO `participant`
-				(`name`, `password`)
-				VALUES (?, PASSWORD(?))';
-
-#			$this->db->beginTransaction();
-			$query=$this->db->prepare($sql);
-			$param = array ($login, $password);
-			try {
-			    $query->execute($param);
-			} catch (PDOException $e){
-			    echo $e->getMessage();
-			}
-			#TODO: needs to check session to commit() on
-#			$this->db->commit();
-			# print the auto incremented user's ID
-			# print "User added, got ID : " . $this->db->lastInsertId();
-			$payload = array("is_admin" => false, "userid" => $this->db->lastInsertId());
-			return $response->withRedirect($this->router->pathFor("login") . "?newuser=1")->withStatus(302);
-		}
+        if ($this->dbo->checkForUser($login)) {
+            # user already exist, so return with error code 0
+            print $this->translator->trans("User already exists");
+            return 0;
+        }
+        else {
+            $id = $this->dbo->addUser($login, $password);
+            //if (is_string($id)) {
+                //echo $id;
+            //}
+            # print the auto incremented user's ID
+            # print "User added, got ID : " . $id;
+            $payload = array("is_admin" => false, "userid" => $id);
+            return $response->withRedirect($this->router->pathFor("login") . "?newuser=1")->withStatus(302);
+        }
     }
 
 		
     public function logout($request, $response, $args) {
-        setcookie("authtoken", "", time()-3600);
+        $this->cookies->set("authtoken", "", time()-3600);
         $config['show_githubforkme'] = true;
         return $this->view->render($response, 'home.html', $config);
     }

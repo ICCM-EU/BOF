@@ -11,6 +11,7 @@ $container = $app->getContainer();
 // Register dependencies
 require __DIR__ . '/../dependencies.php';
 require __DIR__.'/../classes/Results.php';
+require __DIR__.'/../classes/Cookies.php';
 require __DIR__.'/../classes/DBO.php';
 require __DIR__.'/../classes/Logger.php';
 
