@@ -11,12 +11,76 @@ class DBO
 {
     private $db;
     private $PrepBofId = 1;
+    private $passwordCost = 15;
 
     function __construct($db) {
         $this->db = $db;
 
         $settings = require __DIR__.'/../../cfg/settings.php';
         $this->PrepBofId = $settings['settings']['PrepBofId'];
+    }
+
+    /**
+     * Adds auser to the participant table
+     * 
+     * @param string $login The name of the user
+     * @param string $password  The password of the user
+     * 
+     * @return mixed THe ID of the new user, or 
+     */
+    public function addUser($login, $password) {
+        $pass = password_hash($password, PASSWORD_DEFAULT,
+            ['cost' => $this->passwordCost]);
+        $sql = 'INSERT INTO `participant`
+            (`name`, `password`)
+            VALUES (:name, :password)';
+
+        # $this->beginTransaction();
+        $query=$this->db->prepare($sql);
+        $query->bindValue(':name', $login, PDO::PARAM_STR);
+        $query->bindValue(':password', $pass, PDO::PARAM_STR);
+        try {
+            $query->execute();
+        } catch (\PDOException $e){
+            return $e->getMessage();
+        }
+        #TODO: needs to check session to commit() on
+        # $this->commit();
+        return $this->db->lastInsertId();
+    }
+
+    /**
+     * Authenticates a given login name and password.
+     * 
+     * @param string $login The name of the user
+     * @param string $password  The password of the user
+     * 
+     * @return stdClass containing the authentication information:
+     * id, name, and valid. If valid is false, then the authentication failed.
+     */
+    public function authenticate($login, $password) {
+        // This will return default values if the user doesn't exist; that
+        // ensures we will test the password against something. Note that the
+        // default password is in the right format, but is probably incorrect.
+        // Even if it's correct, we know our fake password was used because
+        // count will be 0, and we validate count below.
+        $sql = "SELECT COUNT(id) AS count,
+                       COALESCE(id, -1) AS id,
+                       COALESCE(name, ':name') AS name,
+                       COALESCE(password, '\$2y\$" . $this->passwordCost . "\$NYriOyGGQ0AwLbOxUwaFneXQzI4prjcNbfTs.zOu3PSJPSLaHvvGH') AS password
+                  FROM participant
+                 WHERE name = :name";
+        $query=$this->db->prepare($sql);
+        $query->bindValue(':name', $login, PDO::PARAM_STR);
+        $query->execute();
+        $row = $query->fetch(PDO::FETCH_OBJ);
+        // Always call password_verify! Note that we use bitwise AND to ensure
+        // that $row->count is checked even if password_verify() fails. This
+        // should avoid leaking information about if the user exists.
+        $row->valid = ((password_verify($password, $row->password) & $row->count) === 1);
+        unset($row->password);
+        unset($row->count);
+        return $row;
     }
 
     /**
@@ -71,6 +135,20 @@ class DBO
                      location_id = NULL,
                      available = NULL";
         $this->db->query($sql);
+    }
+
+    /**
+     * Checks if a user exists in the participant database.
+     * 
+     * @return true if the user exists, otherwise false.
+     */
+    public function checkForUser($login) {
+        $sql = 'SELECT id FROM `participant`
+            WHERE `name` = :name';
+        $query=$this->db->prepare($sql);
+        $query->bindValue('name', $login, PDO::PARAM_STR);
+        $query->execute();
+        return $query->fetch(PDO::FETCH_OBJ) !== false;
     }
 
     /**

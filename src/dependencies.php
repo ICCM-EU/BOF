@@ -41,11 +41,15 @@ $container['view'] = function ($container) {
 $container['ICCM\BOF\Auth'] = function ($c) {
     global $app;
     global $settings;
+    global $translator;
     return new \ICCM\BOF\Auth(
         $c['view'],
-        $c['db'],
         $app->getContainer()->get('router'),
-        $settings['settings']['secrettoken']);
+        $app->getContainer()->get('ICCM\BOF\DBO'),
+        $settings['settings']['secrettoken'],
+        $app->getContainer()->get('ICCM\BOF\Cookies'),
+        $translator
+    );
 };
 
 $container['ICCM\BOF\Admin'] = function ($c) {
@@ -55,6 +59,10 @@ $container['ICCM\BOF\Admin'] = function ($c) {
         $c['view'],
         $c['db'],
         $app->getContainer()->get('router'));
+};
+
+$container['ICCM\BOF\Cookies'] = function ($c) {
+    return new \ICCM\BOF\Cookies();
 };
 
 $container['ICCM\BOF\DBO'] = function ($c) {
