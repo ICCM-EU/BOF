@@ -43,6 +43,7 @@ class TestNomination extends TestCase
 
         $request->expects($this->once())
             ->method('getAttribute')
+            ->with('userid')
             ->willReturn($userid);
 
         $request->expects($this->once())
