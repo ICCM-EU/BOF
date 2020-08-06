@@ -21,6 +21,35 @@ class DBO
     }
 
     /**
+     * Adds the given user as a facilitator for the given workshop. If the
+     * user voted for the workshop, the user is simply updated to be a
+     * facilitator. If the user did not vote for the workshop, an entry is
+     * added to make that user a facilitator, and does not affect the vote
+     * total for the workshop.
+     * 
+     * @param int $workshop The ID of the workshop to add the facilitator for
+     * @param int $mergeId The ID of the user to add as a facilitator
+     */
+    public function addFacilitator($workshop, $participant) {
+        $sql = 'INSERT INTO `workshop_participant` (`workshop_id`,`participant_id`,`leader`, participant) 
+                VALUES (:workshop_id, :participant_id, 1, 0)
+                ON DUPLICATE KEY UPDATE `leader` = 1';
+        if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            $sql = 'INSERT INTO workshop_participant
+                                (workshop_id, participant_id, leader, participant)
+                                VALUES(:workshop_id, :participant_id, 1, 0)
+                    ON CONFLICT(workshop_id, participant_id) DO UPDATE
+                            SET leader = 1';
+        }
+        
+        $query = $this->db->prepare($sql);
+        $query->bindValue('workshop_id', (int) $workshop, PDO::PARAM_INT);
+        $query->bindValue('participant_id', (int) $participant, PDO::PARAM_INT);
+        
+        $query->execute();
+    }
+
+    /**
      * Adds auser to the participant table
      * 
      * @param string $login The name of the user
@@ -156,6 +185,28 @@ class DBO
      */
     public function commit() {
         $this->db->commit();
+    }
+
+    /**
+     * Deletes the workshop specified by the given ID
+     * 
+     * @param int $workshop The ID of the BoF to book
+     */
+    public function deleteWorkshop($workshop) {
+        $sql = 'DELETE FROM `workshop`
+                      WHERE `id` = :workshop_id';
+
+        $query = $this->db->prepare($sql);
+        $query->bindValue('workshop_id', (int) $workshop, PDO::PARAM_INT);
+        $query->execute();
+
+        /* Should we also delete the votes for this workshop?
+        $sql = 'DELETE FROM `workshop_participant`
+                      WHERE `workshop_id` = :workshop_id';
+        $query = $this->db->prepare($sql);
+        $query->bindValue('workshop_id', (int) $workshop, PDO::PARAM_INT);
+        $query->execute();
+        */
     }
 
     /**
@@ -638,6 +689,20 @@ class DBO
     }
 
     /**
+     * Gets the names and ids of all users, except the admin user.
+     */
+    public function getUsers() {
+        $sql = 'SELECT id, name
+                  FROM `participant`
+                 WHERE `name` <> "admin"
+              ORDER BY `name`';
+        $query=$this->db->prepare($sql);
+        $param = array ();
+        $query->execute($param);
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
      * Gets the workshop names and ids for all workshops, in descending order
      * according to id.
      */
@@ -647,6 +712,59 @@ class DBO
         $query->execute();
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
+
+    /**
+     * Returns the details for the 
+     * detailed information about the workshop.
+     * 
+     * @return array An array whose elements are an object representing the
+     * name, id, leader(s) of each workshop, those who gave the workshop a
+     * full vote, and the creator of the workshop. The leader and fullvoter
+     * members are comma-delimited lists of users' names as strings.
+     */
+    public function getWorkshopsDetails() {
+        $groupConcat = "GROUP_CONCAT(p.name ORDER BY p.name ASC SEPARATOR ', ')";
+        if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            // Note that we can't make ORDER BY work inside the GROUP_CONCAT,
+            // and the trick used in getFacilitiators doesn't work, either. To
+            // get around these problems, we use a subquery and sort the
+            // subquery by p.name. But we still have to specify ORDER BY in the
+            // GROUP_CONCAT for mysql!
+            $groupConcat = "GROUP_CONCAT(p.name, ', ')";
+        }
+        $sql = "SELECT name, t.id, createdby, leader, fullvoters
+                  FROM (SELECT w.name AS name,
+                                 w.id AS id,
+                              pc.name AS createdby, "
+                   . $groupConcat . " AS leader
+                          FROM workshop w
+                     LEFT JOIN workshop_participant wp
+                            ON wp.workshop_id = w.id
+                           AND wp.leader = 1
+                     LEFT JOIN participant pc
+                            ON w.creator_id = pc.id
+                     LEFT JOIN participant p
+                            ON wp.participant_id = p.id
+                      GROUP BY w.id
+                      ORDER BY w.id ASC) AS t
+             LEFT JOIN (SELECT w.id AS id, "
+                 . $groupConcat . " AS fullvoters
+                          FROM workshop w
+                     LEFT JOIN workshop_participant wp
+                            ON wp.workshop_id = w.id
+                           AND wp.participant = 1
+                     LEFT JOIN participant p
+                            ON wp.participant_id = p.id
+                     GROUP BY w.id
+                     ORDER BY w.id ASC) AS t2
+                    ON t.id = t2.id
+              GROUP BY t.id
+              ORDER BY t.id ASC";
+        $query = $this->db->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
 
     /**
      * Gets booking information for a workshop with a particular vote total to
@@ -715,6 +833,37 @@ class DBO
     }
 
     /**
+     * Merges two workshops
+     * 
+     * @param int $targetId The ID of the workshop in which to merge
+     * @param int $mergeId The ID of the workshop to merge with $targetId
+     */
+    public function mergeWorkshops($targetId, $mergeId) {
+        $sql = "SELECT name, description, published
+                  FROM workshop
+                 WHERE id = :workshop_id";
+        $queryWorkshop = $this->db->prepare($sql);
+        $queryWorkshop->bindValue('workshop_id', (int) $targetId, PDO::PARAM_INT);
+        $queryWorkshop->execute();
+        $target = $queryWorkshop->fetch(PDO::FETCH_OBJ);
+
+        $queryWorkshop->bindValue('workshop_id', (int) $mergeId, PDO::PARAM_INT);
+        $queryWorkshop->execute();
+        $merge = $queryWorkshop->fetch(PDO::FETCH_OBJ);
+
+        $this->beginTransaction();
+
+        $this->updateWorkshop($targetId,
+            $target->name . " and " . $merge->name,
+            $target->description . " and " . $merge->description,
+            $target->published);
+
+        $this->deleteWorkshop($mergeId);
+
+        $this->commit();
+    }
+
+    /**
      * Inserts the given title as a new workshop, using the given creator.
      * 
      * @param string $name The name for the new workshop.
@@ -771,6 +920,37 @@ class DBO
         $queryUpdateRound->bindValue(':round_id', (int) $round_id2, PDO::PARAM_INT);
         $queryUpdateRound->bindValue(':location_id', (int) $location_id2, PDO::PARAM_INT);
         $sucess = $queryUpdateRound->execute();
+    }
+
+    /**
+     * Updates the given workshop with the given name, description, and
+     * "published" value.
+     * 
+     * @param int $workshop The workshop id of the workshop to update
+     * @param string $name The new name for the workshop
+     * @param string $description The new description for the workshop
+     * @param int $published The new "published" value. If empty($published) returns true, it will be set to 0, otherwise 1.
+     */
+    public function updateWorkshop($workshop, $name, $description, $published) {
+        $sql = 'UPDATE `workshop`
+                   SET `name` = :name,
+                       `description` = :description,
+                       `published` = :published
+                 WHERE `id` = :workshop_id';
+        
+        if (empty($published)) {
+            $published = 0;
+        }
+        else {
+            $published = 1;
+        }
+
+        $query=$this->db->prepare($sql);
+        $query->bindValue(':workshop_id', (int) $workshop, PDO::PARAM_INT);
+        $query->bindValue(':published', (int) $published, PDO::PARAM_INT);
+        $query->bindValue(':name', $name, PDO::PARAM_STR);
+        $query->bindValue(':description', $description, PDO::PARAM_STR);
+        $query->execute();
     }
 
     /**
