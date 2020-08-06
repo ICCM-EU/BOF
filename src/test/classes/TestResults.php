@@ -15,7 +15,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Argument;
 
 /**
- * @covers ICCM\BOF\Results
+ * @covers \ICCM\BOF\Results
  */
 class TestResults extends TestCase
 {

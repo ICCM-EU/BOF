@@ -12,7 +12,7 @@ use Slim\Http\Request;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * @covers ICCM\BOF\Nomination
+ * @covers \ICCM\BOF\Nomination
  */
 class TestNomination extends TestCase
 {

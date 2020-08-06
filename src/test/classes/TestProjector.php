@@ -11,7 +11,7 @@ use Slim\Views\Twig;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * @covers ICCM\BOF\Projector
+ * @covers \ICCM\BOF\Projector
  */
 class TestProjector extends TestCase
 {
