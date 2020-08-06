@@ -8,7 +8,7 @@ use ICCM\BOF\DBO;
 use ICCM\BOF\Logger;
 
 /**
- * @covers ICCM\BOF\DBO
+ * @covers \ICCM\BOF\DBO::__construct
  */
 class TestDBO extends TestCase
 {
@@ -22,6 +22,7 @@ class TestDBO extends TestCase
         self::$pdo->query("DELETE FROM participant");
         self::$pdo->query("DELETE FROM workshop");
         self::$pdo->query("DELETE FROM workshop_participant");
+        self::$pdo->query("DELETE FROM sqlite_sequence WHERE name='participant' OR name='workshop' OR name='workshop_participant'");
     }
 
     private function _setAvailable($available) {
@@ -53,6 +54,7 @@ class TestDBO extends TestCase
 
     private function _setupRounds($rounds, $valid) {
         self::$pdo->query("DELETE FROM round");
+        self::$pdo->query("DELETE FROM sqlite_sequence WHERE name='round'");
         $sql = "INSERT INTO round (id, time_period) VALUES";
         for ($count = 0, $id = 0; $count < $rounds; $count++, $id++) {
             if ($count != 0) {
@@ -71,6 +73,7 @@ class TestDBO extends TestCase
 
     private function _setupLocations($locations, $valid) {
         self::$pdo->query("DELETE FROM location");
+        self::$pdo->query("DELETE FROM sqlite_sequence WHERE name='location'");
         $sql = "INSERT INTO location (id, name) VALUES";
         for ($count = 0, $id = 0, $letter = 'A'; $count < $locations; $count++, $id++, $letter++) {
             if ($count != 0) {
@@ -370,6 +373,15 @@ class TestDBO extends TestCase
             print("{$row->id}\t{$row->round_id}\t\t{$row->facilitator}\n");
         }
     }
+
+    private function _printVoters() {
+        print("\nworkshop_id\t\tvoter\tleader\n");
+        $query = self::$pdo->prepare("SELECT workshop_id, participant_id, leader FROM workshop_participant ORDER BY workshop_id, participant_id");
+        $query->execute();
+        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+            print("{$row->workshop_id}\t\t{$row->participant_id}\t{$row->leader}\n");
+        }
+    }
     */
 
     public static function initializeDatabase() {
@@ -419,10 +431,78 @@ class TestDBO extends TestCase
         // Clear out everything
         $this->_resetWorkshops();
         self::$pdo->query("DELETE FROM config");
+        self::$pdo->query("DELETE FROM sqlite_sequence WHERE name='config'");
     }
 
     /**
-     * @covers ICCM\BOF\DBO::addUser
+     * @covers \ICCM\BOF\DBO::addFacilitator
+     * @test
+     */
+    public function addFacilitatorForExistingLeader() {
+        $this->_setupWorkshops(2, 2, true, 0);
+        $dbo = new DBO(self::$pdo);
+        $dbo->addFacilitator(101, 101);
+        $sql = "SELECT leader
+                  FROM workshop_participant
+                 WHERE participant_id = 101
+                   AND workshop_id = 101
+              ORDER BY participant_id, workshop_id";
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        $wp = $query->fetch(PDO::FETCH_OBJ);
+        $this->assertEquals(1, $wp->leader);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::addFacilitator
+     * @uses \ICCM\BOF\DBO::calculateVotes
+     * @test
+     */
+    public function addFacilitatorForNonVoterDoesntChangeVotes() {
+        $this->_setupWorkshops(2, 2, true, 2);
+        $dbo = new DBO(self::$pdo);
+        $dbo->calculateVotes();
+        $sql = "SELECT votes FROM workshop WHERE id = 101";
+        $queryVotes = self::$pdo->prepare($sql);
+        $queryVotes->execute();
+        $oldVotes = $queryVotes->fetch(PDO::FETCH_COLUMN);
+        $dbo->addFacilitator(101, 109);
+        $sql = "SELECT leader
+                  FROM workshop_participant
+                 WHERE participant_id = 109
+                   AND workshop_id = 101
+              ORDER BY participant_id, workshop_id";
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        $wp = $query->fetch(PDO::FETCH_OBJ);
+        $this->assertEquals(1, $wp->leader);
+        $dbo->calculateVotes();
+        $queryVotes->execute();
+        $newVotes = $queryVotes->fetch(PDO::FETCH_COLUMN);
+        $this->assertEquals($oldVotes, $newVotes);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::addFacilitator
+     * @test
+     */
+    public function addFacilitatorForVoter() {
+        $this->_setupWorkshops(2, 2, true, 2);
+        $dbo = new DBO(self::$pdo);
+        $dbo->addFacilitator(101, 110);
+        $sql = "SELECT leader
+                  FROM workshop_participant
+                 WHERE participant_id = 101
+                   AND workshop_id = 101
+              ORDER BY participant_id, workshop_id";
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        $wp = $query->fetch(PDO::FETCH_OBJ);
+        $this->assertEquals(1, $wp->leader);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::addUser
      * @test
      */
     public function addUserFailsForExistingUser() {
@@ -445,7 +525,7 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::addUser
+     * @covers \ICCM\BOF\DBO::addUser
      * @test
      */
     public function addUserSucceedsForNewUser() {
@@ -468,7 +548,7 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::authenticate
+     * @covers \ICCM\BOF\DBO::authenticate
      * @test
      */
     public function authenticateFailsForEmptyPassword() {
@@ -491,7 +571,7 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::authenticate
+     * @covers \ICCM\BOF\DBO::authenticate
      * @test
      */
     public function authenticateFailsForEmptyUser() {
@@ -514,7 +594,7 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::authenticate
+     * @covers \ICCM\BOF\DBO::authenticate
      * @test
      */
     public function authenticateFailsForUnknownUser() {
@@ -537,7 +617,7 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::authenticate
+     * @covers \ICCM\BOF\DBO::authenticate
      * @test
      */
     public function authenticateFailsForWrongPassword() {
@@ -560,7 +640,7 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::authenticate
+     * @covers \ICCM\BOF\DBO::authenticate
      * @test
      */
     public function authenticateSucceedsForKnownUser() {
@@ -583,7 +663,7 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::beginTransaction
+     * @covers \ICCM\BOF\DBO::beginTransaction
      * @test
      */
     public function beginTransactionOnlyInvokesPDOBeginTransaction() {
@@ -606,7 +686,7 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::bookWorkshop
+     * @covers \ICCM\BOF\DBO::bookWorkshop
      * @test
      */
     public function bookWorkshopSetsRoundLocationAndAvailable() {
@@ -631,7 +711,7 @@ class TestDBO extends TestCase
     }
  
     /**
-     * @covers ICCM\BOF\DBO::calculateVotes
+     * @covers \ICCM\BOF\DBO::calculateVotes
      * @test
      */
     public function calculateVotesSetsVotesFromWorkshopParticipant() {
@@ -663,7 +743,7 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::checkForUser
+     * @covers \ICCM\BOF\DBO::checkForUser
      * @test
      */
     public function checkForUserReturnsFalseForUserThatDoesntExist() {
@@ -685,7 +765,7 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::checkForUser
+     * @covers \ICCM\BOF\DBO::checkForUser
      * @test
      */
     public function checkForUserReturnsTrueForUserThatExists() {
@@ -707,7 +787,7 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::commit
+     * @covers \ICCM\BOF\DBO::commit
      * @test
      */
     public function commitOnlyInvokesPDOCommit() {
@@ -730,7 +810,29 @@ class TestDBO extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\DBO::exportWorkshops
+     * @covers \ICCM\BOF\DBO::deleteWorkshop
+     * @test
+     */
+    public function deleteWorkshopDeletesOnlySpecifiedWorkshop() {
+        $this->_setupWorkshops(2, 2, true, 0);
+        $dbo = new DBO(self::$pdo);
+        $dbo->deleteWorkshop(101);
+        $query = self::$pdo->prepare("SELECT id FROM workshop ORDER BY id");
+        $query->execute();
+        $rows=$query->fetchAll(PDO::FETCH_OBJ);
+        $this->assertEquals(8, count($rows));
+        $this->assertEquals(1, $rows[0]->id);
+        $this->assertEquals(102, $rows[1]->id);
+        $this->assertEquals(103, $rows[2]->id);
+        $this->assertEquals(104, $rows[3]->id);
+        $this->assertEquals(105, $rows[4]->id);
+        $this->assertEquals(106, $rows[5]->id);
+        $this->assertEquals(107, $rows[6]->id);
+        $this->assertEquals(108, $rows[7]->id);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::exportWorkshops
      * @test
      */
     public function exportWorkshops() {
@@ -822,7 +924,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::findConflicts
+     * @covers \ICCM\BOF\DBO::findConflicts
      * @test
      */
     public function findConflictsWhenEverythingConflicts() {
@@ -836,7 +938,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::findConflicts
+     * @covers \ICCM\BOF\DBO::findConflicts
      * @test
      */
     public function findConflictsWhenNoConflictsExist() {
@@ -868,7 +970,7 @@ EOF;
     /**
      * @testdox find conflicts when everything has two faciliators, one in
      * common and one unique.
-     * @covers ICCM\BOF\DBO::findConflicts
+     * @covers \ICCM\BOF\DBO::findConflicts
      * @test
      */
     public function findConflictsWhenNoConflictsExistMax() {
@@ -898,7 +1000,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::findConflicts
+     * @covers \ICCM\BOF\DBO::findConflicts
      * @test
      */
     public function findConflictsWithMultiple34() {
@@ -937,7 +1039,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::findConflicts
+     * @covers \ICCM\BOF\DBO::findConflicts
      * @test
      */
     public function findConflictsWhenNoConflictsExist52() {
@@ -965,7 +1067,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::findConflicts
+     * @covers \ICCM\BOF\DBO::findConflicts
      * @test
      */
     public function findConflictsWithOnlyOneConflict52() {
@@ -995,7 +1097,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::findConflicts
+     * @covers \ICCM\BOF\DBO::findConflicts
      * @test
      */
     public function findConflictsWithOnlyOneConflictMultipleFacilitators() {
@@ -1027,7 +1129,7 @@ EOF;
     }
  
     /**
-     * @covers ICCM\BOF\DBO::getBookedWorkshop
+     * @covers \ICCM\BOF\DBO::getBookedWorkshop
      * @test
      */
     public function getBookedWorkshopReturnsExpectedData() {
@@ -1052,7 +1154,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getBookedWorkshop
+     * @covers \ICCM\BOF\DBO::getBookedWorkshop
      * @test
      */
     public function getBookedWorkshopReturnsFalseForNoBooking() {
@@ -1067,7 +1169,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getConflict
+     * @covers \ICCM\BOF\DBO::getConflict
      * @test
      */
     public function getConflictReturnsExpectedData() {
@@ -1088,7 +1190,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getConflict
+     * @covers \ICCM\BOF\DBO::getConflict
      * @test
      */
     public function getConflictReturnsFalseWhenConflictInLocationZero() {
@@ -1106,7 +1208,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getConflict
+     * @covers \ICCM\BOF\DBO::getConflict
      * @test
      */
     public function getConflictForWrongData() {
@@ -1133,7 +1235,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getConflictSwitchTargets
+     * @covers \ICCM\BOF\DBO::getConflictSwitchTargets
      * @test
      */
     public function getConflictSwitchTargetsForSimpleConflict() {
@@ -1181,7 +1283,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getConflictSwitchTargets
+     * @covers \ICCM\BOF\DBO::getConflictSwitchTargets
      * @test
      */
     public function getConflictSwitchTargetsWhenAllHaveSameFacilitator() {
@@ -1217,7 +1319,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getCurrentVotes
+     * @covers \ICCM\BOF\DBO::getCurrentVotes
      * @test
      */
     public function getCurrentVotes() {
@@ -1298,7 +1400,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getFacilitators
+     * @covers \ICCM\BOF\DBO::getFacilitators
      * @test
      */
     public function getFacilitators() {
@@ -1315,7 +1417,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getFacilitators
+     * @covers \ICCM\BOF\DBO::getFacilitators
      * @test
      */
     public function getFacilitatorsReturnsEmptyStringForNoLeaders() {
@@ -1330,7 +1432,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getMaxVote
+     * @covers \ICCM\BOF\DBO::getMaxVote
      * @test
      */
     public function getMaxVote() {
@@ -1341,7 +1443,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getMaxVote
+     * @covers \ICCM\BOF\DBO::getMaxVote
      * @test
      */
     public function getMaxVoteASecondTime() {
@@ -1356,7 +1458,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getLocationNames
+     * @covers \ICCM\BOF\DBO::getLocationNames
      * @test
      */
     public function getLocationNamesReturnsExpected() {
@@ -1368,7 +1470,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getMaxVote
+     * @covers \ICCM\BOF\DBO::getMaxVote
      * @test
      */
     public function getMaxVoteForMultipleWorkshopsWithSameVotes() {
@@ -1387,7 +1489,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getNumLocations
+     * @covers \ICCM\BOF\DBO::getNumLocations
      * @test
      */
     public function getNumLocationsReturnsExpected() {
@@ -1398,7 +1500,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getNumRounds
+     * @covers \ICCM\BOF\DBO::getNumRounds
      * @test
      */
     public function getNumRoundsReturnsExpected() {
@@ -1409,7 +1511,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getPrepBoF
+     * @covers \ICCM\BOF\DBO::getPrepBoF
      * @test
      */
     public function getPrepBoFReturnsExpectedData() {
@@ -1423,7 +1525,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getPrepBoF
+     * @covers \ICCM\BOF\DBO::getPrepBoF
      * @test
      */
     public function getPrepBoFReturnsFalseIfNotFound() {
@@ -1434,7 +1536,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getRoundNames
+     * @covers \ICCM\BOF\DBO::getRoundNames
      * @test
      */
     public function getRoundNamesReturnsExpected() {
@@ -1498,7 +1600,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getStage
+     * @covers \ICCM\BOF\DBO::getStage
      * @test
      */
     public function getStageReturnsLockedWhenConfigIsEmpty() {
@@ -1507,7 +1609,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getStage
+     * @covers \ICCM\BOF\DBO::getStage
      * @test
      */
     public function getStageReturnsLockedBeforeNominations() {
@@ -1531,7 +1633,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getTopWorkshops
+     * @covers \ICCM\BOF\DBO::getTopWorkshops
      * @test
      */
     public function getTopWorkshopsForThreeRounds() {
@@ -1555,7 +1657,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getTopWorkshops
+     * @covers \ICCM\BOF\DBO::getTopWorkshops
      * @test
      */
     public function getTopWorkshopsForEightRounds() {
@@ -1599,7 +1701,125 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getWorkshops
+     * @covers \ICCM\BOF\DBO::getUsers
+     * @test
+     */
+    public function getUsersReturnsAllButAdminInAscendingOrderByName() {
+        $this->_setupWorkshops(1, 1, true, 0);
+        $dbo = new DBO(self::$pdo);
+        $users = $dbo->getUsers();
+        $this->assertEquals(30, count($users));
+        $this->assertEquals(101, $users[0]->id);
+        $this->assertEquals("user1", $users[0]->name);
+        $this->assertEquals(110, $users[1]->id);
+        $this->assertEquals("user10", $users[1]->name);
+        $this->assertEquals(111, $users[2]->id);
+        $this->assertEquals("user11", $users[2]->name);
+        $this->assertEquals(112, $users[3]->id);
+        $this->assertEquals("user12", $users[3]->name);
+        $this->assertEquals(113, $users[4]->id);
+        $this->assertEquals("user13", $users[4]->name);
+        $this->assertEquals(114, $users[5]->id);
+        $this->assertEquals("user14", $users[5]->name);
+        $this->assertEquals(115, $users[6]->id);
+        $this->assertEquals("user15", $users[6]->name);
+        $this->assertEquals(116, $users[7]->id);
+        $this->assertEquals("user16", $users[7]->name);
+        $this->assertEquals(117, $users[8]->id);
+        $this->assertEquals("user17", $users[8]->name);
+        $this->assertEquals(118, $users[9]->id);
+        $this->assertEquals("user18", $users[9]->name);
+        $this->assertEquals(119, $users[10]->id);
+        $this->assertEquals("user19", $users[10]->name);
+        $this->assertEquals(102, $users[11]->id);
+        $this->assertEquals("user2", $users[11]->name);
+        $this->assertEquals(120, $users[12]->id);
+        $this->assertEquals("user20", $users[12]->name);
+        $this->assertEquals(121, $users[13]->id);
+        $this->assertEquals("user21", $users[13]->name);
+        $this->assertEquals(122, $users[14]->id);
+        $this->assertEquals("user22", $users[14]->name);
+        $this->assertEquals(123, $users[15]->id);
+        $this->assertEquals("user23", $users[15]->name);
+        $this->assertEquals(124, $users[16]->id);
+        $this->assertEquals("user24", $users[16]->name);
+        $this->assertEquals(125, $users[17]->id);
+        $this->assertEquals("user25", $users[17]->name);
+        $this->assertEquals(126, $users[18]->id);
+        $this->assertEquals("user26", $users[18]->name);
+        $this->assertEquals(127, $users[19]->id);
+        $this->assertEquals("user27", $users[19]->name);
+        $this->assertEquals(128, $users[20]->id);
+        $this->assertEquals("user28", $users[20]->name);
+        $this->assertEquals(129, $users[21]->id);
+        $this->assertEquals("user29", $users[21]->name);
+        $this->assertEquals(103, $users[22]->id);
+        $this->assertEquals("user3", $users[22]->name);
+        $this->assertEquals(130, $users[23]->id);
+        $this->assertEquals("user30", $users[23]->name);
+        $this->assertEquals(104, $users[24]->id);
+        $this->assertEquals("user4", $users[24]->name);
+        $this->assertEquals(105, $users[25]->id);
+        $this->assertEquals("user5", $users[25]->name);
+        $this->assertEquals(106, $users[26]->id);
+        $this->assertEquals("user6", $users[26]->name);
+        $this->assertEquals(107, $users[27]->id);
+        $this->assertEquals("user7", $users[27]->name);
+        $this->assertEquals(108, $users[28]->id);
+        $this->assertEquals("user8", $users[28]->name);
+        $this->assertEquals(109, $users[29]->id);
+        $this->assertEquals("user9", $users[29]->name);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::getWorkshopsDetails
+     * @test
+     */
+    public function getWorkshopsDetailsReturnsDetailsInAscendingOrder() {
+        $this->_setupWorkshops(2, 2, true, 0);
+        $dbo = new DBO(self::$pdo);
+        $workshops = $dbo->getWorkshopsDetails();
+        $this->assertEquals(9, count($workshops));
+        $this->assertEquals(1, $workshops[0]->id);
+        $this->assertEquals('Prep Team', $workshops[0]->name);
+        $this->assertEquals('user1, user2', $workshops[0]->leader);
+        $this->assertEquals('', $workshops[0]->fullvoters);
+        $this->assertEquals(101, $workshops[1]->id);
+        $this->assertEquals('topic1', $workshops[1]->name);
+        $this->assertEquals('user1', $workshops[1]->leader);
+        $this->assertEquals('user1, user10, user19, user26, user28, user29, user34, user37, user38, user41', $workshops[1]->fullvoters);
+        $this->assertEquals(102, $workshops[2]->id);
+        $this->assertEquals('topic2', $workshops[2]->name);
+        $this->assertEquals('user2', $workshops[2]->leader);
+        $this->assertEquals('user2, user7, user11, user20, user23, user25, user29, user32, user37, user38', $workshops[2]->fullvoters);
+        $this->assertEquals(103, $workshops[3]->id);
+        $this->assertEquals('topic3', $workshops[3]->name);
+        $this->assertEquals('user3', $workshops[3]->leader);
+        $this->assertEquals('user2, user3, user4, user12, user18, user21, user30, user33, user39', $workshops[3]->fullvoters);
+        $this->assertEquals(104, $workshops[4]->id);
+        $this->assertEquals('topic4', $workshops[4]->name);
+        $this->assertEquals('user4', $workshops[4]->leader);
+        $this->assertEquals('user4, user10, user12, user13, user22, user31, user36, user40', $workshops[4]->fullvoters);
+        $this->assertEquals(105, $workshops[5]->id);
+        $this->assertEquals('topic5', $workshops[5]->name);
+        $this->assertEquals('user5', $workshops[5]->leader);
+        $this->assertEquals('user3, user5, user6, user14, user22, user23, user24, user31, user32, user40, user41, user43', $workshops[5]->fullvoters);
+        $this->assertEquals(106, $workshops[6]->id);
+        $this->assertEquals('topic6', $workshops[6]->name);
+        $this->assertEquals('user6', $workshops[6]->leader);
+        $this->assertEquals('user6, user9, user14, user15, user17, user19, user24, user33, user42', $workshops[6]->fullvoters);
+        $this->assertEquals(107, $workshops[7]->id);
+        $this->assertEquals('topic7', $workshops[7]->name);
+        $this->assertEquals('user7', $workshops[7]->leader);
+        $this->assertEquals('user1, user7, user8, user16, user21, user25, user27, user28, user34, user35, user42, user43', $workshops[7]->fullvoters);
+        $this->assertEquals(108, $workshops[8]->id);
+        $this->assertEquals('topic8', $workshops[8]->name);
+        $this->assertEquals('user8', $workshops[8]->leader);
+        $this->assertEquals('user8, user11, user13, user15, user16, user17, user26, user35, user44, user45', $workshops[8]->fullvoters);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::getWorkshops
      * @test
      */
     public function getWorkshopsReturnsAllWorkshopsInDescendingOrder() {
@@ -1628,7 +1848,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getWorkshopToBook
+     * @covers \ICCM\BOF\DBO::getWorkshopToBook
      * @test
      */
     public function getWorkshopToBookReturnsFalseIfVoteTooBig() {
@@ -1640,7 +1860,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::getWorkshopToBook
+     * @covers \ICCM\BOF\DBO::getWorkshopToBook
      * @test
      */
     public function getWorkshopToBookReturnsCorrectWorkshops() {
@@ -1787,7 +2007,50 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::nominate
+     * @covers \ICCM\BOF\DBO::mergeWorkshops
+     * @uses \ICCM\BOF\DBO::beginTransaction
+     * @uses \ICCM\BOF\DBO::commit
+     * @uses \ICCM\BOF\DBO::deleteWorkshop
+     * @uses \ICCM\BOF\DBO::updateWorkshop
+     * @test
+     */
+    public function mergeWorkshopMergesWorkshopsLeavesRestAlone() {
+        $this->_setupWorkshops(2, 2, true, 0);
+        $dbo = new DBO(self::$pdo);
+        $dbo->mergeWorkshops(101, 107);
+        $query = self::$pdo->prepare("SELECT id,name,description FROM workshop ORDER BY id");
+        $query->execute();
+        $rows=$query->fetchAll(PDO::FETCH_OBJ);
+        $this->assertEquals(8, count($rows));
+        $this->assertEquals(1, $rows[0]->id);
+        $this->assertEquals('Prep Team', $rows[0]->name);
+        $this->assertEquals('Prep Team BoF', $rows[0]->description);
+        $this->assertEquals(101, $rows[1]->id);
+        $this->assertEquals('topic1 and topic7', $rows[1]->name);
+        $this->assertEquals('Description for topic1 and Description for topic7', $rows[1]->description);
+        $this->assertEquals(102, $rows[2]->id);
+        $this->assertEquals('topic2', $rows[2]->name);
+        $this->assertEquals('Description for topic2', $rows[2]->description);
+        $this->assertEquals(103, $rows[3]->id);
+        $this->assertEquals('topic3', $rows[3]->name);
+        $this->assertEquals('Description for topic3', $rows[3]->description);
+        $this->assertEquals(104, $rows[4]->id);
+        $this->assertEquals('topic4', $rows[4]->name);
+        $this->assertEquals('Description for topic4', $rows[4]->description);
+        $this->assertEquals(105, $rows[5]->id);
+        $this->assertEquals('topic5', $rows[5]->name);
+        $this->assertEquals('Description for topic5', $rows[5]->description);
+        $this->assertEquals(106, $rows[6]->id);
+        $this->assertEquals('topic6', $rows[6]->name);
+        $this->assertEquals('Description for topic6', $rows[6]->description);
+        $this->assertEquals(108, $rows[7]->id);
+        $this->assertEquals('topic8', $rows[7]->name);
+        $this->assertEquals('Description for topic8', $rows[7]->description);
+
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::nominate
      * @test
      */
     public function nominateInsertsNewWorkshop() {
@@ -1813,7 +2076,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::rollBack
+     * @covers \ICCM\BOF\DBO::rollBack
      * @test
      */
     public function rollbackOnlyInvokesPDOCommit() {
@@ -1836,7 +2099,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::switchBookings
+     * @covers \ICCM\BOF\DBO::switchBookings
      * @test
      */
     public function switchBookingsSwitchesOnlyWhatItShould() {
@@ -1855,7 +2118,81 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::validateLocations
+     * @covers \ICCM\BOF\DBO::updateWorkshop
+     * @test
+     */
+    public function updateWorkshopUpdatesOnlySpecifiedWorkshop() {
+        $this->_setupWorkshops(2, 2, true, 0);
+        $dbo = new DBO(self::$pdo);
+        $title = 'new title';
+        $description = 'new description';
+        $published = 1;
+        $dbo->updateWorkshop(101, $title, $description, $published);
+        $query = self::$pdo->prepare("SELECT id,name,description,published FROM workshop ORDER BY id");
+        $query->execute();
+        $rows=$query->fetchAll(PDO::FETCH_OBJ);
+        $this->assertEquals(9, count($rows));
+        $this->assertEquals(1, $rows[0]->id);
+        $this->assertEquals('Prep Team', $rows[0]->name);
+        $this->assertEquals('Prep Team BoF', $rows[0]->description);
+        $this->assertEquals(0, $rows[0]->published);
+        $this->assertEquals(101, $rows[1]->id);
+        $this->assertEquals($title, $rows[1]->name);
+        $this->assertEquals($description, $rows[1]->description);
+        $this->assertEquals($published, $rows[1]->published);
+        $this->assertEquals(102, $rows[2]->id);
+        $this->assertEquals('topic2', $rows[2]->name);
+        $this->assertEquals('Description for topic2', $rows[2]->description);
+        $this->assertEquals(0, $rows[2]->published);
+        $this->assertEquals(103, $rows[3]->id);
+        $this->assertEquals('topic3', $rows[3]->name);
+        $this->assertEquals('Description for topic3', $rows[3]->description);
+        $this->assertEquals(0, $rows[3]->published);
+        $this->assertEquals(104, $rows[4]->id);
+        $this->assertEquals('topic4', $rows[4]->name);
+        $this->assertEquals('Description for topic4', $rows[4]->description);
+        $this->assertEquals(0, $rows[4]->published);
+        $this->assertEquals(105, $rows[5]->id);
+        $this->assertEquals('topic5', $rows[5]->name);
+        $this->assertEquals('Description for topic5', $rows[5]->description);
+        $this->assertEquals(0, $rows[5]->published);
+        $this->assertEquals(106, $rows[6]->id);
+        $this->assertEquals('topic6', $rows[6]->name);
+        $this->assertEquals('Description for topic6', $rows[6]->description);
+        $this->assertEquals(0, $rows[6]->published);
+        $this->assertEquals(107, $rows[7]->id);
+        $this->assertEquals('topic7', $rows[7]->name);
+        $this->assertEquals('Description for topic7', $rows[7]->description);
+        $this->assertEquals(0, $rows[7]->published);
+        $this->assertEquals(108, $rows[8]->id);
+        $this->assertEquals('topic8', $rows[8]->name);
+        $this->assertEquals('Description for topic8', $rows[8]->description);
+        $this->assertEquals(0, $rows[8]->published);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::updateWorkshop
+     * @test
+     */
+    public function updateWorkshopHandlesEmptyPublishedValue() {
+        $this->_setupWorkshops(2, 2, true, 0);
+        $dbo = new DBO(self::$pdo);
+        $title = 'new title';
+        $description = 'new description';
+        $published = null;
+        $dbo->updateWorkshop(101, $title, $description, $published);
+        $query = self::$pdo->prepare("SELECT id,name,description,published FROM workshop ORDER BY id");
+        $query->execute();
+        $rows=$query->fetchAll(PDO::FETCH_OBJ);
+        $this->assertEquals(9, count($rows));
+        $this->assertEquals(101, $rows[1]->id);
+        $this->assertEquals($title, $rows[1]->name);
+        $this->assertEquals($description, $rows[1]->description);
+        $this->assertEquals(0, $rows[1]->published);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::validateLocations
      * @test
      */
     public function validateLocationsWhenValid() {
@@ -1865,7 +2202,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::validateLocations
+     * @covers \ICCM\BOF\DBO::validateLocations
      * @test
      */
     public function validateLocationsWhenInvalid() {
@@ -1875,7 +2212,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::validateRounds
+     * @covers \ICCM\BOF\DBO::validateRounds
      * @test
      */
     public function validateRoundsWhenValid() {
@@ -1885,7 +2222,7 @@ EOF;
     }
 
     /**
-     * @covers ICCM\BOF\DBO::validateRounds
+     * @covers \ICCM\BOF\DBO::validateRounds
      * @test
      */
     public function validateRoundsWhenInvalid() {

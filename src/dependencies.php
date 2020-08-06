@@ -84,8 +84,8 @@ $container['ICCM\BOF\Moderation'] = function ($c) {
     global $settings;
     return new \ICCM\BOF\Moderation(
         $c['view'],
-        $c['db'],
-        $app->getContainer()->get('router'));
+        $app->getContainer()->get('router'),
+        $app->getContainer()->get('ICCM\BOF\DBO'));
 };
 
 $container['ICCM\BOF\Projector'] = function ($c) {
