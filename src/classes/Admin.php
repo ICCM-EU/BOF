@@ -19,7 +19,7 @@ class Admin
 
 	public function showAdminView($request, $response, $args) {
 		$is_admin = $request->getAttribute('is_admin');
-		if (!$is_admin) die("you don't have permissions for this page");
+		if (!$is_admin) throw new RuntimeException("you don't have permissions for this page");
 
 		$sql = "SELECT * FROM `config` WHERE item != 'branding'";
 		$query=$this->db->prepare($sql);
@@ -62,13 +62,13 @@ class Admin
 
 	public function update_config($request, $response, $args) {
 		$is_admin = $request->getAttribute('is_admin');
-		if (!$is_admin) die("you don't have permissions for this page");
+		if (!$is_admin) throw new RuntimeException("you don't have permissions for this page");
 
 		$data = $request->getParsedBody();
 
 		if (!empty($data["password1"])) {
 			if ($data["password1"] != $data["password2"]) {
-				die("passwords do not match");
+				throw new RuntimeException("passwords do not match");
 			} else {
 				$sql = "UPDATE `participant` SET `password`=PASSWORD(?) WHERE name = 'admin'";
 				$query=$this->db->prepare($sql);
@@ -79,7 +79,7 @@ class Admin
 
 		if (!empty($data["reset_database"])) {
 			if ($data["reset_database"] != "yes") {
-				die("invalid request");
+				throw new RuntimeException("invalid request");
 			}
 
 			$sql = "DELETE FROM participant where name <> 'admin'";
@@ -101,7 +101,7 @@ class Admin
 
 		if (!empty($data["download_database"])) {
 			if ($data["download_database"] != "yes") {
-				die("invalid request");
+				throw new RuntimeException("invalid request");
 			}
 
 			$settings = require __DIR__.'/../../cfg/settings.php';
@@ -117,30 +117,30 @@ class Admin
 			Header('Content-Disposition: attachment; filename=db-backup-BOF-'.date('Y-m-d_hi').'.sql');
 
 			echo file_get_contents($dumpfile);
-			die();
+			throw new RuntimeException();
 		}
 
 		$sql = "UPDATE `config` SET value=? WHERE item = 'nomination_begins'";
 		$query=$this->db->prepare($sql);
-		if (empty($data['time_nomination_begins'])) die("invalid time");
+		if (empty($data['time_nomination_begins'])) throw new RuntimeException("invalid time");
 		$param = array($data['nomination_begins']." ".$data['time_nomination_begins'].":00");
 		$query->execute($param);
 
 		$sql = "UPDATE `config` SET value=? WHERE item = 'nomination_ends'";
 		$query=$this->db->prepare($sql);
-		if (empty($data['time_nomination_ends'])) die("invalid time");
+		if (empty($data['time_nomination_ends'])) throw new RuntimeException("invalid time");
 		$param = array($data['nomination_ends']." ".$data['time_nomination_ends'].":00");
 		$query->execute($param);
 
 		$sql = "UPDATE `config` SET value=? WHERE item = 'voting_begins'";
 		$query=$this->db->prepare($sql);
-		if (empty($data['time_voting_begins'])) die("invalid time");
+		if (empty($data['time_voting_begins'])) throw new RuntimeException("invalid time");
 		$param = array($data['voting_begins']." ".$data['time_voting_begins'].":00");
 		$query->execute($param);
 
 		$sql = "UPDATE `config` SET value=? WHERE item = 'voting_ends'";
 		$query=$this->db->prepare($sql);
-		if (empty($data['time_voting_ends'])) die("invalid time");
+		if (empty($data['time_voting_ends'])) throw new RuntimeException("invalid time");
 		$param = array($data['voting_ends']." ".$data['time_voting_ends']);
 		$query->execute($param);
 
@@ -188,15 +188,10 @@ class Admin
 	public function calcResult($request, $response, $args) {
 		global $app;
 		$is_admin = $request->getAttribute('is_admin');
-		if (!$is_admin) die("you don't have permissions for this page");
+		if (!$is_admin) throw new RuntimeException("you don't have permissions for this page");
 
-		try {
-			$results = new Results($this->view, $this->router, $app->getContainer()->get('ICCM\BOF\DBO'), new Logger());
-			return $results->calculateResults($request, $response, $args);
-		}
-		catch (RuntimeException $re) {
-			die($re->getMessage());
-		}
+		$results = new Results($this->view, $this->router, $app->getContainer()->get('ICCM\BOF\DBO'), new Logger());
+		return $results->calculateResults($request, $response, $args);
 	}
 }
 
