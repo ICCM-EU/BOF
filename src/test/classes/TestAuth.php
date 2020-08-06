@@ -18,12 +18,12 @@ use Slim\Http\Request;
 use Symfony\Component\Translation\Translator;
 
 /**
- * @covers ICCM\BOF\Auth
+ * @covers \ICCM\BOF\Auth::__construct
  */
 class TestAuth extends TestCase
 {
     /**
-     * @covers ICCM\BOF\Auth::authenticate
+     * @covers \ICCM\BOF\Auth::authenticate
      * @test
      */
     public function authenitcateFailsForBadPassword() {
@@ -103,7 +103,7 @@ class TestAuth extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\Auth::authenticate
+     * @covers \ICCM\BOF\Auth::authenticate
      * @test
      */
     public function authenticateSuccessForRegularUser() {
@@ -191,7 +191,7 @@ class TestAuth extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\Auth::authenticate
+     * @covers \ICCM\BOF\Auth::authenticate
      * @test
      */
     public function authenticateSuccessForAdmin() {
@@ -279,7 +279,7 @@ class TestAuth extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\Auth::logout
+     * @covers \ICCM\BOF\Auth::logout
      * @test
      */
     public function logout() {
@@ -318,7 +318,7 @@ class TestAuth extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\Auth::new_user
+     * @covers \ICCM\BOF\Auth::new_user
      * @test
      */
     public function newUserFailsForEmptyPassword() {
@@ -388,7 +388,7 @@ class TestAuth extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\Auth::new_user
+     * @covers \ICCM\BOF\Auth::new_user
      * @test
      */
     public function newUserFailsForEmptyUser() {
@@ -458,7 +458,7 @@ class TestAuth extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\Auth::new_user
+     * @covers \ICCM\BOF\Auth::new_user
      * @test
      */
     public function newUserFailsForExistingUser() {
@@ -539,7 +539,7 @@ class TestAuth extends TestCase
     }
 
     /**
-     * @covers ICCM\BOF\Auth::new_user
+     * @covers \ICCM\BOF\Auth::new_user
      * @test
      */
     public function newUserSuccessForNewUser() {
