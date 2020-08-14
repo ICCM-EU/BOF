@@ -52,6 +52,13 @@ class TestDBO extends TestCase
         }
     }
 
+    private function _setupConfigDates($nomination_begins, $nomination_ends, $voting_begins, $voting_ends) {
+        self::$pdo->query("INSERT INTO config (item, value) VALUES('nomination_begins', '{$nomination_begins}')");
+        self::$pdo->query("INSERT INTO config (item, value) VALUES('nomination_ends', '{$nomination_ends}')");
+        self::$pdo->query("INSERT INTO config (item, value) VALUES('voting_begins', '{$voting_begins}')");
+        self::$pdo->query("INSERT INTO config (item, value) VALUES('voting_ends', '{$voting_ends}')");
+    }
+
     private function _setupRounds($rounds, $valid) {
         self::$pdo->query("DELETE FROM round");
         self::$pdo->query("DELETE FROM sqlite_sequence WHERE name='round'");
@@ -545,6 +552,13 @@ class TestDBO extends TestCase
         $dbo = new DBO(self::$pdo);
         $ret = $dbo->addUser('newuser', 'blah');
         $this->assertEquals(106, $ret);
+        $sql = "SELECT password
+                  FROM participant
+                 WHERE id = 106";
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        $pass = $query->fetch(PDO::FETCH_OBJ);
+        $this->assertTrue(password_verify('blah', $pass->password));
     }
 
     /**
@@ -708,6 +722,60 @@ class TestDBO extends TestCase
         $row = $query->fetch(PDO::FETCH_OBJ);
         $this->assertNotFalse($row);
         $this->assertEquals(15, $row->available);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::changePassword
+     * @test
+     */
+    public function changePasswordChangesPassword() {
+        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $users = 5;
+        $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
+        for ($count = 0; $count <= $users; $count++) {
+            if ($count != 0) {
+                $id= $count + 100;
+                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+            }
+            else {
+                $sql .= "(1, 'admin', '{$pass}')";
+            }
+        }
+        self::$pdo->query($sql);
+        $dbo = new DBO(self::$pdo);
+        $ret = $dbo->changePassword('user1', 'blah');
+        $this->assertTrue($ret);
+        $this->assertFalse(is_string($ret));
+        $sql = "SELECT password
+                  FROM participant
+                 WHERE name='user1'";
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        $pass = $query->fetch(PDO::FETCH_OBJ);
+        $this->assertTrue(password_verify('blah', $pass->password));
+    }
+ 
+    /**
+     * @covers \ICCM\BOF\DBO::changePassword
+     * @test
+     */
+    public function changePasswordFailsForNonExistentUser() {
+        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $users = 5;
+        $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
+        for ($count = 0; $count <= $users; $count++) {
+            if ($count != 0) {
+                $id= $count + 100;
+                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+            }
+            else {
+                $sql .= "(1, 'admin', '{$pass}')";
+            }
+        }
+        self::$pdo->query($sql);
+        $dbo = new DBO(self::$pdo);
+        $ret = $dbo->changePassword('noexist', 'blah');
+        $this->assertFalse($ret);
     }
  
     /**
@@ -1166,6 +1234,54 @@ EOF;
         ]);
         $dbo = new DBO(self::$pdo);
         $this->assertFalse($dbo->getBookedWorkshop(0, 0));
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::getConfig
+     * @uses \ICCM\BOF\DBO::getLocationNames
+     * @uses \ICCM\BOF\DBO::getRoundNames
+     * @uses \ICCM\BOF\DBO::getStage
+     * @test
+     */
+    public function getConfig() {
+        $localservertime = date('Y-m-d H:i:s');
+        $nomination_begins = date("Y-m-d H:i:s", strtotime('-3 hours', strtotime($localservertime)));
+        $nomination_begins_time = date("H:i", strtotime('-3 hours', strtotime($localservertime)));
+        $nomination_ends = date("Y-m-d H:i:s", strtotime('-2 hours', strtotime($localservertime)));
+        $nomination_ends_time = date("H:i", strtotime('-2 hours', strtotime($localservertime)));
+        $voting_begins = date("Y-m-d H:i:s", strtotime('-1 hour', strtotime($localservertime)));
+        $voting_begins_time = date("H:i", strtotime('-1 hour', strtotime($localservertime)));
+        $voting_ends = date("Y-m-d H:i:s", strtotime('+1 hour', strtotime($localservertime)));
+        $voting_ends_time = date("H:i", strtotime('+1 hour', strtotime($localservertime)));
+        $this->_setupConfigDates($nomination_begins, $nomination_ends, $voting_begins, $voting_ends);
+        $config = [
+            'nomination_begins' => date('Y-m-d', strtotime($nomination_begins)),
+            'nomination_begins_time' => $nomination_begins_time,
+            'nomination_ends' => date('Y-m-d', strtotime($nomination_ends)),
+            'nomination_ends_time' => $nomination_ends_time,
+            'voting_begins' => date('Y-m-d', strtotime($voting_begins)),
+            'voting_begins_time' => $voting_begins_time,
+            'voting_ends' => date('Y-m-d', strtotime($voting_ends)),
+            'voting_ends_time' => $voting_ends_time,
+            'loggedin' => true,
+            'localservertime' => $localservertime,
+            'rounds' => [
+                0 => 'Round 0',
+                1 => 'Round 1'
+            ],
+            'num_rounds' => 2,
+            'locations' => [
+                0 => 'Room A',
+                1 => 'Room B',
+                2 => 'Room C'
+            ],
+            'num_locations' => 3,
+            'stage' => 'voting'
+        ];
+        $this->_setupRounds(2, true);
+        $this->_setupLocations(3, true);
+        $dbo = new DBO(self::$pdo);
+        $this->assertEquals($config, $dbo->getConfig());
     }
 
     /**
@@ -2076,6 +2192,52 @@ EOF;
     }
 
     /**
+     * @covers \ICCM\BOF\DBO::reset
+     * @test
+     */
+    public function reset() {
+        // First, make sure we have data...
+        $this->_setupWorkshops(3, 3, true, 0);
+        $queryParticipant = self::$pdo->prepare("SELECT * FROM participant");
+        $queryWorkshop = self::$pdo->prepare("SELECT * FROM workshop");
+        $queryWorkshopParticipant = self::$pdo->prepare("SELECT * FROM workshop_participant");
+
+        $queryParticipant->execute();
+        $rows = $queryParticipant->fetchAll(PDO::FETCH_OBJ);
+        $this->assertGreaterThan(1, count($rows));
+
+        $queryWorkshop->execute();
+        $rows = $queryWorkshop->fetchAll(PDO::FETCH_OBJ);
+        $this->assertGreaterThan(1, count($rows));
+
+        $queryWorkshopParticipant->execute();
+        $rows = $queryWorkshopParticipant->fetchAll(PDO::FETCH_OBJ);
+        $this->assertGreaterThan(1, count($rows));
+
+        $dbo = new DBO(self::$pdo);
+        // Call reset
+        $dbo->reset();
+
+        // Make sure we only have the data we expect left
+        $queryParticipant->execute();
+        $rows = $queryParticipant->fetchAll(PDO::FETCH_OBJ);
+        $this->assertEquals(1, count($rows));
+        $this->assertEquals('admin', $rows[0]->name);
+        $this->assertEquals('1', $rows[0]->id);
+
+        $queryWorkshop->execute();
+        $rows = $queryWorkshop->fetchAll(PDO::FETCH_OBJ);
+        $this->assertEquals(1, count($rows));
+        $this->assertEquals('Prep Team', $rows[0]->name);
+        $this->assertEquals('Prep Team BoF', $rows[0]->description);
+        $this->assertEquals('1', $rows[0]->id);
+
+        $queryWorkshopParticipant->execute();
+        $rows = $queryWorkshopParticipant->fetchAll(PDO::FETCH_OBJ);
+        $this->assertEquals(0, count($rows));
+    }
+
+    /**
      * @covers \ICCM\BOF\DBO::rollBack
      * @test
      */
@@ -2096,6 +2258,108 @@ EOF;
             ->method('rollBack');
         $dbo = new DBO($pdoMock);
         $dbo->rollBack();
+    }
+
+    public function _setConfigDateTimeSetsIt($which) {
+        $this->_setupConfigDates(date('2019-01-01 00:00:00'),
+            date('2019-01-01 00:00:00'), date('2019-01-01 00:00:00'),
+            date('2019-01-01 00:00:00'));
+        $dbo = new DBO(self::$pdo);
+        $dbo->setConfigDateTime($which, 1561456980);
+        $query = self::$pdo->prepare("SELECT `value` FROM config WHERE `item`=:which");
+        $query->bindValue('which', $which);
+        $query->execute();
+        $this->assertEquals('2019-06-25 10:03:00', $query->fetchColumn(0));
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::setConfigDateTime
+     * @test
+     */
+    public function setConfigDateTimeSetsNominationBegins() {
+        $this->_setConfigDateTimeSetsIt('nomination_begins');
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::setConfigDateTime
+     * @test
+     */
+    public function setConfigDateTimeSetsNominationEnds() {
+        $this->_setConfigDateTimeSetsIt('nomination_ends');
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::setConfigDateTime
+     * @test
+     */
+    public function setConfigDateTimeSetsVotingBegins() {
+        $this->_setConfigDateTimeSetsIt('voting_begins');
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::setConfigDateTime
+     * @test
+     */
+    public function setConfigDateTimeSetsVotingEnds() {
+        $this->_setConfigDateTimeSetsIt('voting_ends');
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::setConfigDateTime
+     * @test
+     */
+    public function setConfigDateTimeThrowsExceptionForUnknown() {
+        $dbo = new DBO(self::$pdo);
+        $this->expectException(RuntimeException::class);
+        $dbo->setConfigDateTime('blah', '06-25-2019', '10:03');
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::setLocationNames
+     * @test
+     */
+    public function setLocationNamesSetsLocationsSequentially() {
+        $locations = [
+            'Location 1',
+            'Location 2',
+            'Location 3'
+        ];
+        $dbo = new DBO(self::$pdo);
+        $dbo->setLocationNames($locations);
+        $query = self::$pdo->prepare("SELECT * from `location`");
+        $query->execute();
+        $rows = $query->fetchAll(PDO::FETCH_OBJ);
+        $this->assertEquals(3, count($rows));
+        $this->assertEquals(0, $rows[0]->id);
+        $this->assertEquals('Location 1', $rows[0]->name);
+        $this->assertEquals(1, $rows[1]->id);
+        $this->assertEquals('Location 2', $rows[1]->name);
+        $this->assertEquals(2, $rows[2]->id);
+        $this->assertEquals('Location 3', $rows[2]->name);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::setRoundNames
+     * @test
+     */
+    public function setRoundNamesSetsRoundsSequentially() {
+        $rounds = [
+            'Round 1',
+            'Round 2',
+            'Round 3'
+        ];
+        $dbo = new DBO(self::$pdo);
+        $dbo->setRoundNames($rounds);
+        $query = self::$pdo->prepare("SELECT * from `round`");
+        $query->execute();
+        $rows = $query->fetchAll(PDO::FETCH_OBJ);
+        $this->assertEquals(3, count($rows));
+        $this->assertEquals(0, $rows[0]->id);
+        $this->assertEquals('Round 1', $rows[0]->time_period);
+        $this->assertEquals(1, $rows[1]->id);
+        $this->assertEquals('Round 2', $rows[1]->time_period);
+        $this->assertEquals(2, $rows[2]->id);
+        $this->assertEquals('Round 3', $rows[2]->time_period);
     }
 
     /**

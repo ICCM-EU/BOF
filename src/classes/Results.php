@@ -2,21 +2,14 @@
 
 namespace ICCM\BOF;
 
-use ErrorException;
-use \PDO;
 use RuntimeException;
-use Twig\Error\RuntimeError;
 
 class Results
 {
     private $dbo;
-    private $view;
-    private $router;
     private $logger;
 
-    function __construct($view, $router, $dbo, $logger) {
-        $this->view = $view;
-        $this->router = $router;
+    function __construct($dbo, $logger) {
         $this->dbo = $dbo;
         $this->logger = $logger;
     }
@@ -185,11 +178,11 @@ class Results
     }
 
     /**
-     * Entry point for the class -- books workshops and displays a page with
+     * Entry point for the class -- books workshops and returns data about
      * the booked workshops in CSV format along with some log data about what
      * was done and why.
      */
-    public function calculateResults($request, $response, $args) {
+    public function calculateResults() {
         $rounds = $this->dbo->getNumRounds();
         $locations = $this->dbo->getNumLocations();
 
@@ -211,7 +204,7 @@ class Results
         $config['stage'] = $this->dbo->getStage();
         $config['csvdata'] = $this->dbo->exportWorkshops();
         $config['log'] = $this->logger->getLog();
-        return $this->view->render($response, 'results.html', $config);
+        return $config;
     }
 }
 

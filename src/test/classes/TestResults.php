@@ -9,8 +9,6 @@ use PHPUnit\Framework\TestCase;
 use ICCM\BOF\Results;
 use ICCM\BOF\DBO;
 use ICCM\BOF\Logger;
-use Slim\Views\Twig;
-use Psr\Http\Message\ResponseInterface;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Argument;
 
@@ -294,25 +292,10 @@ EOF;
             ->willReturn(true)
             ->shouldBeCalledTimes(1);
 
-        // ResponseInterface mock
-        $response = $this->getMockBuilder(ResponseInterface::class)
-              ->disableOriginalConstructor()
-              ->getMock();
-
-        // Twig view mock
-        $view = $this->getMockBuilder(Twig::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['render'])
-            ->getMock();
-        $view->expects($this->once())
-            ->method('render')
-            ->with($response, 'results.html', $config)
-            ->willReturn(4);
-
-        $results = new Results($view, null, $dbo->reveal(), $logger);
+        $results = new Results($dbo->reveal(), $logger);
         // This ensures the ultimate return value is correct (i.e. whatever
         // $view->render returns), and calls the function under test.
-        $this->assertEquals(4, $results->calculateResults(null, $response, null));
+        $this->assertEquals($config, $results->calculateResults());
     }
 
     /**
@@ -428,9 +411,9 @@ EOF;
             ->method('validateRounds')
             ->willReturn(true);
 
-        $results = new Results(null, null, $dbo, null);
+        $results = new Results($dbo, null);
         $this->expectException(RuntimeException::class);
-        $results->calculateResults(null, null, null, null);
+        $results->calculateResults();
     }
 
     /**
@@ -461,9 +444,9 @@ EOF;
             ->method('validateRounds')
             ->willReturn(false);
 
-        $results = new Results(null, null, $dbo, null);
+        $results = new Results($dbo, null);
         $this->expectException(RuntimeException::class);
-        $results->calculateResults(null, null, null, null);
+        $results->calculateResults();
     }
 
     /**
@@ -494,8 +477,8 @@ EOF;
             ->method('validateRounds')
             ->willReturn(true);
 
-        $results = new Results(null, null, $dbo, null);
+        $results = new Results($dbo, null);
         $this->expectException(RuntimeException::class);
-        $results->calculateResults(null, null, null, null);
+        $results->calculateResults();
     }
 }
