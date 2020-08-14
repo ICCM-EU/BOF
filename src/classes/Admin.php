@@ -1,62 +1,27 @@
 <?php
 
 namespace ICCM\BOF;
-use \Firebase\JWT\JWT;
-use \PDO;
 use RuntimeException;
 
 class Admin
 {
 	private $view;
-	private $db;
+	private $dbo;
 	private $router;
+	private $results;
 
-	function __construct($view, $db, $router) {
+	function __construct($view, $router, $dbo, $results) {
 		$this->view = $view;
-		$this->db = $db;
 		$this->router = $router;
+		$this->dbo = $dbo;
+		$this->results = $results;
 	}
 
 	public function showAdminView($request, $response, $args) {
 		$is_admin = $request->getAttribute('is_admin');
 		if (!$is_admin) throw new RuntimeException("you don't have permissions for this page");
 
-		$sql = "SELECT * FROM `config` WHERE item != 'branding'";
-		$query=$this->db->prepare($sql);
-		$param = array ();
-		$query->execute($param);
-		$config = array ();
-		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
-			$config[$row->item] = date("Y-m-d", strtotime($row->value));
-			$config[$row->item."_time"] = date("H:i", strtotime($row->value));
-		}
-		$config['loggedin'] = true;
-		$config['localservertime'] = date("Y-m-d H:i:s");
-		$sql = "SELECT id, time_period FROM `round`";
-		$query = $this->db->prepare($sql);
-		$param = array ();
-		$query->execute($param);
-		$config['rounds'] = array ();
-		$count = 0;
-		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
-			$config['rounds'][$row->id] = $row->time_period;
-			$count++;
-		}
-		$config['num_rounds'] = $count;
-		$sql = "SELECT id, name FROM `location`";
-		$query = $this->db->prepare($sql);
-		$param = array ();
-		$query->execute($param);
-		$config['locations'] = array ();
-		$count = 0;
-		while ($row=$query->fetch(PDO::FETCH_OBJ)) {
-			$config['locations'][$row->id] = $row->name;
-			$count++;
-		}
-		$config['num_locations'] = $count;
-		global $app;
-		$dbo = $app->getContainer()->get('ICCM\BOF\DBO');
-		$config['stage'] = $dbo->getStage();
+		$config = $this->dbo->getConfig();
 		return $this->view->render($response, 'admin.html', $config);
 	}
 
@@ -69,12 +34,8 @@ class Admin
 		if (!empty($data["password1"])) {
 			if ($data["password1"] != $data["password2"]) {
 				throw new RuntimeException("passwords do not match");
-			} else {
-				$sql = "UPDATE `participant` SET `password`=PASSWORD(?) WHERE name = 'admin'";
-				$query=$this->db->prepare($sql);
-				$param = array($data['password1']);
-				$query->execute($param);
 			}
+			$this->dbo->changePassword('admin', $data['password1']);
 		}
 
 		if (!empty($data["reset_database"])) {
@@ -82,19 +43,7 @@ class Admin
 				throw new RuntimeException("invalid request");
 			}
 
-			$sql = "DELETE FROM participant where name <> 'admin'";
-			$query=$this->db->prepare($sql);
-			$param = array();
-			$query->execute($param);
-			# keep the prep workshop
-			$sql = "DELETE FROM workshop where id<>1";
-			$query=$this->db->prepare($sql);
-			$param = array();
-			$query->execute($param);
-			$sql = "DELETE FROM workshop_participant";
-			$query=$this->db->prepare($sql);
-			$param = array();
-			$query->execute($param);
+			$this->dbo->reset();
 
 			return $this->showAdminView($request, $response, $args);
 		}
@@ -120,78 +69,39 @@ class Admin
 			throw new RuntimeException();
 		}
 
-		$sql = "UPDATE `config` SET value=? WHERE item = 'nomination_begins'";
-		$query=$this->db->prepare($sql);
-		if (empty($data['time_nomination_begins'])) throw new RuntimeException("invalid time");
-		$param = array($data['nomination_begins']." ".$data['time_nomination_begins'].":00");
-		$query->execute($param);
-
-		$sql = "UPDATE `config` SET value=? WHERE item = 'nomination_ends'";
-		$query=$this->db->prepare($sql);
-		if (empty($data['time_nomination_ends'])) throw new RuntimeException("invalid time");
-		$param = array($data['nomination_ends']." ".$data['time_nomination_ends'].":00");
-		$query->execute($param);
-
-		$sql = "UPDATE `config` SET value=? WHERE item = 'voting_begins'";
-		$query=$this->db->prepare($sql);
-		if (empty($data['time_voting_begins'])) throw new RuntimeException("invalid time");
-		$param = array($data['voting_begins']." ".$data['time_voting_begins'].":00");
-		$query->execute($param);
-
-		$sql = "UPDATE `config` SET value=? WHERE item = 'voting_ends'";
-		$query=$this->db->prepare($sql);
-		if (empty($data['time_voting_ends'])) throw new RuntimeException("invalid time");
-		$param = array($data['voting_ends']." ".$data['time_voting_ends']);
-		$query->execute($param);
-
-		# Delete everything from round
-		$sql = "DELETE FROM `round`";
-		$query=$this->db->prepare($sql);
-		$query->execute($param);
-		# Now add the data for the sessions
-		$round_id = 0;
-		$this->db->beginTransaction();
-		$sql = "INSERT INTO round(id,time_period) VALUES(:id,:time_period)";
-		$query=$this->db->prepare($sql);
-		foreach ($data['rounds'] as $round)
-		{
-			$query->bindValue(':id', $round_id);
-			$query->bindValue(':time_period', $round);
-			$query->execute();
-			$round_id++;
+		if (!empty($data['nomination_begins']) && !empty($data['time_nomination_begins'])) {
+			$this->dbo->setConfigDateTime('nomination_begins', strtotime($data['nomination_begins']." ".$data['time_nomination_begins']));
 		}
-		$query = null;
-		$this->db->commit();
 
-		# Delete everything from location
-		$sql = "DELETE FROM `location`";
-		$query=$this->db->prepare($sql);
-		$query->execute($param);
-		# Now add the data for the sessions
-		$location_id = 0;
-		$this->db->beginTransaction();
-		$sql = "INSERT INTO location(id,name) VALUES(:id,:name)";
-		$query=$this->db->prepare($sql);
-		foreach ($data['locations'] as $location)
-		{
-			$query->bindValue(':id', $location_id);
-			$query->bindValue(':name', $location);
-			$query->execute();
-			$location_id++;
+		if (!empty($data['nomination_ends']) && !empty($data['time_nomination_ends'])) {
+			$this->dbo->setConfigDateTime('nomination_ends', strtotime($data['nomination_ends']." ".$data['time_nomination_ends']));
 		}
-		$query = null;
-		$this->db->commit();
+
+		if (!empty($data['voting_begins']) && !empty($data['time_voting_begins'])) {
+			$this->dbo->setConfigDateTime('voting_begins', strtotime($data['voting_begins']." ".$data['time_voting_begins']));
+		}
+		
+		if (!empty($data['voting_ends']) && !empty($data['time_voting_ends'])) {
+			$this->dbo->setConfigDateTime('voting_ends', strtotime($data['voting_ends']." ".$data['time_voting_ends']));
+		}
+
+		if (is_array($data['rounds']) && count($data['rounds']) > 0) {
+			$this->dbo->setRoundNames($data['rounds']);
+		}
+
+		if (is_array($data['locations']) && count($data['locations']) > 0) {
+			$this->dbo->setLocationNames($data['locations']);
+		}
 
 		return $this->showAdminView($request, $response, $args);
 	}
 
 	public function calcResult($request, $response, $args) {
-		global $app;
 		$is_admin = $request->getAttribute('is_admin');
 		if (!$is_admin) throw new RuntimeException("you don't have permissions for this page");
 
-		$results = new Results($this->view, $this->router, $app->getContainer()->get('ICCM\BOF\DBO'), new Logger());
-		return $results->calculateResults($request, $response, $args);
+		$config = $this->results->calculateResults();
+        return $this->view->render($response, 'results.html', $config);
 	}
 }
 

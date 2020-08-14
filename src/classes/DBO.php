@@ -55,7 +55,7 @@ class DBO
      * @param string $login The name of the user
      * @param string $password  The password of the user
      * 
-     * @return mixed THe ID of the new user, or 
+     * @return mixed THe ID of the new user, or a string indicating an error
      */
     public function addUser($login, $password) {
         $pass = password_hash($password, PASSWORD_DEFAULT,
@@ -64,7 +64,6 @@ class DBO
             (`name`, `password`)
             VALUES (:name, :password)';
 
-        # $this->beginTransaction();
         $query=$this->db->prepare($sql);
         $query->bindValue(':name', $login, PDO::PARAM_STR);
         $query->bindValue(':password', $pass, PDO::PARAM_STR);
@@ -73,8 +72,6 @@ class DBO
         } catch (\PDOException $e){
             return $e->getMessage();
         }
-        #TODO: needs to check session to commit() on
-        # $this->commit();
         return $this->db->lastInsertId();
     }
 
@@ -164,6 +161,29 @@ class DBO
                      location_id = NULL,
                      available = NULL";
         $this->db->query($sql);
+    }
+
+    /**
+     * Changes the given user's password
+     * 
+     * @param string $login The name of the user
+     * @param string $password  The password of the user
+     * 
+     * @return mixed True if the password was changed, false if the user
+     * doesn't exist, or a string on some other error.
+     */
+    public function changePassword($login, $password) {
+        $pass = password_hash($password, PASSWORD_DEFAULT,
+            ['cost' => $this->passwordCost]);
+        $sql = 'UPDATE `participant`
+                   SET password = :password
+                 WHERE name = :name';
+
+        $query=$this->db->prepare($sql);
+        $query->bindValue(':name', $login, PDO::PARAM_STR);
+        $query->bindValue(':password', $pass, PDO::PARAM_STR);
+        $query->execute();
+        return $query->rowCount() === 1;
     }
 
     /**
@@ -365,6 +385,35 @@ class DBO
         $queryWorkshop->execute();
         
         return $queryWorkshop->fetch(PDO::FETCH_OBJ);
+    }
+
+    /**
+     * Gets configuration information
+     * 
+     * @return array An array containing the configuration info. Keys are
+     * nomination_begins, nomination_begins_time, nomination_ends,
+     * nomination_ends_time, voting_begins, voting_begins_time, voting_ends,
+     * voting_ends_time,
+     * loggedin, localservertime, rounds, num_rounds, locations,
+     * num_locations, and stage.
+     */
+    public function getConfig() {
+        $sql = "SELECT * FROM `config` WHERE item != 'branding'";
+        $query=$this->db->prepare($sql);
+        $query->execute();
+        $config = array ();
+        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+            $config[$row->item] = date("Y-m-d", strtotime($row->value));
+            $config[$row->item."_time"] = date("H:i", strtotime($row->value));
+        }
+        $config['loggedin'] = true;
+        $config['localservertime'] = date("Y-m-d H:i:s");
+        $config['rounds'] = $this->getRoundNames();
+        $config['num_rounds'] = count($config['rounds']);
+        $config['locations'] = $this->getLocationNames();
+        $config['num_locations'] = count($config['locations']);
+        $config['stage'] = $this->getStage();
+        return $config;
     }
 
     // Note that return value is an array with the first conflict found, and
@@ -883,10 +932,100 @@ class DBO
     }
 
     /**
+     * Delete all votes, users, and workshops, except the admin user and the
+     * Prep BoF.
+     */
+    public function reset() {
+        # Delete all users except admin user
+        $this->db->query("DELETE FROM participant where name <> 'admin'");
+        $this->db->query("DELETE FROM workshop_participant");
+        # Delete all workshops except the prep workshop
+        $sql = "DELETE FROM workshop where id<>:prep_bof_id";
+        $query=$this->db->prepare($sql);
+        $query->bindValue('prep_bof_id', (int) $this->PrepBofId, PDO::PARAM_INT);
+        $query->execute();
+    }
+
+    /**
      * Rolls back (undoes) a transaction that hasn't been committed yet.
      */
     public function rollBack() {
         $this->db->rollBack();
+    }
+
+    /**
+     * Sets the specified configuration date and time 
+     * 
+     * @param string $which Which configuration date and time to set. Must be
+     * one of:
+     * 'nomination_begins'
+     * 'nomination_ends'
+     * 'voting_begins'
+     * 'voting_ends'
+     * @param int $timestamp A UNIX timestamp representing the date and time to set.
+     */
+    public function setConfigDateTime($which, $timestamp) {
+        static $query = null;
+        // Validate $which
+        if (($which != 'nomination_begins')
+            && ($which != 'nomination_ends')
+            && ($which != 'voting_begins')
+            && ($which != 'voting_ends')) {
+                throw new RuntimeException('Invalid configuration item');
+        }
+
+        if ($query == null) {
+            $query = $this->db->prepare(
+                "UPDATE `config`
+                    SET value = :dateTime
+                  WHERE item = :which");
+        }
+
+        $query->bindValue('which', $which, PDO::PARAM_STR);
+        $query->bindValue('dateTime', date('Y-m-d H:i:00', $timestamp), PDO::PARAM_STR);
+        $query->execute();
+    }
+
+    /**
+     * Sets the location names.
+     * 
+     * @param array $locations An array of the names of all locations.
+     */
+    public function setLocationNames($locations) {
+        # Delete everything from location
+        $this->db->query("DELETE FROM `location`");
+        # Now add the data for the sessions
+        $location_id = 0;
+        $sql = "INSERT INTO location(id,name) VALUES(:id,:name)";
+        $query=$this->db->prepare($sql);
+        foreach ($locations as $location)
+        {
+            $query->bindValue(':id', $location_id);
+            $query->bindValue(':name', $location);
+            $query->execute();
+            $location_id++;
+        }
+    }
+
+    /**
+     * Sets the round names.
+     * 
+     * @param array $rounds An array of the names of all rounds.
+     */
+    public function setRoundNames($rounds) {
+        # Delete everything from round
+        $this->db->query("DELETE FROM `round`");
+        # Now add the data for the sessions
+        $round_id = 0;
+		$sql = "INSERT INTO round(id,time_period) VALUES(:id,:time_period)";
+        $query=$this->db->prepare($sql);
+        foreach ($rounds as $round)
+        {
+            $query->bindValue(':id', $round_id);
+			$query->bindValue(':time_period', $round);
+            $query->execute();
+            $round_id++;
+        }
     }
 
     /**

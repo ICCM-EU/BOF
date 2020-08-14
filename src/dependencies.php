@@ -57,8 +57,9 @@ $container['ICCM\BOF\Admin'] = function ($c) {
     global $settings;
     return new \ICCM\BOF\Admin(
         $c['view'],
-        $c['db'],
-        $app->getContainer()->get('router'));
+        $app->getContainer()->get('router'),
+		$app->getContainer()->get('ICCM\BOF\DBO'),
+		$app->getContainer()->get('ICCM\BOF\Results'));
 };
 
 $container['ICCM\BOF\Cookies'] = function ($c) {
@@ -97,4 +98,10 @@ $container['ICCM\BOF\Projector'] = function ($c) {
         $app->getContainer()->get('ICCM\BOF\DBO'));
 };
 
+$container['ICCM\BOF\Results'] = function ($c) {
+    global $app;
+    return new \ICCM\BOF\Results(
+        $app->getContainer()->get('ICCM\BOF\DBO'),
+        new \ICCM\BOF\Logger());
+};
 ?>
