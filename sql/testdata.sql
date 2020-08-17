@@ -145,7 +145,7 @@ CREATE TABLE `config` (
 
 LOCK TABLES `config` WRITE;
 /*!40000 ALTER TABLE `config` DISABLE KEYS */;
-INSERT INTO `config` VALUES (1,'nomination_begins','2019-02-13 21:45:36'),(2,'nomination_ends','2019-02-14 21:45:36'),(3,'voting_begins','2019-02-14 23:45:36'),(4,'voting_ends','2019-02-16 21:45:36');
+INSERT INTO `config` VALUES (1,'nomination_begins','2019-02-13 21:45:36'),(2,'nomination_ends','2019-02-14 21:45:36'),(3,'voting_begins','2019-02-14 23:45:36'),(4,'voting_ends','2019-02-16 21:45:36'),(5, 'branding', 'Europe');
 /*!40000 ALTER TABLE `config` ENABLE KEYS */;
 UNLOCK TABLES;
 
