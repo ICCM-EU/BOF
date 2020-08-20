@@ -76,4 +76,5 @@ cd /var/www/bof/src
 composer install --dev
 apt-get install php-xdebug php-pdo-sqlite
 ./vendor/bin/phpunit -c phpunit.xml
+# Please note you should not install PHPUnit on anything but your development system.  See https://thephp.cc/news/2020/02/phpunit-a-security-risk for further explanation. 
 ```
