@@ -18,6 +18,7 @@
     <logging>
 	<log type="coverage-html" target="test/results/coverage"/>
 	<log type="testdox-html" target="test/results/index.html"/>
+	<log type="coverage-xml" target="test/results/coverage"/>
     </logging>
     <filter>
 	<whitelist addUncoveredFilesFromWhitelist="true" processUncoveredFilesFromWhitelist="false">
