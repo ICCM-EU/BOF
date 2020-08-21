@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../../classes/Cookies.php';
-
 use PHPUnit\Framework\TestCase;
 use phpmock\spy\Spy;
 use ICCM\BOF\Cookies;

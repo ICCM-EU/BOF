@@ -1,10 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../../classes/Auth.php';
-require_once __DIR__ . '/../../classes/Cookies.php';
-require_once __DIR__ . '/../../classes/DBO.php';
-require_once __DIR__ . '/../../vendor/slim/twig-view/src/Twig.php';
-
 use PHPUnit\Framework\TestCase;
 use ICCM\BOF\Auth;
 use ICCM\BOF\Cookies;

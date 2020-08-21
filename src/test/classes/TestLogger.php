@@ -1,8 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../../classes/DBO.php';
-require_once __DIR__ . '/../../classes/Logger.php';
-
 use PHPUnit\Framework\TestCase;
 use ICCM\BOF\DBO;
 use ICCM\BOF\Logger;

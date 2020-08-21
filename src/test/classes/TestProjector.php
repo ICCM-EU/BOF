@@ -1,9 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../../classes/Projector.php';
-require_once __DIR__ . '/../../classes/DBO.php';
-require_once __DIR__ . '/../../vendor/slim/twig-view/src/Twig.php';
-
 use PHPUnit\Framework\TestCase;
 use ICCM\BOF\Projector;
 use ICCM\BOF\DBO;
