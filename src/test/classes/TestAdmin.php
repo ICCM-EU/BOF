@@ -1,10 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../../classes/Admin.php';
-require_once __DIR__ . '/../../classes/DBO.php';
-require_once __DIR__ . '/../../classes/Results.php';
-require_once __DIR__ . '/../../vendor/slim/twig-view/src/Twig.php';
-
 use PHPUnit\Framework\TestCase;
 use phpmock\spy\Spy;
 use ICCM\BOF\Admin;

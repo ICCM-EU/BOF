@@ -1,10 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../../classes/Results.php';
-require_once __DIR__ . '/../../classes/DBO.php';
-require_once __DIR__ . '/../../classes/Logger.php';
-require_once __DIR__ . '/../../vendor/slim/twig-view/src/Twig.php';
-
 use PHPUnit\Framework\TestCase;
 use ICCM\BOF\Results;
 use ICCM\BOF\DBO;
