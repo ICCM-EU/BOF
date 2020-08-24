@@ -38,7 +38,7 @@ $app->get('/votes/add', function (Request $request, Response $response, array $a
 })->setName("votesaddget");
 
 $app->post('/votes/add', function (Request $request, Response $response, array $args) {
-    global $PrepBofId;
+    global $PrepBofId, $app;
     $data = $request->getParsedBody();
 
     $setting_leader = 1;
@@ -52,9 +52,9 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
     if($userid === NULL)
         return $response->withRedirect($this->router->pathFor('home'), 302);
 
-    $stage =new ICCM\BOF\Stage($this->db);
-    $stage2 =$stage->getstage();
-    if ($stage2 != 'voting')
+    $dbo = $app->getContainer()->get('ICCM\BOF\DBO');
+    $stage =$dbo->getStage();
+    if ($stage != 'voting')
        return $response->withRedirect($this->router->pathFor('home'), 302);
 
     // turn full votes for Prep BOF into quarter votes. we don't want to waste your full vote!

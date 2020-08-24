@@ -1,4 +1,4 @@
-insert into participant values('1', 'admin', PASSWORD('secret'));
+insert into participant values('1', 'admin', '$2y$10$Coh8TTXxnNnmouU8dxJ8aO91vyBHLTdwtWs3axSdVDfTJrZjPU5fy');
 insert into location (id,name) values (0,'Room A');
 insert into location (id,name) values (1,'Room B');
 insert into location (id,name) values (2,'Room C');

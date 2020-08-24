@@ -7,6 +7,7 @@ echo "DELETE FROM config;
 INSERT INTO config (item, value) VALUES('nomination_begins', DATE_ADD(NOW(), INTERVAL -1 DAY));
 INSERT INTO config (item, value) VALUES('nomination_ends', DATE_ADD(NOW(), INTERVAL +1 DAY));
 INSERT INTO config (item, value) VALUES('voting_begins', DATE_ADD(NOW(), INTERVAL +1 DAY));
-INSERT INTO config (item, value) VALUES('voting_ends', DATE_ADD(NOW(), INTERVAL +2 DAY));"  | \
+INSERT INTO config (item, value) VALUES('voting_ends', DATE_ADD(NOW(), INTERVAL +2 DAY));
+INSERT INTO config (item, value) VALUES('branding', 'Europe');" | \
      mysql -u myuser mydbname --password="mypwd"
 

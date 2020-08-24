@@ -7,12 +7,12 @@ use \PDO;
 class Nomination
 {
     private $view;
-    private $db;
+    private $dbo;
     private $router;
 
-    function __construct($view, $db, $router) {
+    function __construct($view, $router, $dbo) {
         $this->view = $view;
-        $this->db = $db;
+        $this->dbo = $dbo;
         $this->router = $router;
     }
 
@@ -25,13 +25,7 @@ class Nomination
             print "Empty title or description. Don't do that!";
             return 0;
         }
-        $sql = 'INSERT IGNORE INTO `workshop` (`name`,`description`,`creator_id`)
-            VALUES (?, ?, ?)';
-
-        $query=$this->db->prepare($sql);
-        $param = array ($title, $description, $userid);
-
-        $query->execute($param);
+        $this->dbo->nominate($title, $description, $userid);
         return $this->view->render($response, 'nomination_response.html', [
             'loggedin' => True,
         ]);

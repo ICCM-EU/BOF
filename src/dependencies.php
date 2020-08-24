@@ -41,11 +41,15 @@ $container['view'] = function ($container) {
 $container['ICCM\BOF\Auth'] = function ($c) {
     global $app;
     global $settings;
+    global $translator;
     return new \ICCM\BOF\Auth(
         $c['view'],
-        $c['db'],
         $app->getContainer()->get('router'),
-        $settings['settings']['secrettoken']);
+        $app->getContainer()->get('ICCM\BOF\DBO'),
+        $settings['settings']['secrettoken'],
+        $app->getContainer()->get('ICCM\BOF\Cookies'),
+        $translator
+    );
 };
 
 $container['ICCM\BOF\Admin'] = function ($c) {
@@ -53,8 +57,13 @@ $container['ICCM\BOF\Admin'] = function ($c) {
     global $settings;
     return new \ICCM\BOF\Admin(
         $c['view'],
-        $c['db'],
-        $app->getContainer()->get('router'));
+        $app->getContainer()->get('router'),
+		$app->getContainer()->get('ICCM\BOF\DBO'),
+		$app->getContainer()->get('ICCM\BOF\Results'));
+};
+
+$container['ICCM\BOF\Cookies'] = function ($c) {
+    return new \ICCM\BOF\Cookies();
 };
 
 $container['ICCM\BOF\DBO'] = function ($c) {
@@ -67,8 +76,8 @@ $container['ICCM\BOF\Nomination'] = function ($c) {
     global $settings;
     return new \ICCM\BOF\Nomination(
         $c['view'],
-        $c['db'],
-        $app->getContainer()->get('router'));
+        $app->getContainer()->get('router'),
+        $app->getContainer()->get('ICCM\BOF\DBO'));
 };
 
 $container['ICCM\BOF\Moderation'] = function ($c) {
@@ -76,8 +85,8 @@ $container['ICCM\BOF\Moderation'] = function ($c) {
     global $settings;
     return new \ICCM\BOF\Moderation(
         $c['view'],
-        $c['db'],
-        $app->getContainer()->get('router'));
+        $app->getContainer()->get('router'),
+        $app->getContainer()->get('ICCM\BOF\DBO'));
 };
 
 $container['ICCM\BOF\Projector'] = function ($c) {
@@ -85,8 +94,14 @@ $container['ICCM\BOF\Projector'] = function ($c) {
     global $settings;
     return new \ICCM\BOF\Projector(
         $c['view'],
-        $c['db'],
-        $app->getContainer()->get('router'));
+        $app->getContainer()->get('router'),
+        $app->getContainer()->get('ICCM\BOF\DBO'));
 };
 
+$container['ICCM\BOF\Results'] = function ($c) {
+    global $app;
+    return new \ICCM\BOF\Results(
+        $app->getContainer()->get('ICCM\BOF\DBO'),
+        new \ICCM\BOF\Logger());
+};
 ?>

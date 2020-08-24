@@ -1,21 +1,14 @@
 <?php
 
-require_once __DIR__ . '/../../classes/Results.php';
-require_once __DIR__ . '/../../classes/Stage.php';
-require_once __DIR__ . '/../../classes/DBO.php';
-require_once __DIR__ . '/../../classes/Logger.php';
-require_once __DIR__ . '/../../vendor/slim/twig-view/src/Twig.php';
-
 use PHPUnit\Framework\TestCase;
 use ICCM\BOF\Results;
 use ICCM\BOF\DBO;
-use Slim\Views\Twig;
-use Psr\Http\Message\ResponseInterface;
+use ICCM\BOF\Logger;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Argument;
 
 /**
- * @covers ICCM\BOF\Results
+ * @covers \ICCM\BOF\Results
  */
 class TestResults extends TestCase
 {
@@ -182,7 +175,8 @@ EOF;
 
         // Logger mock
         $logger = $this->getMockBuilder(Logger::class)
-              ->setMethods(['clearLog', 'getLog', 'log', 'logBookWorkshop', 'logSwitchedWorkshops'])
+              ->disableOriginalConstructor()
+              ->onlyMethods(['clearLog', 'getLog', 'log', 'logBookWorkshop', 'logSwitchedWorkshops'])
               ->getMock();
         $logger->expects($this->once())
             ->method('getLog')
@@ -192,6 +186,10 @@ EOF;
 
         // DBO mock
         $dbo = $this->prophesize(DBO::class);
+        $dbo->getStage()
+            ->willReturn('stage')
+            ->shouldBeCalledTimes(1);
+
         $dbo->exportWorkshops()
             ->willReturn($exportedData)
             ->shouldBeCalledTimes(1);
@@ -289,34 +287,10 @@ EOF;
             ->willReturn(true)
             ->shouldBeCalledTimes(1);
 
-        // ResponseInterface mock
-        $response = $this->getMockBuilder(ResponseInterface::class)
-              ->disableOriginalConstructor()
-              ->getMock();
-
-        // Twig view mock
-        $view = $this->getMockBuilder(Twig::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['render'])
-            ->getMock();
-        $view->expects($this->once())
-            ->method('render')
-            ->with($response, 'results.html', $config)
-            ->willReturn(4);
-
-        // Stage mock
-        $stage = $this->getMockBuilder(Stage::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getstage'])
-            ->getMock();
-        $stage->expects($this->once())
-            ->method('getstage')
-            ->willReturn('stage');
-
-        $results = new Results($view, null, $dbo->reveal(), $logger);
+        $results = new Results($dbo->reveal(), $logger);
         // This ensures the ultimate return value is correct (i.e. whatever
         // $view->render returns), and calls the function under test.
-        $this->assertEquals(4, $results->calculateResults(null, $response, $stage, null));
+        $this->assertEquals($config, $results->calculateResults());
     }
 
     /**
@@ -410,7 +384,7 @@ EOF;
     public function calculateResultsThrowsExceptionIfInvalidLocations() {
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getNumLocations',
+            ->onlyMethods(['getNumLocations',
                           'getNumRounds',
                           'validateLocations',
                           'validateRounds'])
@@ -432,9 +406,9 @@ EOF;
             ->method('validateRounds')
             ->willReturn(true);
 
-        $results = new Results(null, null, $dbo, null);
+        $results = new Results($dbo, null);
         $this->expectException(RuntimeException::class);
-        $results->calculateResults(null, null, null, null);
+        $results->calculateResults();
     }
 
     /**
@@ -443,7 +417,7 @@ EOF;
     public function calculateResultsThrowsExceptionIfInvalidRounds() {
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getNumLocations',
+            ->onlyMethods(['getNumLocations',
                           'getNumRounds',
                           'validateLocations',
                           'validateRounds'])
@@ -465,9 +439,9 @@ EOF;
             ->method('validateRounds')
             ->willReturn(false);
 
-        $results = new Results(null, null, $dbo, null);
+        $results = new Results($dbo, null);
         $this->expectException(RuntimeException::class);
-        $results->calculateResults(null, null, null, null);
+        $results->calculateResults();
     }
 
     /**
@@ -476,7 +450,7 @@ EOF;
     public function calculateResultsThrowsExceptionIfTooFewLocations() {
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getNumLocations',
+            ->onlyMethods(['getNumLocations',
                           'getNumRounds',
                           'validateLocations',
                           'validateRounds'])
@@ -498,8 +472,8 @@ EOF;
             ->method('validateRounds')
             ->willReturn(true);
 
-        $results = new Results(null, null, $dbo, null);
+        $results = new Results($dbo, null);
         $this->expectException(RuntimeException::class);
-        $results->calculateResults(null, null, null, null);
+        $results->calculateResults();
     }
 }
