@@ -19,6 +19,7 @@
 		var delete_button = document.createElement('button');
 		var br = document.createElement('br');
 		br.id = 'br_' + type + '_' + last_id;
+		item.type = 'text';
 		item.id = type + '_' + last_id;
 		item.name = type + 's[]';
 		item.className = 'bof-form-input2';
@@ -31,7 +32,7 @@
 		parent.appendChild(item);
 		parent.appendChild(delete_button);
 		parent.appendChild(br);
-		last_round_id_el.value = ++last_id;
+		last_id_el.value = ++last_id;
 	}
 </script>
 <h1>Admin</h1>
