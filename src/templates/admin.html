@@ -23,6 +23,7 @@
 		item.id = type + '_' + last_id;
 		item.name = type + 's[]';
 		item.className = 'bof-form-input2';
+		delete_button.type = 'button';
 		delete_button.id = 'delete_' + type + '_' + last_id;
 		delete_button.onclick = function() {
 			delete_item(type, last_id);
@@ -63,11 +64,11 @@
 			<div class="bof-form__item2" id="rounds">
 			{% for round in rounds %}
 				<input type="text" id="round_{{loop.index0}}" name="rounds[]" value="{{round}}" class="bof-form-input2"/>
-				<button id="delete_round_{{loop.index0}}" onclick="delete_item('round', {{loop.index0}} )">{{'Delete'|trans}}</button>
+				<button type="button" id="delete_round_{{loop.index0}}" onclick="delete_item('round', {{loop.index0}} )">{{'Delete'|trans}}</button>
 				<br id="br_round_{{loop.index0}}"/>
 			{% endfor %}
 			</div>
-			<button onclick="add_item('round')">{{'Add Slot'|trans}}</button>
+			<button type="button" onclick="add_item('round')">{{'Add Slot'|trans}}</button>
 			<input type="hidden" id="last_round_id" value="{{num_rounds}}"/>
 		</fieldset>
 		<br/>
@@ -76,11 +77,11 @@
 			<div class="bof-form__item2" id="locations">
 			{% for location in locations %}
 				<input type="text" id="location_{{loop.index0}}" name="locations[]" value="{{location}}" class="bof-form-input2"/>
-				<button id="delete_location_{{loop.index0}}" onclick="delete_item('location', {{loop.index0}} )">{{'Delete'|trans}}</button>
+				<button type="button" id="delete_location_{{loop.index0}}" onclick="delete_item('location', {{loop.index0}} )">{{'Delete'|trans}}</button>
 				<br id="br_location_{{loop.index0}}"/>
 			{% endfor %}
 			</div>
-			<button onclick="add_item('location')">{{'Add Room'|trans}}</button>
+			<button type="button" onclick="add_item('location')">{{'Add Room'|trans}}</button>
 			<input type="hidden" id="last_location_id" value="{{num_locations}}"/>
 		</fieldset>
 		<br/>
