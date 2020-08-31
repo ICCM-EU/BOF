@@ -46,7 +46,8 @@
         <properties>
             <property name="exceptions">
                 <value>
-                    db
+                    db,
+                    id
                 </value>
             </property>
         </properties>
