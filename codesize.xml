@@ -12,6 +12,8 @@
 
     <!-- Import all but StaticAccess from cleancode rule set -->
     <rule ref="rulesets/cleancode.xml">
+        <exclude name="BooleanArgumentFlag" />
+        <exclude name="ElseExpression" />
         <exclude name="StaticAccess" />
     </rule>
     <!-- Set properties for ShortVariable from cleancode rule set -->
@@ -26,13 +28,23 @@
     </rule>
 
     <!-- Import the entire codesize rule set -->
-    <rule ref="rulesets/codesize.xml" />
+    <rule ref="rulesets/codesize.xml">
+        <exclude name="TooManyPublicMethods" />
+    </rule>
 
     <!-- Import the entire controversial rule set -->
-    <rule ref="rulesets/controversial.xml" />
+    <rule ref="rulesets/controversial.xml">
+        <exclude name="CamelCaseClassName" />
+        <exclude name="CamelCaseMethodName" />
+        <exclude name="CamelCaseParameterName" />
+        <exclude name="CamelCasePropertyName" />
+        <exclude name="CamelCaseVariableName" />
+    </rule>
 
     <!-- Import the entire design rule set -->
-    <rule ref="rulesets/design.xml" />
+    <rule ref="rulesets/design.xml">
+        <exclude name="DevelopmentCodeFragment" />
+    </rule>
 
     <!-- Import the entire unusedcode rule set -->
     <rule ref="rulesets/unusedcode.xml" />
@@ -44,12 +56,7 @@
     <!-- Set properties for ShortVariable from naming rule set -->
     <rule ref="rulesets/naming.xml/ShortVariable">
         <properties>
-            <property name="exceptions">
-                <value>
-                    db,
-                    id
-                </value>
-            </property>
+            <property name="exceptions" value="db,id" />
         </properties>
     </rule>
 
