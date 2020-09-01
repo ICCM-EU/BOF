@@ -47,7 +47,6 @@ class TestLogger extends TestCase
      */
     public function getLogReturnsEmptyAfterGetLog() {
         $message = 'Test message';
-        $expected = $message."\n";
         $logger = new Logger();
         $logger->log($message);
         $logger->getLog();
