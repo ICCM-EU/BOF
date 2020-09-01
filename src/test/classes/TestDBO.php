@@ -149,7 +149,7 @@ class TestDBO extends TestCase
         $sql = "INSERT INTO participant (id, name, password) VALUES";
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '*14E65567ABDB5135D0CFD9A70B3032C179A49EE7')";
             }
             else {
@@ -162,7 +162,7 @@ class TestDBO extends TestCase
         $sql = "INSERT INTO workshop (id, creator_id, name, description, published) VALUES";
         for ($count = 0; $count < $workshops; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, {$id}, 'topic{$count}', 'Description for topic{$count}', 0)";
             }
             else {
@@ -349,10 +349,10 @@ class TestDBO extends TestCase
         $rows = $query->fetchAll(PDO::FETCH_OBJ);
         $this->assertNotFalse($rows);
         $this->assertEquals(count($expected), count($rows));
-        for ($i = 0; $i < count($expected); $i++) {
-            $this->assertEquals($expected[$i][0], $rows[$i]->id);
-            $this->assertEquals($expected[$i][1], $rows[$i]->round_id);
-            $this->assertEquals($expected[$i][2], $rows[$i]->location_id);
+        for ($idx = 0; $idx < count($expected); $idx++) {
+            $this->assertEquals($expected[$idx][0], $rows[$idx]->id);
+            $this->assertEquals($expected[$idx][1], $rows[$idx]->round_id);
+            $this->assertEquals($expected[$idx][2], $rows[$idx]->location_id);
         }
     }
 
@@ -453,8 +453,8 @@ class TestDBO extends TestCase
               ORDER BY participant_id, workshop_id";
         $query = self::$pdo->prepare($sql);
         $query->execute();
-        $wp = $query->fetch(PDO::FETCH_OBJ);
-        $this->assertEquals(1, $wp->leader);
+        $participant = $query->fetch(PDO::FETCH_OBJ);
+        $this->assertEquals(1, $participant->leader);
     }
 
     /**
@@ -515,7 +515,7 @@ class TestDBO extends TestCase
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '{$pass}')";
             }
             else {
@@ -538,7 +538,7 @@ class TestDBO extends TestCase
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '{$pass}')";
             }
             else {
@@ -568,7 +568,7 @@ class TestDBO extends TestCase
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '{$pass}')";
             }
             else {
@@ -591,7 +591,7 @@ class TestDBO extends TestCase
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '{$pass}')";
             }
             else {
@@ -614,7 +614,7 @@ class TestDBO extends TestCase
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '{$pass}')";
             }
             else {
@@ -637,7 +637,7 @@ class TestDBO extends TestCase
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '{$pass}')";
             }
             else {
@@ -660,7 +660,7 @@ class TestDBO extends TestCase
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '{$pass}')";
             }
             else {
@@ -731,7 +731,7 @@ class TestDBO extends TestCase
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '{$pass}')";
             }
             else {
@@ -762,7 +762,7 @@ class TestDBO extends TestCase
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '{$pass}')";
             }
             else {
@@ -817,7 +817,7 @@ class TestDBO extends TestCase
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '{$pass}')";
             }
             else {
@@ -839,7 +839,7 @@ class TestDBO extends TestCase
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
-                $id= $count + 100;
+                $id = $count + 100;
                 $sql .= ",({$id}, 'user{$count}', '{$pass}')";
             }
             else {
@@ -948,17 +948,17 @@ EOF;
         // findConflicts returns.
         $bookedWorkshops = [];
         $workshop_id = 101;
-        $i = 0;
+        $idx = 0;
         for ($round = 0; $round < $rounds; $round++) {
             for ($location = 0; $location < $locations; $location++) {
                 if (($round == $rounds - 1) && ($location == 1)) {
-                    $bookedWorkshops[$i] = [1, $round, $location];
+                    $bookedWorkshops[$idx] = [1, $round, $location];
                 }
                 else {
-                    $bookedWorkshops[$i] = [$workshop_id, $round, $location];
+                    $bookedWorkshops[$idx] = [$workshop_id, $round, $location];
                     $workshop_id++;
                 }
-                $i++;
+                $idx++;
             }
         }
         $this->_setBooking($bookedWorkshops);
@@ -982,9 +982,9 @@ EOF;
 
         $conflicts = $conflictsArr['conflicts'];
         $this->assertEquals($expectedInArray, count($conflicts));
-        for ($i = 0; $i < $expectedInArray; $i++) {
-            $this->assertEquals(101, $conflicts[$i]->participant_id);
-            $this->assertEquals($i, $conflicts[$i]->round_id);
+        for ($idx = 0; $idx < $expectedInArray; $idx++) {
+            $this->assertEquals(101, $conflicts[$idx]->participant_id);
+            $this->assertEquals($idx, $conflicts[$idx]->round_id);
         }
     }
 
