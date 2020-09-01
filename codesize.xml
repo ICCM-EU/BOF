@@ -21,7 +21,8 @@
         <properties>
             <property name="exceptions">
                 <value>
-                    \JWT
+                    \Firebase\JWT\JWT,
+                    \Prophecy\Argument
                 </value>
             </property>
         </properties>
