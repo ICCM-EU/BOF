@@ -11,9 +11,9 @@
 }
 
 @function siteImage($i) {
-  @return map-get($site_images, $i)
+  @return map-get($site_images, $i);
 }
 
 @function siteSize($m) {
-  @return map-get($site_sizes, $m)
+  @return map-get($site_sizes, $m);
 }

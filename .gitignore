@@ -11,3 +11,7 @@ src/public/assets/svg/*
 !src/public/assets/css/.keep
 !src/public/assets/js/.keep
 !src/public/assets/svg/.keep
+
+.codacy-coverage/**
+codacy-coverage-reporter-assembly.jar
+

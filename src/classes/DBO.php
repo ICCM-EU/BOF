@@ -1052,13 +1052,13 @@ class DBO
         $queryUpdateRound->bindValue(':id', (int) $id2, PDO::PARAM_INT);
         $queryUpdateRound->bindValue(':round_id', (int) $round_id1, PDO::PARAM_INT);
         $queryUpdateRound->bindValue(':location_id', (int) $location_id1, PDO::PARAM_INT);
-        $success = $queryUpdateRound->execute();
+        $queryUpdateRound->execute();
 
         // Put $id1 into $round_id2 and $location_id2
         $queryUpdateRound->bindValue(':id', (int) $id1, PDO::PARAM_INT);
         $queryUpdateRound->bindValue(':round_id', (int) $round_id2, PDO::PARAM_INT);
         $queryUpdateRound->bindValue(':location_id', (int) $location_id2, PDO::PARAM_INT);
-        $sucess = $queryUpdateRound->execute();
+        $queryUpdateRound->execute();
     }
 
     /**

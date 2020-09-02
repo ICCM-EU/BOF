@@ -55,7 +55,7 @@ class Results
         $this->fillBooking($rounds, $locations);
         $this->dbo->commit();
 
-        $this->resolveConflicts($rounds, $locations);
+        $this->resolveConflicts($locations);
     }
 
     /**
@@ -83,10 +83,9 @@ class Results
     /**
      * Resolve conflicts with facilitators.  Conflicts might not be resolvable!
      *
-     * @param int $rounds The total number of rounds.
      * @param int $locations The total number locations.
      */
-    private function resolveConflicts($rounds, $locations) {
+    private function resolveConflicts($locations) {
         // Find minimum number of conflicts; limit to $triesLeft
         $conflictArr=$this->dbo->findConflicts($this->logger);
         $conflictIndex = 0;

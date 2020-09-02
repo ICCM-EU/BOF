@@ -306,9 +306,6 @@ class TestAdmin extends TestCase
      * @test
      */
     public function updateConfigDownloadsDatabase() {
-        $config = [
-            'loggedin' => true,
-        ];
         $data = [
             'password1' => null,
             'password2' => null,

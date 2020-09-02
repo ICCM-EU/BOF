@@ -461,11 +461,6 @@ class TestAuth extends TestCase
             'user_name' => 'user1',
             'password' => 'password1'
         ];
-        $user = (object) [
-           'id' => 1,
-           'name' => $data['user_name'],
-           'valid' => false
-        ];
 
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
