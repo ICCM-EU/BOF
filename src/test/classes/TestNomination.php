@@ -326,4 +326,60 @@ class TestNomination extends TestCase
         $this->assertEquals(0, $nomination->nominate($request, $response, null));
     }
 
+    /**
+     * @test
+     */
+    public function nominateShowsErrorIfDBONominateThrowsException() {
+        $data = [
+            'title' => 'Title',
+            'description' => 'Description',
+        ];
+        $userid = 1;
+
+        $dbo = $this->getMockBuilder(DBO::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['nominate'])
+            ->getMock();
+
+        $dbo->expects($this->once())
+            ->method('nominate')
+            ->with($data['title'], $data['description'], $userid)
+            ->will($this->throwException(new Exception()));
+
+        // Request mock
+        $request = $this->getMockBuilder(Request::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getAttribute', 'getParsedBody'])
+            ->getMock();
+
+        $request->expects($this->once())
+            ->method('getAttribute')
+            ->with('userid')
+            ->willReturn($userid);
+
+        $request->expects($this->once())
+            ->method('getParsedBody')
+            ->willReturn($data);
+
+        // ResponseInterface mock
+        $response = $this->getMockBuilder(ResponseInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Twig view mock
+        $view = $this->getMockBuilder(Twig::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['render'])
+            ->getMock();
+
+        $view->expects($this->once())
+            ->method('render')
+            ->with($response, 'nomination_error.html')
+            ->willReturn(4);
+
+        $nomination = new Nomination($view, null, $dbo);
+        $this->assertEquals(4, $nomination->nominate($request, $response, null));
+    }
+
+
 }

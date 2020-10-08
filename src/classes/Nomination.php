@@ -25,13 +25,17 @@ class Nomination
             print "Empty title or description. Don't do that!";
             return 0;
         }
-        $this->dbo->nominate($title, $description, $userid);
-        return $this->view->render($response, 'nomination_response.html', [
-            'loggedin' => True,
-        ]);
+        try
+        {
+            $this->dbo->nominate($title, $description, $userid);
+            return $this->view->render($response, 'nomination_response.html', [
+                'loggedin' => True,
+            ]);
+        }
+        catch (\Exception $ex) { $ex; }
 
         // Handle error
-        // return $this->view->render($response, 'nomination_error.html');
+        return $this->view->render($response, 'nomination_error.html');
     }
 }
 
