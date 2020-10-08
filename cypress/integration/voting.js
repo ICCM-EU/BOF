@@ -1,14 +1,3 @@
-function login_user(username, password) {
-  cy.visit("/login")
-  cy.get('input[name=user_name]').clear().type(username)
-  cy.get('input[name=password]').clear().type(password)
-  cy.get('input[type=submit]').click()
-}
-
-function logout_user() {
-  cy.visit("/logout")
-}
-
 function cast_vote(topic, vote) {
   cy.visit("/topics")
   // select the div class=topic
@@ -130,10 +119,18 @@ var votes_quarter = [
 ]
 
 describe('test voting stage', function() {
+  before(function() {
+    var resetDB = require('../support/reset_database.js')
+    resetDB.resetVoting()
+    for(var i=1; i < 60; i++) {
+      cy.createUser({username: "user" + i, password: "pwd" + i})
+    }
+  })
+
   it('cast votes', function() {
     var i
     for(i=1; i < 60; i++) {
-      login_user("user" + i, "pwd" + i)
+      cy.typeLogin({username: "user" + i, password: "pwd" + i})
 
       var topic
       for (topic=0; topic < 14; topic++)
@@ -145,7 +142,7 @@ describe('test voting stage', function() {
         else if (votes_quarter[topic].indexOf(i) > -1)
           cast_vote(topic, 2)
       }
-      logout_user()
+      cy.logout()
     }
   })
 })

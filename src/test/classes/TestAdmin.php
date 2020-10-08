@@ -364,11 +364,14 @@ class TestAdmin extends TestCase
         $passthruSpy = new Spy('ICCM\BOF', 'passthru', function() {});
         $passthruSpy->enable();
 
-        $fileGetContentsSpy = new Spy('ICCM\BOF', 'file_get_contents', function() {});
-        $fileGetContentsSpy->enable();
-
-        $headerSpy = new Spy('ICCM\BOF', 'Header', function() {});
+        $headerSpy = new Spy('ICCM\BOF', 'header', function() {});
         $headerSpy->enable();
+
+        // Note that we really don't care if ob_get_clean() is called, but we
+        // need to make sure that it's not really called, or else this unit
+        // test will fail, as a "Risky" test.
+        $ob_get_cleanSpy = new Spy('ICCM\BOF', 'ob_get_clean', function() {});
+        $ob_get_cleanSpy->enable();
 
         // Note that a RuntimeException is thrown even though it's all OK.
         $this->expectException(RuntimeException::class);
@@ -379,16 +382,16 @@ class TestAdmin extends TestCase
         $this->assertStringStartsWith('mysqldump', $invocations[0]->getArguments()[0]);
         $passthruSpy->disable();
 
-        $invocations = $fileGetContentsSpy->getInvocations();
-        $this->assertEquals(1, count($invocations));
-        $fileGetContentsSpy->disable();
-
         $invocations = $headerSpy->getInvocations();
         $this->assertEquals(2, count($invocations));
-        $this->assertEquals('Content-type: application/octet-stream', $invocations[0]->getArguments()[0]);
+        $this->assertEquals('Content-Type: application/octet-stream', $invocations[0]->getArguments()[0]);
         $this->assertStringStartsWith('Content-Disposition: attachment; filename=db-backup-BOF-', $invocations[1]->getArguments()[0]);
         $this->assertStringEndsWith('.sql', $invocations[1]->getArguments()[0]);
         $headerSpy->disable();
+
+        // Since we don't care, we don't assert on it, just disable it now
+        // we're done.
+        $ob_get_cleanSpy->disable();
     }
 
     /**
