@@ -1,21 +1,3 @@
-function create_user(username, password) {
-  cy.visit("/register")
-  cy.get('input[name=user_name]').clear().type(username)
-  cy.get('input[name=password]').clear().type(password)
-  cy.get('input[type=submit]').click()
-}
-
-function login_user(username, password) {
-  cy.visit("/login")
-  cy.get('input[name=user_name]').clear().type(username)
-  cy.get('input[name=password]').clear().type(password)
-  cy.get('input[type=submit]').click()
-}
-
-function logout_user() {
-  cy.visit("/logout")
-}
-
 function create_topic(title) {
   cy.visit("/nomination")
   cy.get('input[name=title]').clear().type(title)
@@ -24,19 +6,23 @@ function create_topic(title) {
 }
 
 describe('test nomination stage', function() {
+  before(function() {
+    require('../support/reset_database.js').reset()
+  })
+
   it('create users', function() {
     var i
     for(i=1; i < 60; i++) {
-      create_user("user" + i, "pwd" + i)
+      cy.createUser({username: "user" + i, password: "pwd" + i})
     }
   })
 
   it('nominate topics', function() {
-    login_user("user1", "pwd1")
+    cy.typeLogin({username: "user1", password: "pwd1"})
     var i
     for(i=1; i < 15; i++) {
       create_topic("topic" + i)
     }
-    logout_user()
+    cy.logout()
   })
 })
