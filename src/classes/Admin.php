@@ -59,13 +59,16 @@ class Admin
 			$dbname=$settings['db']['name'];
 			$dbuser=$settings['db']['user'];
 			$dbpassword=$settings['db']['pass'];
-			$dumpfile="/tmp/mysqldump.sql";
-			passthru("mysqldump --user=$dbuser --password=$dbpassword --host=$dbhost $dbname > $dumpfile");
 
-			Header('Content-type: application/octet-stream');
-			Header('Content-Disposition: attachment; filename=db-backup-BOF-'.date('Y-m-d_hi').'.sql');
+			// Call ob_get_clean() to force Content-Type header;
+			// this works because the header that's already in the
+			// output buffer will be lost after this call.
+			ob_get_clean();
 
-			echo file_get_contents($dumpfile);
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename=db-backup-BOF-'.date('Y-m-d_hi').'.sql');
+			passthru("mysqldump --user=$dbuser --password=$dbpassword --host=$dbhost $dbname");
+
 			throw new RuntimeException();
 		}
 
