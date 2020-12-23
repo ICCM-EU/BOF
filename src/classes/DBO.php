@@ -1093,37 +1093,6 @@ class DBO
     }
 
     /**
-     * Updates the given workshop with the given name, description, and
-     * "published" value.
-     * 
-     * @param int $workshop The workshop id of the workshop to update
-     * @param string $name The new name for the workshop
-     * @param string $description The new description for the workshop
-     * @param int $published The new "published" value. If empty($published) returns true, it will be set to 0, otherwise 1.
-     */
-    public function updateWorkshop($workshop, $name, $description, $published) {
-        $sql = 'UPDATE `workshop`
-                   SET `name` = :name,
-                       `description` = :description,
-                       `published` = :published
-                 WHERE `id` = :workshop_id';
-        
-        if (empty($published)) {
-            $published = 0;
-        }
-        else {
-            $published = 1;
-        }
-
-        $query=$this->db->prepare($sql);
-        $query->bindValue(':workshop_id', (int) $workshop, PDO::PARAM_INT);
-        $query->bindValue(':published', (int) $published, PDO::PARAM_INT);
-        $query->bindValue(':name', $name, PDO::PARAM_STR);
-        $query->bindValue(':description', $description, PDO::PARAM_STR);
-        $query->execute();
-    }
-
-    /**
      * Checks if location IDs are consecutive, starting with id 0. TODO: Note
      * this is naieve, if location IDs starts with < 0, it won't be caught
      * here.
