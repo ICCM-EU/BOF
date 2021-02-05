@@ -140,7 +140,7 @@ class DBO
                   WHERE id = :workshop"
             );
         }
-        $logger->logBookWorkshop($this, $name, $round, $location, $round, $reason);
+        $logger->logBookWorkshop($this, $name, $round, $location, $reason);
         $queryUpdate->bindValue(':round', (int) $round, PDO::PARAM_INT);
         $queryUpdate->bindValue(':location', (int) $location, PDO::PARAM_INT);
         $queryUpdate->bindValue(':available', (int) $available, PDO::PARAM_INT);
