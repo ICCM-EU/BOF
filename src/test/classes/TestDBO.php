@@ -701,6 +701,11 @@ class TestDBO extends TestCase
      * @test
      */
     public function bookWorkshopSetsRoundLocationAndAvailable() {
+        $name = "topic5";
+        $round = 10;
+        $location = 12;
+        $reason = "blue";
+        $available = 15;
         $this->_setupWorkshops(12, 15, true, 0);
         $dbo = new DBO(self::$pdo);
         $logger = $this->getMockBuilder(Logger::class)
@@ -708,17 +713,18 @@ class TestDBO extends TestCase
             ->onlyMethods(['logBookWorkshop'])
             ->getMock();
         $logger->expects($this->once())
-            ->method('logBookWorkshop');
+            ->method('logBookWorkshop')
+            ->with($dbo, $name, $round, $location, $reason);
 
-        $dbo->bookWorkshop(105, "topic5", 10, 12, 15, "blue", $logger);
-        $expected = [[105, 10, 12]];
+        $dbo->bookWorkshop(105, $name, $round, $location, $available, $reason, $logger);
+        $expected = [[105, $round, $location]];
         $this->_verifyBooking($expected);
 
         $query = self::$pdo->prepare("SELECT available FROM workshop WHERE id = 105");
         $query->execute();
         $row = $query->fetch(PDO::FETCH_OBJ);
         $this->assertNotFalse($row);
-        $this->assertEquals(15, $row->available);
+        $this->assertEquals($available, $row->available);
     }
 
     /**
@@ -1895,40 +1901,58 @@ EOF;
         $this->assertEquals(9, count($workshops));
         $this->assertEquals(1, $workshops[0]->id);
         $this->assertEquals('Prep Team', $workshops[0]->name);
+        $this->assertEquals('admin', $workshops[0]->createdby);
         $this->assertEquals('user1, user2', $workshops[0]->leader);
         $this->assertEquals('', $workshops[0]->fullvoters);
+        $this->assertEquals('Prep Team BoF', $workshops[0]->description);
         $this->assertEquals(101, $workshops[1]->id);
         $this->assertEquals('topic1', $workshops[1]->name);
+        $this->assertEquals('user1', $workshops[1]->createdby);
         $this->assertEquals('user1', $workshops[1]->leader);
         $this->assertEquals('user1, user10, user19, user26, user28, user29, user34, user37, user38, user41', $workshops[1]->fullvoters);
+        $this->assertEquals('Description for topic1', $workshops[1]->description);
         $this->assertEquals(102, $workshops[2]->id);
         $this->assertEquals('topic2', $workshops[2]->name);
+        $this->assertEquals('user2', $workshops[2]->createdby);
         $this->assertEquals('user2', $workshops[2]->leader);
         $this->assertEquals('user2, user7, user11, user20, user23, user25, user29, user32, user37, user38', $workshops[2]->fullvoters);
+        $this->assertEquals('Description for topic2', $workshops[2]->description);
         $this->assertEquals(103, $workshops[3]->id);
         $this->assertEquals('topic3', $workshops[3]->name);
+        $this->assertEquals('user3', $workshops[3]->createdby);
         $this->assertEquals('user3', $workshops[3]->leader);
         $this->assertEquals('user2, user3, user4, user12, user18, user21, user30, user33, user39', $workshops[3]->fullvoters);
+        $this->assertEquals('Description for topic3', $workshops[3]->description);
         $this->assertEquals(104, $workshops[4]->id);
         $this->assertEquals('topic4', $workshops[4]->name);
+        $this->assertEquals('user4', $workshops[4]->createdby);
         $this->assertEquals('user4', $workshops[4]->leader);
         $this->assertEquals('user4, user10, user12, user13, user22, user31, user36, user40', $workshops[4]->fullvoters);
+        $this->assertEquals('Description for topic4', $workshops[4]->description);
         $this->assertEquals(105, $workshops[5]->id);
         $this->assertEquals('topic5', $workshops[5]->name);
+        $this->assertEquals('user5', $workshops[5]->createdby);
         $this->assertEquals('user5', $workshops[5]->leader);
         $this->assertEquals('user3, user5, user6, user14, user22, user23, user24, user31, user32, user40, user41, user43', $workshops[5]->fullvoters);
+        $this->assertEquals('Description for topic5', $workshops[5]->description);
         $this->assertEquals(106, $workshops[6]->id);
         $this->assertEquals('topic6', $workshops[6]->name);
+        $this->assertEquals('user6', $workshops[6]->createdby);
         $this->assertEquals('user6', $workshops[6]->leader);
         $this->assertEquals('user6, user9, user14, user15, user17, user19, user24, user33, user42', $workshops[6]->fullvoters);
+        $this->assertEquals('Description for topic6', $workshops[6]->description);
         $this->assertEquals(107, $workshops[7]->id);
         $this->assertEquals('topic7', $workshops[7]->name);
+        $this->assertEquals('user7', $workshops[7]->createdby);
         $this->assertEquals('user7', $workshops[7]->leader);
         $this->assertEquals('user1, user7, user8, user16, user21, user25, user27, user28, user34, user35, user42, user43', $workshops[7]->fullvoters);
+        $this->assertEquals('Description for topic7', $workshops[7]->description);
         $this->assertEquals(108, $workshops[8]->id);
         $this->assertEquals('topic8', $workshops[8]->name);
+        $this->assertEquals('user8', $workshops[8]->createdby);
         $this->assertEquals('user8', $workshops[8]->leader);
         $this->assertEquals('user8, user11, user13, user15, user16, user17, user26, user35, user44, user45', $workshops[8]->fullvoters);
+        $this->assertEquals('Description for topic8', $workshops[8]->description);
     }
 
     /**
