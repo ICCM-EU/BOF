@@ -701,6 +701,11 @@ class TestDBO extends TestCase
      * @test
      */
     public function bookWorkshopSetsRoundLocationAndAvailable() {
+        $name = "topic5";
+        $round = 10;
+        $location = 12;
+        $reason = "blue";
+        $available = 15;
         $this->_setupWorkshops(12, 15, true, 0);
         $dbo = new DBO(self::$pdo);
         $logger = $this->getMockBuilder(Logger::class)
@@ -708,17 +713,18 @@ class TestDBO extends TestCase
             ->onlyMethods(['logBookWorkshop'])
             ->getMock();
         $logger->expects($this->once())
-            ->method('logBookWorkshop');
+            ->method('logBookWorkshop')
+            ->with($dbo, $name, $round, $location, $reason);
 
-        $dbo->bookWorkshop(105, "topic5", 10, 12, 15, "blue", $logger);
-        $expected = [[105, 10, 12]];
+        $dbo->bookWorkshop(105, $name, $round, $location, $available, $reason, $logger);
+        $expected = [[105, $round, $location]];
         $this->_verifyBooking($expected);
 
         $query = self::$pdo->prepare("SELECT available FROM workshop WHERE id = 105");
         $query->execute();
         $row = $query->fetch(PDO::FETCH_OBJ);
         $this->assertNotFalse($row);
-        $this->assertEquals(15, $row->available);
+        $this->assertEquals($available, $row->available);
     }
 
     /**
