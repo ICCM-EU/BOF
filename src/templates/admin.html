@@ -2,6 +2,48 @@
 
 {% block body %}
 <script type="text/javascript">
+	function clicked_schedule_prep() {
+		var checkbox = document.getElementById('schedule_prep');
+		if (checkbox) {
+			var disabled = false;
+			if (checkbox.checked) {
+				disabled = true;
+			}
+			var prep_bof_round = document.getElementById('prep_bof_round');
+			var prep_bof_location = document.getElementById('prep_bof_location');
+			prep_bof_round.disabled = disabled;
+			prep_bof_location.disabled = disabled;
+		}
+	}
+
+	function update_prep(type) {
+		var prepItem = document.getElementById('prep_bof_' + type);
+		var selectedName = null;
+		if (prepItem.selectedIndex > 0) {
+			var selected = document.getElementById(type + '_' + prepItem.selectedIndex);
+			if (selected) {
+				selectedName = selected.value;
+			}
+		}
+		var options = '';
+		var last_id_el = document.getElementById('last_' + type + '_id');
+		var last_id = parseInt(last_id_el.value);
+		for (var id=0; id < last_id; id++) {
+			var item = document.getElementById(type + '_' + id);
+			if (!item) {
+				continue;
+			}
+			if ((item.value === selectedName)
+				|| ((selectedName === null)
+					&& (id == (last_id - 1)))) {
+			    options  += '<option value="' + item.value + '" selected>' + item.value + '</option>';
+			} else if (item) {
+			    options  += '<option value="' + item.value + '">' + item.value + '</option>';
+			}
+		}
+		prepItem.innerHTML = options;
+	}
+
 	function delete_item(type, id) {
 		var item = document.getElementById(type + '_' + id);
 		var delete_button = document.getElementById('delete_' + type + '_' + id);
@@ -9,6 +51,7 @@
 		item.remove();
 		delete_button.remove();
 		br.remove();
+		update_prep(type);
 	}
 
 	function add_item(type) {
@@ -23,18 +66,25 @@
 		item.id = type + '_' + last_id;
 		item.name = type + 's[]';
 		item.className = 'bof-form-input2';
+		item.setAttribute('onchange', "update_prep('" + type + "')");
 		delete_button.type = 'button';
 		delete_button.id = 'delete_' + type + '_' + last_id;
-		delete_button.onclick = function() {
-			delete_item(type, last_id);
-			return false;
-		};
-		delete_button.innerHTML = "Delete";
+		delete_button.setAttribute('onclick', "delete_item('" + type + "', " + last_id + ')');
+		delete_button.innerHTML = "{{'Delete' | trans}}";
 		parent.appendChild(item);
 		parent.appendChild(delete_button);
 		parent.appendChild(br);
 		last_id_el.value = ++last_id;
+		update_prep(type);
 	}
+
+		(function(){
+			window.setTimeout(function() {
+				update_prep('location');
+				update_prep('round');
+			}, 250);
+		})();
+
 </script>
 <h1>Admin</h1>
 
@@ -63,7 +113,7 @@
 			<legend tabindex="-1">{{'Slots'|trans}}</legend>
 			<div class="bof-form__item2" id="rounds">
 			{% for round in rounds %}
-				<input type="text" id="round_{{loop.index0}}" name="rounds[]" value="{{round}}" class="bof-form-input2"/>
+				<input type="text" id="round_{{loop.index0}}" name="rounds[]" value="{{round}}" class="bof-form-input2" onchange="update_prep('round')"/>
 				<button type="button" id="delete_round_{{loop.index0}}" onclick="delete_item('round', {{loop.index0}} )">{{'Delete'|trans}}</button>
 				<br id="br_round_{{loop.index0}}"/>
 			{% endfor %}
@@ -76,13 +126,25 @@
 			<legend tabindex="-1">{{'Rooms'|trans}}</legend>
 			<div class="bof-form__item2" id="locations">
 			{% for location in locations %}
-				<input type="text" id="location_{{loop.index0}}" name="locations[]" value="{{location}}" class="bof-form-input2"/>
+				<input type="text" id="location_{{loop.index0}}" name="locations[]" value="{{location}}" class="bof-form-input2" onchange="update_prep('location')"/>
 				<button type="button" id="delete_location_{{loop.index0}}" onclick="delete_item('location', {{loop.index0}} )">{{'Delete'|trans}}</button>
 				<br id="br_location_{{loop.index0}}"/>
 			{% endfor %}
 			</div>
 			<button type="button" onclick="add_item('location')">{{'Add Room'|trans}}</button>
 			<input type="hidden" id="last_location_id" value="{{num_locations}}"/>
+		</fieldset>
+		<br/>
+		<fieldset>
+			<legend tabindex="-1">Prep BoF</legend>
+			<input type="checkbox" id="schedule_prep" name="schedule_prep" value="False" {{schedule_prep == "True" ? "" : 'checked'}} onclick="clicked_schedule_prep()">
+			<label for="schedule_prep" class="bof-form__checkbox">{{'Prep BoF has its own slot'|trans}}</label>
+			<label for="prep_bof_round" class="bof-form__label">{{'Slot for Prep BoF'|trans}}</label>
+			<select id="prep_bof_round" name="prep_bof_round">
+			</select>
+			<label for="prep_bof_location" class="bof-form__label">{{'Room for Prep BoF'|trans}}</label>
+			<select id="prep_bof_location" name="prep_bof_location">
+			</select>
 		</fieldset>
 		<br/>
 		<div class="bof-form__item2">
