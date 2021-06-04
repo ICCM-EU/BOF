@@ -17,7 +17,7 @@ class TestResults extends TestCase
     # Helper function for testing Results::calculateResults.  This takes in a
     # number of rounds and locations, sets up mocks which exercise the logic
     # and runs calculateResults, when that method should succeed.
-    private function _calculateResults($rounds, $locations, $enough, $conflicts, $havePrep)
+    private function _calculateResults($rounds, $locations, $enough, $conflicts, $havePrep, $prepRound, $prepLocation)
     {
         // Expected data values
         $exportedData = <<<EOF
@@ -57,7 +57,9 @@ EOF;
         $prepBoF = (object) [
             'id' => 1,
             'name' => 'Prep Team',
-            'available' => 5
+            'available' => 5,
+            'location' => $prepLocation,
+            'round' => $prepRound 
         ];
 
         $topWorkshops = [];
@@ -200,13 +202,23 @@ EOF;
             ->shouldBeCalledTimes(1);
 
 	$alreadyBookedIds = [ ];
+	if ($prepBoF->location == -1) {
+	    $location = $locations - 1;
+	} else {
+	    $location = $prepBoF->location;
+	}
+	if ($prepBoF->round == -1) {
+	    $round = $rounds - 1;
+	} else {
+	    $round = $prepBoF->round;
+	}
         if ($havePrep) {
-            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $rounds - 1, $locations - 1, $prepBoF->available, 'Prep BoF', $logger)
+            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $round, $location, $prepBoF->available, 'Prep BoF', $logger)
                 ->shouldBeCalledTimes(1);
 	    array_push($alreadyBookedIds, $prepBoF->id);
         }
         else {
-            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $rounds - 1, $locations - 1, $prepBoF->available, 'Prep BoF', $logger)
+            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $round, $location, $prepBoF->available, 'Prep BoF', $logger)
                 ->shouldNotBeCalled();
         }
 
@@ -310,14 +322,21 @@ EOF;
      * @test
      */
     public function calculateResultsWithNoPrepBoF() {
-        $this->_calculateResults(3, 4, true, 0, false);
+        $this->_calculateResults(3, 4, true, 0, false, -1, -1);
+    }
+
+    /**
+     * @test
+     */
+    public function calculateResultsWithPrepBofAt01() {
+        $this->_calculateResults(3, 4, true, 0, true, 0, 1);
     }
 
     /**
      * @test
      */
     public function calculateResultsWhenNoConflictsEnoughWorkshops34() {
-        $this->_calculateResults(3, 4, true, 0, true);
+        $this->_calculateResults(3, 4, true, 0, true, -1, -1);
     }
 /*
     public function calculateResultsWhenNoConflictsEnoughWorkshops25() {
@@ -345,36 +364,36 @@ EOF;
      * @test
      */
     public function calculateResultsConflictsWhenConflictsEnoughWorkshops34() {
-        $this->_calculateResults(3, 4, true, 1, true);
+        $this->_calculateResults(3, 4, true, 1, true, -1, -1);
     }
 
     /**
      * @test
      */
     public function calculateResultsConflictsWhenConflictsEnoughWorkshops25() {
-        $this->_calculateResults(2, 5, true, 1, true);
+        $this->_calculateResults(2, 5, true, 1, true, -1, -1);
     }
 
     /**
      * @test
      */
     public function calculateResultsConflictsWhenConflictsEnoughWorkshops52() {
-        $this->_calculateResults(5, 2, true, 1, true);
+        $this->_calculateResults(5, 2, true, 1, true, -1, -1);
     }
 
     /**
      * @test
      */
     public function calculateResultsConflictsWhenConflictsNotEnoughWorkshops34() {
-        $this->_calculateResults(3, 4, false, 1, true);
+        $this->_calculateResults(3, 4, false, 1, true, -1, -1);
     }
 /*
     public function calculateResultsConflictsWhenConflictsNotEnoughWorkshops25() {
-        $this->_calculateResults(2, 5, false, 1, true);
+        $this->_calculateResults(2, 5, false, 1, true, -1, -1);
     }
 
     public function calculateResultsConflictsWhenConflictsNotEnoughWorkshops52() {
-        $this->_calculateResults(5, 2, false, 1, true);
+        $this->_calculateResults(5, 2, false, 1, true, -1, -1);
     }
  */
 
@@ -382,13 +401,13 @@ EOF;
      * @test
      */
     public function calculateResultsWithMaxConflicts() {
-        $this->_calculateResults(3, 4, true, 2, true);
-        //$this->_calculateResults(2, 5, true, 2, true);
-        //$this->_calculateResults(5, 2, true, 2, true);
+        $this->_calculateResults(3, 4, true, 2, true, -1, -1);
+        //$this->_calculateResults(2, 5, true, 2, true, -1, -1);
+        //$this->_calculateResults(5, 2, true, 2, true, -1, -1);
 
-        //$this->_calculateResults(3, 4, false, 2, true);
-        //$this->_calculateResults(2, 5, false, 2, true);
-        //$this->_calculateResults(5, 2, false, 2, true);
+        //$this->_calculateResults(3, 4, false, 2, true, -1, -1);
+        //$this->_calculateResults(2, 5, false, 2, true, -1, -1);
+        //$this->_calculateResults(5, 2, false, 2, true, -1, -1);
     }
 
     /**

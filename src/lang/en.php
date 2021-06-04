@@ -40,5 +40,6 @@ return array(
     'Prep BoF has its own slot' => 'Prep BoF has its own slot',
     'Slot for Prep BoF' => 'Slot for Prep BoF',
     'Room for Prep BoF' => 'Room for Prep BoF',
+    'Default' => 'Default',
     'dummy' => 'dummy'
 );

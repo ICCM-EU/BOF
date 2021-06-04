@@ -15,13 +15,27 @@ class Results
     }
 
     /**
-     * Books location 1 of the last round for the Prep BoF
+     * Books the Prep BoF, according to the values returned by
+     * DBO::getPrepBoF.  If the round or location returned by getPrepBoF is -1,
+     * then the last round or location will be used.  If getPrepBoF returns
+     * false, then the Prep BoF will not be booked.
      *
      * @param int $rounds The total number of rounds
+     * @param int $locations The total number of locations
+     *
+     * @return boolean true if the Prep BoF was booked, otherwise false
      */
     private function bookPrepBoF($rounds, $locations) {
         if ($row = $this->dbo->getPrepBoF()) {
-            $this->dbo->bookWorkshop($row->id, $row->name, $rounds - 1, $locations - 1, $row->available, "Prep BoF", $this->logger);
+            $round = $row->round;
+            $location = $row->location;
+            if ($round == -1) {
+                $round = $rounds - 1;
+            }
+            if ($location == -1) {
+                $location = $locations - 1;
+            }
+            $this->dbo->bookWorkshop($row->id, $row->name, $round, $location, $row->available, "Prep BoF", $this->logger);
             return true;
         }
         return false;

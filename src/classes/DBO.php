@@ -41,7 +41,7 @@ class DBO
                     ON CONFLICT(workshop_id, participant_id) DO UPDATE
                             SET leader = 1';
         }
-        
+
         $query = $this->db->prepare($sql);
         $query->bindValue('workshop_id', (int) $workshop, PDO::PARAM_INT);
         $query->bindValue('participant_id', (int) $participant, PDO::PARAM_INT);
@@ -417,11 +417,11 @@ class DBO
                 FROM config 
                WHERE item = 'schedule_prep'";
         $row = $this->db->query($sql)->fetch(PDO::FETCH_NUM);
-	if ($row) {
-	    $config['schedule_prep'] = $row[0];
-	} else {
-	    $config['schedule_prep'] = 'True';
-	}
+        if ($row) {
+            $config['schedule_prep'] = $row[0];
+        } else {
+            $config['schedule_prep'] = 'True';
+        }
         return $config;
     }
 
@@ -661,18 +661,18 @@ class DBO
     /**
      * Gets information about the PrepBoF for booking
      *
-     * @return stdClass An object with the id, name, and number of available
-     * participants for the Prep BoF.
+     * @return stdClass An object with the id, name, the number of available
+     * participants, and which round and location for the Prep BoF.
      */
     public function getPrepBoF() {
         $sql="SELECT value
                 FROM config 
                WHERE item = 'schedule_prep'";
         $row = $this->db->query($sql)->fetch(PDO::FETCH_NUM);
-	if ($row && $row[0] != 'True') {
-	    return false;
-	}
-	
+        if ($row && $row[0] != 'True') {
+            return false;
+        }
+
         $sql="SELECT id, name,
                      (SELECT COUNT(ID)
                         FROM workshop_participant
@@ -681,7 +681,35 @@ class DBO
                 FROM workshop
                 WHERE id = ".$this->PrepBofId;
 
-        return $this->db->query($sql)->fetch(PDO::FETCH_OBJ);
+        $row = $this->db->query($sql)->fetch(PDO::FETCH_OBJ);
+        if ($row !== false) {
+            # Note that the stored location is a 1-based index, because casting
+            # the string to an int will return 0 if the string isn't an
+            # integer. Since a 0-based index requires 0 to be a legitimate
+            # value, we can't use a 0-based index.  However, we still return a
+            # 0-based index.
+            $sql="SELECT value
+                    FROM config 
+                   WHERE item = 'prep_location'";
+            $location = $this->db->query($sql)->fetch(PDO::FETCH_NUM);
+            if ($location) {
+                $row->location = intval($location[0]) - 1;
+            } else {
+                $row->location = -1;
+            }
+
+            $sql="SELECT value
+                    FROM config 
+                   WHERE item = 'prep_round'";
+            $round = $this->db->query($sql)->fetch(PDO::FETCH_NUM);
+            if ($round) {
+                $row->round = intval($round[0]) - 1;
+            } else {
+                $row->round = -1;
+            }
+        }
+
+        return $row;
     }
 
     /**
@@ -1004,28 +1032,38 @@ class DBO
         $query->execute();
     }
 
+    /* Portable helper that essentially handles INSERT OR UPDATE; it's not
+       very fast, but we don't do this often. */
+    private function _updateConfig($item, $value) {
+        $row = $this->db->query(
+            "SELECT value FROM `config`
+              WHERE item = '$item'")->fetch(PDO::FETCH_NUM);
+        if ($row) {
+            $query = $this->db->prepare(
+                "UPDATE `config`
+                    SET value = :value
+                  WHERE item = '$item'");
+        } else {
+            $query = $this->db->prepare(
+                "INSERT INTO `config`
+                    (item, value) VALUES('$item', :value)");
+        }
+        $query->bindValue('value', $value);
+        $query->execute();
+    }
+
     /**
      * Sets information about how the Prep BoF should be scheduled
-     * 
+     *
      * @param string $schedule_prep 'True' if the Prep BoF should be
      * scheduled, otherwise 'False'
+     * @param int $prep_round The round for the Prep BoF, or -1 for last round
+     * @param int $prep_location The location for the Prep BoF, or -1 for last location
      */
-    public function setConfigPrepBoF($schedule_prep) {
-        $row = $this->db->query(
-	    "SELECT value FROM `config`
-	      WHERE item = 'schedule_prep'")->fetch(PDO::FETCH_NUM);
-	if ($row) {
-	    $query = $this->db->prepare(
-		"UPDATE `config`
-		    SET value = :schedule_prep
-		  WHERE item = 'schedule_prep'");
-	} else {
-	    $query = $this->db->prepare(
-		"INSERT INTO `config`
-		    (item, value) VALUES('schedule_prep', :schedule_prep)");
-	}
-	$query->bindValue('schedule_prep', $schedule_prep);
-	$query->execute();
+    public function setConfigPrepBoF($schedule_prep, $prep_round, $prep_location) {
+        $this->_updateConfig('schedule_prep', $schedule_prep);
+        $this->_updateConfig('prep_round', strval($prep_round + 1));
+        $this->_updateConfig('prep_location', strval($prep_location + 1));
     }
 
     /**
@@ -1059,12 +1097,12 @@ class DBO
         $this->db->query("DELETE FROM `round`");
         # Now add the data for the sessions
         $round_id = 0;
-		$sql = "INSERT INTO round(id,time_period) VALUES(:id,:time_period)";
+        $sql = "INSERT INTO round(id,time_period) VALUES(:id,:time_period)";
         $query=$this->db->prepare($sql);
         foreach ($rounds as $round)
         {
             $query->bindValue(':id', $round_id);
-			$query->bindValue(':time_period', $round);
+                        $query->bindValue(':time_period', $round);
             $query->execute();
             $round_id++;
         }

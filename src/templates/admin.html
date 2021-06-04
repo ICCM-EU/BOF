@@ -19,27 +19,34 @@
 	function update_prep(type) {
 		var prepItem = document.getElementById('prep_bof_' + type);
 		var selectedName = null;
-		if (prepItem.selectedIndex > 0) {
-			var selected = document.getElementById(type + '_' + prepItem.selectedIndex);
+		if (prepItem.selectedIndex >= 0) {
+			var selected = prepItem.selectedOptions[0];
 			if (selected) {
 				selectedName = selected.value;
+			} else {
+				selectedName = '-1';
 			}
 		}
 		var options = '';
 		var last_id_el = document.getElementById('last_' + type + '_id');
 		var last_id = parseInt(last_id_el.value);
+		var selected = false;
 		for (var id=0; id < last_id; id++) {
 			var item = document.getElementById(type + '_' + id);
 			if (!item) {
 				continue;
 			}
-			if ((item.value === selectedName)
-				|| ((selectedName === null)
-					&& (id == (last_id - 1)))) {
+			if (item.value === selectedName) {
 			    options  += '<option value="' + item.value + '" selected>' + item.value + '</option>';
+				selected = true;
 			} else if (item) {
 			    options  += '<option value="' + item.value + '">' + item.value + '</option>';
 			}
+		}
+        if (!selected) {
+			options += '<option value="-1" selected>{{'Default'|trans}}</option>';
+		} else {
+			options += '<option value="-1">{{'Default'|trans}}</option>';
 		}
 		prepItem.innerHTML = options;
 	}
