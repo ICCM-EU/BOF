@@ -96,6 +96,13 @@ class Admin
 			$this->dbo->setLocationNames($data['locations']);
 		}
 
+		if (!empty($data["schedule_prep"])) {
+			$this->dbo->setConfigPrepBoF($data["schedule_prep"]);
+                }
+		else {
+			$this->dbo->setConfigPrepBoF('True');
+		}
+
 		return $this->showAdminView($request, $response, $args);
 	}
 

@@ -395,10 +395,10 @@ class DBO
      * nomination_ends_time, voting_begins, voting_begins_time, voting_ends,
      * voting_ends_time,
      * loggedin, localservertime, rounds, num_rounds, locations,
-     * num_locations, and stage.
+     * num_locations, stage, and schedule_prep.
      */
     public function getConfig() {
-        $sql = "SELECT * FROM `config` WHERE item != 'branding'";
+        $sql = "SELECT * FROM `config` WHERE item != 'branding' AND item != 'schedule_prep'";
         $query=$this->db->prepare($sql);
         $query->execute();
         $config = array ();
@@ -413,6 +413,15 @@ class DBO
         $config['locations'] = $this->getLocationNames();
         $config['num_locations'] = count($config['locations']);
         $config['stage'] = $this->getStage();
+        $sql="SELECT value
+                FROM config 
+               WHERE item = 'schedule_prep'";
+        $row = $this->db->query($sql)->fetch(PDO::FETCH_NUM);
+	if ($row) {
+	    $config['schedule_prep'] = $row[0];
+	} else {
+	    $config['schedule_prep'] = 'True';
+	}
         return $config;
     }
 
@@ -993,6 +1002,30 @@ class DBO
         $query->bindValue('which', $which, PDO::PARAM_STR);
         $query->bindValue('dateTime', date('Y-m-d H:i:00', $timestamp), PDO::PARAM_STR);
         $query->execute();
+    }
+
+    /**
+     * Sets information about how the Prep BoF should be scheduled
+     * 
+     * @param string $schedule_prep 'True' if the Prep BoF should be
+     * scheduled, otherwise 'False'
+     */
+    public function setConfigPrepBoF($schedule_prep) {
+        $row = $this->db->query(
+	    "SELECT value FROM `config`
+	      WHERE item = 'schedule_prep'")->fetch(PDO::FETCH_NUM);
+	if ($row) {
+	    $query = $this->db->prepare(
+		"UPDATE `config`
+		    SET value = :schedule_prep
+		  WHERE item = 'schedule_prep'");
+	} else {
+	    $query = $this->db->prepare(
+		"INSERT INTO `config`
+		    (item, value) VALUES('schedule_prep', :schedule_prep)");
+	}
+	$query->bindValue('schedule_prep', $schedule_prep);
+	$query->execute();
     }
 
     /**
