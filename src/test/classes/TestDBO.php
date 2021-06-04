@@ -1635,6 +1635,21 @@ EOF;
      */
     public function getPrepBoFReturnsExpectedData() {
         $this->_setupWorkshops(3, 3, true, 0);
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(6, 'schedule_prep', 'True')");
+        $dbo = new DBO(self::$pdo);
+        $prepBoF = $dbo->getPrepBoF();
+        $this->assertNotFalse($prepBoF);
+        $this->assertEquals(1, $prepBoF->id);
+        $this->assertEquals("Prep Team", $prepBoF->name);
+        $this->assertEquals(8, $prepBoF->available);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::getPrepBoF
+     * @test
+     */
+    public function getPrepBoFReturnsExpectedDataIfNoConfig() {
+        $this->_setupWorkshops(3, 3, true, 0);
         $dbo = new DBO(self::$pdo);
         $prepBoF = $dbo->getPrepBoF();
         $this->assertNotFalse($prepBoF);
@@ -1650,6 +1665,18 @@ EOF;
     public function getPrepBoFReturnsFalseIfNotFound() {
         // Remove all workshops, so getPrepBoF() won't return anything!
         $this->_resetWorkshops();
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(6, 'schedule_prep', 'True')");
+        $dbo = new DBO(self::$pdo);
+        $this->assertFalse($dbo->getPrepBoF());
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::getPrepBoF
+     * @test
+     */
+    public function getPrepBoFReturnsFalseIfConfigNoSchedule() {
+        $this->_setupWorkshops(3, 3, true, 0);
+        self::$pdo->query("INSERT INTO config (item, value) VALUES('schedule_prep', 'False')");
         $dbo = new DBO(self::$pdo);
         $this->assertFalse($dbo->getPrepBoF());
     }

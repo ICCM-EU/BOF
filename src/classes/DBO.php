@@ -656,6 +656,14 @@ class DBO
      * participants for the Prep BoF.
      */
     public function getPrepBoF() {
+        $sql="SELECT value
+                FROM config 
+               WHERE item = 'schedule_prep'";
+        $row = $this->db->query($sql)->fetch(PDO::FETCH_NUM);
+	if ($row && $row[0] != 'True') {
+	    return false;
+	}
+	
         $sql="SELECT id, name,
                      (SELECT COUNT(ID)
                         FROM workshop_participant

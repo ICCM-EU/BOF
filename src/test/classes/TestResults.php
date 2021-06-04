@@ -45,8 +45,8 @@ EOF;
         // Various vars for the DBO mock; some are used in expectations for the
         // mock, while others are return values to fully exercise the logic.
         $row = (object) [
-            'id' => 101,
-            'name' => 'Workshop 1',
+            'id' => 100,
+            'name' => 'topic',
             'round' => 2,
             'location_id' => 1,
             'last_location' => 0,
@@ -72,8 +72,11 @@ EOF;
 
         $maxVotes = [];
         $workshopsToBook = [];
-        $maxWorkshops = $rounds * $locations - $rounds - 1;
-        $maxWorkshopsToBook = $rounds * $locations - $rounds - 2;
+        $maxWorkshops = $rounds * $locations - $rounds;
+        if ($havePrep) {
+	    $maxWorkshops--;
+	}
+        $maxWorkshopsToBook = $maxWorkshops - 1;
         if ($enough) {
             $maxWorkshopsToBook++;
         }
@@ -84,7 +87,9 @@ EOF;
             else {
                 $maxVotes[$i] = $maxVotes[$i-1] - 0.25;
             }
-            $workshopsToBook[$i] = $row;
+            $workshopsToBook[$i] = clone($row);
+            $workshopsToBook[$i]->id += $i + $rounds;
+            $workshopsToBook[$i]->name .= ($i + $rounds);
         }
         $maxVotes[$i] = 0.0;
         if ($i > 0) {
@@ -193,21 +198,29 @@ EOF;
         $dbo->exportWorkshops()
             ->willReturn($exportedData)
             ->shouldBeCalledTimes(1);
+
+	$alreadyBookedIds = [ ];
         if ($havePrep) {
-            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $rounds - 1, 1, $prepBoF->available, 'Prep BoF', $logger)
+            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $rounds - 1, $locations - 1, $prepBoF->available, 'Prep BoF', $logger)
                 ->shouldBeCalledTimes(1);
+	    array_push($alreadyBookedIds, $prepBoF->id);
         }
         else {
-            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $rounds - 1, 1, $prepBoF->available, 'Prep BoF', $logger)
+            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $rounds - 1, $locations - 1, $prepBoF->available, 'Prep BoF', $logger)
                 ->shouldNotBeCalled();
         }
+
         for ($i = 0; $i < $rounds; $i++) {
             $dbo->bookWorkshop($topWorkshops[$i]->id, $topWorkshops[$i]->name,
                 $i, 0, $topWorkshops[$i]->available, Argument::any(), $logger)
                 ->shouldBeCalledTimes(1);
+	    array_push($alreadyBookedIds,$topWorkshops[$i]->id);
         }
-        $dbo->bookWorkshop(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any(), $logger)
-            ->shouldBeCalled();
+
+	for ($i = 0; $i < $maxWorkshopsToBook - 1; $i++) {
+	    $dbo->bookWorkshop($workshopsToBook[$i]->id, $workshopsToBook[$i]->name, 2, 1, $workshopsToBook[$i]->available, Argument::any(), $logger)
+		->shouldBeCalledTimes(1);
+        }
 
         if ($conflicts == 0) {
             $dbo->beginTransaction()

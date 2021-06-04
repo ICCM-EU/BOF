@@ -19,10 +19,12 @@ class Results
      *
      * @param int $rounds The total number of rounds
      */
-    private function bookPrepBoF($rounds) {
+    private function bookPrepBoF($rounds, $locations) {
         if ($row = $this->dbo->getPrepBoF()) {
-            $this->dbo->bookWorkshop($row->id, $row->name, $rounds - 1, 1, $row->available, "Prep BoF", $this->logger);
+            $this->dbo->bookWorkshop($row->id, $row->name, $rounds - 1, $locations - 1, $row->available, "Prep BoF", $this->logger);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -51,8 +53,8 @@ class Results
         $this->dbo->beginTransaction();
         $this->dbo->calculateVotes();
         $this->bookTopVotes($rounds);
-        $this->bookPrepBoF($rounds);
-        $this->fillBooking($rounds, $locations);
+        $booked = $this->bookPrepBoF($rounds, $locations);
+        $this->fillBooking($rounds, $locations, $booked ? 1 : 0);
         $this->dbo->commit();
 
         $this->resolveConflicts($locations);
@@ -64,10 +66,11 @@ class Results
      *
      * @param int $rounds The total number of rounds.
      * @param int $locations The total number locations.
+     * @param int $booked 1 if Prep BoF was booked, otherwise 0
      */
-    private function fillBooking($rounds, $locations) {
+    private function fillBooking($rounds, $locations, $booked) {
         //loop through remaining possible slots
-        for ($i=$rounds+1 ; $i < $rounds * $locations ; $i++) {
+        for ($i=$rounds + $booked ; $i < $rounds * $locations ; $i++) {
             //get highest # votes for unscheduled bof
             if (!($maxvote = $this->dbo->getMaxVote())) {
                 // there are none left, we are done
