@@ -17,7 +17,7 @@ class TestResults extends TestCase
     # Helper function for testing Results::calculateResults.  This takes in a
     # number of rounds and locations, sets up mocks which exercise the logic
     # and runs calculateResults, when that method should succeed.
-    private function _calculateResults($rounds, $locations, $enough, $conflicts, $havePrep)
+    private function _calculateResults($rounds, $locations, $enough, $conflicts, $havePrep, $prepRound, $prepLocation)
     {
         // Expected data values
         $exportedData = <<<EOF
@@ -45,8 +45,8 @@ EOF;
         // Various vars for the DBO mock; some are used in expectations for the
         // mock, while others are return values to fully exercise the logic.
         $row = (object) [
-            'id' => 101,
-            'name' => 'Workshop 1',
+            'id' => 100,
+            'name' => 'topic',
             'round' => 2,
             'location_id' => 1,
             'last_location' => 0,
@@ -57,7 +57,9 @@ EOF;
         $prepBoF = (object) [
             'id' => 1,
             'name' => 'Prep Team',
-            'available' => 5
+            'available' => 5,
+            'location' => $prepLocation,
+            'round' => $prepRound 
         ];
 
         $topWorkshops = [];
@@ -72,8 +74,11 @@ EOF;
 
         $maxVotes = [];
         $workshopsToBook = [];
-        $maxWorkshops = $rounds * $locations - $rounds - 1;
-        $maxWorkshopsToBook = $rounds * $locations - $rounds - 2;
+        $maxWorkshops = $rounds * $locations - $rounds;
+        if ($havePrep) {
+	    $maxWorkshops--;
+	}
+        $maxWorkshopsToBook = $maxWorkshops - 1;
         if ($enough) {
             $maxWorkshopsToBook++;
         }
@@ -84,7 +89,9 @@ EOF;
             else {
                 $maxVotes[$i] = $maxVotes[$i-1] - 0.25;
             }
-            $workshopsToBook[$i] = $row;
+            $workshopsToBook[$i] = clone($row);
+            $workshopsToBook[$i]->id += $i + $rounds;
+            $workshopsToBook[$i]->name .= ($i + $rounds);
         }
         $maxVotes[$i] = 0.0;
         if ($i > 0) {
@@ -193,21 +200,39 @@ EOF;
         $dbo->exportWorkshops()
             ->willReturn($exportedData)
             ->shouldBeCalledTimes(1);
+
+	$alreadyBookedIds = [ ];
+	if ($prepBoF->location == -1) {
+	    $location = $locations - 1;
+	} else {
+	    $location = $prepBoF->location;
+	}
+	if ($prepBoF->round == -1) {
+	    $round = $rounds - 1;
+	} else {
+	    $round = $prepBoF->round;
+	}
         if ($havePrep) {
-            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $rounds - 1, 1, $prepBoF->available, 'Prep BoF', $logger)
+            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $round, $location, $prepBoF->available, 'Prep BoF', $logger)
                 ->shouldBeCalledTimes(1);
+	    array_push($alreadyBookedIds, $prepBoF->id);
         }
         else {
-            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $rounds - 1, 1, $prepBoF->available, 'Prep BoF', $logger)
+            $dbo->bookWorkshop($prepBoF->id, $prepBoF->name, $round, $location, $prepBoF->available, 'Prep BoF', $logger)
                 ->shouldNotBeCalled();
         }
+
         for ($i = 0; $i < $rounds; $i++) {
             $dbo->bookWorkshop($topWorkshops[$i]->id, $topWorkshops[$i]->name,
                 $i, 0, $topWorkshops[$i]->available, Argument::any(), $logger)
                 ->shouldBeCalledTimes(1);
+	    array_push($alreadyBookedIds,$topWorkshops[$i]->id);
         }
-        $dbo->bookWorkshop(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any(), $logger)
-            ->shouldBeCalled();
+
+	for ($i = 0; $i < $maxWorkshopsToBook - 1; $i++) {
+	    $dbo->bookWorkshop($workshopsToBook[$i]->id, $workshopsToBook[$i]->name, 2, 1, $workshopsToBook[$i]->available, Argument::any(), $logger)
+		->shouldBeCalledTimes(1);
+        }
 
         if ($conflicts == 0) {
             $dbo->beginTransaction()
@@ -297,14 +322,21 @@ EOF;
      * @test
      */
     public function calculateResultsWithNoPrepBoF() {
-        $this->_calculateResults(3, 4, true, 0, false);
+        $this->_calculateResults(3, 4, true, 0, false, -1, -1);
+    }
+
+    /**
+     * @test
+     */
+    public function calculateResultsWithPrepBofAt01() {
+        $this->_calculateResults(3, 4, true, 0, true, 0, 1);
     }
 
     /**
      * @test
      */
     public function calculateResultsWhenNoConflictsEnoughWorkshops34() {
-        $this->_calculateResults(3, 4, true, 0, true);
+        $this->_calculateResults(3, 4, true, 0, true, -1, -1);
     }
 /*
     public function calculateResultsWhenNoConflictsEnoughWorkshops25() {
@@ -332,36 +364,36 @@ EOF;
      * @test
      */
     public function calculateResultsConflictsWhenConflictsEnoughWorkshops34() {
-        $this->_calculateResults(3, 4, true, 1, true);
+        $this->_calculateResults(3, 4, true, 1, true, -1, -1);
     }
 
     /**
      * @test
      */
     public function calculateResultsConflictsWhenConflictsEnoughWorkshops25() {
-        $this->_calculateResults(2, 5, true, 1, true);
+        $this->_calculateResults(2, 5, true, 1, true, -1, -1);
     }
 
     /**
      * @test
      */
     public function calculateResultsConflictsWhenConflictsEnoughWorkshops52() {
-        $this->_calculateResults(5, 2, true, 1, true);
+        $this->_calculateResults(5, 2, true, 1, true, -1, -1);
     }
 
     /**
      * @test
      */
     public function calculateResultsConflictsWhenConflictsNotEnoughWorkshops34() {
-        $this->_calculateResults(3, 4, false, 1, true);
+        $this->_calculateResults(3, 4, false, 1, true, -1, -1);
     }
 /*
     public function calculateResultsConflictsWhenConflictsNotEnoughWorkshops25() {
-        $this->_calculateResults(2, 5, false, 1, true);
+        $this->_calculateResults(2, 5, false, 1, true, -1, -1);
     }
 
     public function calculateResultsConflictsWhenConflictsNotEnoughWorkshops52() {
-        $this->_calculateResults(5, 2, false, 1, true);
+        $this->_calculateResults(5, 2, false, 1, true, -1, -1);
     }
  */
 
@@ -369,13 +401,13 @@ EOF;
      * @test
      */
     public function calculateResultsWithMaxConflicts() {
-        $this->_calculateResults(3, 4, true, 2, true);
-        //$this->_calculateResults(2, 5, true, 2, true);
-        //$this->_calculateResults(5, 2, true, 2, true);
+        $this->_calculateResults(3, 4, true, 2, true, -1, -1);
+        //$this->_calculateResults(2, 5, true, 2, true, -1, -1);
+        //$this->_calculateResults(5, 2, true, 2, true, -1, -1);
 
-        //$this->_calculateResults(3, 4, false, 2, true);
-        //$this->_calculateResults(2, 5, false, 2, true);
-        //$this->_calculateResults(5, 2, false, 2, true);
+        //$this->_calculateResults(3, 4, false, 2, true, -1, -1);
+        //$this->_calculateResults(2, 5, false, 2, true, -1, -1);
+        //$this->_calculateResults(5, 2, false, 2, true, -1, -1);
     }
 
     /**

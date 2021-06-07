@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="test/autoload.php"
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+    bootstrap="test/autoload.php"
     backupGlobals="false"
     backupStaticAttributes="false"
     beStrictAboutCoversAnnotation="true"
@@ -11,20 +14,23 @@
     processIsolation="false"
     stopOnFailure="false">
     <testsuites>
-	<testsuite name="Unit">
-	    <directory suffix=".php">test/classes</directory>
-	</testsuite>
+        <testsuite name="Unit">
+            <directory suffix=".php">test/classes</directory>
+        </testsuite>
     </testsuites>
     <logging>
-	<log type="coverage-html" target="test/results/coverage"/>
-	<log type="testdox-html" target="test/results/index.html"/>
-	<log type="coverage-xml" target="test/results/coverage"/>
+        <testdoxHtml outputFile="test/results/index.html"/>
     </logging>
-    <filter>
-	<whitelist addUncoveredFilesFromWhitelist="true" processUncoveredFilesFromWhitelist="false">
-	    <directory suffix=".php">classes</directory>
-	</whitelist>
-    </filter>
+    <coverage includeUncoveredFiles="true"
+              processUncoveredFiles="false">
+        <include>
+            <directory suffix=".php">classes</directory>
+        </include>
+        <report>
+            <html outputDirectory="test/results/coverage"/>
+            <xml outputDirectory="test/results/coverage"/>
+        </report>
+    </coverage>
     <php>
     </php>
 </phpunit>
