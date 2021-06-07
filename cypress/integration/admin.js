@@ -129,11 +129,12 @@ describe('In the Nomination stage, the admin page', function() {
   })
 
   describe('has an Add Slot button', function() {
-    it('that adds a new slot', function() {
+    it('that adds a new slot and adds it to the Prep BoF Slot droplist', function() {
       cy.contains('button', 'Add Slot').click().then(function() {
         cy.get('input[id=round_3][name="rounds[]"][type=text]')
         cy.get('button[id=delete_round_3]')
         cy.get('input[id=last_round_id][type=hidden]').should('have.attr', 'value', '4')
+        cy.get('select[name=prep_bof_round]').get('option[value=""]')
       })
     })
   })
@@ -151,11 +152,12 @@ describe('In the Nomination stage, the admin page', function() {
   })
 
   describe('has an Add Room button', function() {
-    it('that adds a new room', function() {
+    it('that adds a new room and adds it to the Prep BoF Room droplist', function() {
       cy.contains('button', 'Add Room').click().then(function() {
         cy.get('input[id=location_3][name="locations[]"][type=text]')
         cy.get('button[id=delete_location_3]')
         cy.get('input[id=last_location_id][type=hidden]').should('have.attr', 'value', '4')
+        cy.get('select[name=prep_bof_location]').get('option[value=""]')
       })
     })
   })
@@ -173,6 +175,64 @@ describe('In the Nomination stage, the admin page', function() {
       cy.get('button[id=delete_location_1]').click().then(function() {
         cy.get('input[id=location_1][name="locations[]"][type=text]').should('not.exist')
       })
+    })
+  })
+
+  it('has a Prep BoF Has Its Own Slot checkbox that is not checked', function() {
+    cy.get('input[type=checkbox][name=schedule_prep]').should('not.be.checked')
+  })
+
+  describe('the Prep Bof Has its Own Slot checkbox', function() {
+    it('exists', function() {
+      cy.get('input[type=checkbox][name=schedule_prep]')
+    })
+
+    it('is not checked', function() {
+      cy.get('input[type=checkbox][name=schedule_prep]').should('not.be.checked')
+    })
+
+    it('checking it disables the Slot and Room droplists', function() {
+      cy.get('input[type=checkbox][name=schedule_prep]').check().then(function() {
+        cy.get('select[name=prep_bof_round]').should('be.disabled')
+        cy.get('select[name=prep_bof_location]').should('be.disabled')
+      })
+    })
+
+    it('unchecking it re-enables the Slot and Room droplists', function() {
+      cy.get('input[type=checkbox][name=schedule_prep]').check().then(function() {
+        cy.get('input[type=checkbox][name=schedule_prep]').uncheck().then(function() {
+          cy.get('select[name=prep_bof_round]').should('not.be.disabled')
+          cy.get('select[name=prep_bof_location]').should('not.be.disabled')
+        })
+      })
+    })
+  })
+
+  describe('the Slot for Prep BoF droplist', function() {
+    it('exists', function() {
+      cy.get('select[name=prep_bof_round]')
+    })
+    it('has an option for each slot and Default', function() {
+      cy.get('select[name=prep_bof_round]').get('option[value=first]')
+      cy.get('select[name=prep_bof_round]').get('option[value=third]')
+      cy.get('select[name=prep_bof_round]').get('option[value=-1]')
+    })
+    it('Default is selected', function() {
+      cy.get('select[name=prep_bof_round] option:selected').should('have.value', '-1')
+    })
+  })
+
+  describe('the Room for Prep BoF droplist', function() {
+    it('exists', function() {
+      cy.get('select[name=prep_bof_location]')
+    })
+    it('has an option for each room and Default', function() {
+      cy.get('select[name=prep_bof_location]').get('option[value="Room A"]')
+      cy.get('select[name=prep_bof_location]').get('option[value="Room C"]')
+      cy.get('select[name=prep_bof_location]').get('option[value=-1]')
+    })
+    it('Default is selected', function() {
+      cy.get('select[name=prep_bof_location] option:selected').should('have.value', '-1')
     })
   })
 
@@ -328,6 +388,42 @@ describe('After the Voting stage, the admin page', function() {
       cy.get('@footer').get('a[href="/logout"]')
     })
   })
+})
+
+describe('Saving changes updates the database', function() {
+  const checkDB = require('../support/check_database.js')
+  const resetDB = require('../support/reset_database.js')
+  
+  beforeEach(() => {
+    resetDB.reset()
+    cy.typeLogin({username: 'admin', password: 'secret'})
+    cy.visit('/admin')
+  })
+
+  it('sets the Prep BoF to its own slot', function() {
+    cy.get('input[type=checkbox][name=schedule_prep]').check().then(function() {
+      cy.get('input[type=submit][value=Save]').click().then(function() {
+        checkDB.checkPrepBoF('False', -1, -1)
+      })
+    })
+  })
+
+  it('sets the Prep BoF to second round', function() {
+    cy.get('select[name=prep_bof_round]').select('second').then(function() {
+      cy.get('input[type=submit][value=Save]').click().then(function() {
+        checkDB.checkPrepBoF('True', 1, -1)
+      })
+    })
+  })
+
+  it('sets the Prep BoF to Room B', function() {
+    cy.get('select[name=prep_bof_location]').select('Room B').then(function() {
+      cy.get('input[type=submit][value=Save]').click().then(function() {
+        checkDB.checkPrepBoF('True', -1, 1)
+      })
+    })
+  })
+
 })
 
 describe('Download the database', function() {
