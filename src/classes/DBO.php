@@ -396,9 +396,11 @@ class DBO
      * voting_ends_time,
      * loggedin, localservertime, rounds, num_rounds, locations,
      * num_locations, and stage.
+     * allow_edit_nomination
      */
     public function getConfig() {
-        $sql = "SELECT * FROM `config` WHERE item != 'branding'";
+        $columns_timestamp = "'nomination_begins', 'nomination_ends', 'voting_begins', 'voting_ends'";
+        $sql = "SELECT * FROM `config` WHERE item IN ($columns_timestamp)";
         $query=$this->db->prepare($sql);
         $query->execute();
         $config = array ();
@@ -406,6 +408,15 @@ class DBO
             $config[$row->item] = date("Y-m-d", strtotime($row->value));
             $config[$row->item."_time"] = date("H:i", strtotime($row->value));
         }
+
+        $sql = "SELECT * FROM `config` WHERE item NOT IN ($columns_timestamp)";
+        $query=$this->db->prepare($sql);
+        $query->execute();
+        $config = array ();
+        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+            $config[$row->item] = $row->value;
+        }
+
         $config['loggedin'] = true;
         $config['localservertime'] = date("Y-m-d H:i:s");
         $config['rounds'] = $this->getRoundNames();
@@ -413,6 +424,11 @@ class DBO
         $config['locations'] = $this->getLocationNames();
         $config['num_locations'] = count($config['locations']);
         $config['stage'] = $this->getStage();
+
+        if (!array_key_exists('allow_edit_nomination', $config)) {
+            $config['allow_edit_nomination'] = "false";
+        }
+
         return $config;
     }
 
@@ -815,6 +831,60 @@ class DBO
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * Returns the details for the
+     * detailed information about one workshop.
+     * 
+     * @return array An array whose elements are an object representing the
+     * name, id, leader(s) of the specified workshop, those who gave the workshop a
+     * full vote, and the creator of the workshop. The leader and fullvoter
+     * members are comma-delimited lists of users' names as strings.
+     */
+    public function getWorkshopDetails($topic_id) {
+        $groupConcat = "GROUP_CONCAT(p.name ORDER BY p.name ASC SEPARATOR ', ')";
+        if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            // Note that we can't make ORDER BY work inside the GROUP_CONCAT,
+            // and the trick used in getFacilitiators doesn't work, either. To
+            // get around these problems, we use a subquery and sort the
+            // subquery by p.name. But we still have to specify ORDER BY in the
+            // GROUP_CONCAT for mysql!
+            $groupConcat = "GROUP_CONCAT(p.name, ', ')";
+        }
+        $sql = "SELECT name, description, t.id, createdby, creator_id, leader, fullvoters
+                  FROM (SELECT w.name AS name,
+                                 w.id AS id,
+                        w.description AS description,
+                            creator_id,
+                              pc.name AS createdby, "
+                   . $groupConcat . " AS leader
+                          FROM workshop w
+                     LEFT JOIN workshop_participant wp
+                            ON wp.workshop_id = w.id
+                           AND wp.leader = 1
+                     LEFT JOIN participant pc
+                            ON w.creator_id = pc.id
+                     LEFT JOIN participant p
+                            ON wp.participant_id = p.id
+                      GROUP BY w.id
+                      ORDER BY w.id ASC) AS t
+             LEFT JOIN (SELECT w.id AS id, "
+                 . $groupConcat . " AS fullvoters
+                          FROM workshop w
+                     LEFT JOIN workshop_participant wp
+                            ON wp.workshop_id = w.id
+                           AND wp.participant = 1
+                     LEFT JOIN participant p
+                            ON wp.participant_id = p.id
+                     GROUP BY w.id
+                     ORDER BY w.id ASC) AS t2
+                    ON t.id = t2.id
+              WHERE t.id = :topic_id
+              GROUP BY t.id
+              ORDER BY t.id ASC";
+        $query = $this->db->prepare($sql);
+        $query->execute(array(':topic_id' => $topic_id ));
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
 
     /**
      * Gets booking information for a workshop with a particular vote total to
@@ -926,10 +996,22 @@ class DBO
                 VALUES (:name, :description, :creator_id, 0)';
 
         $query=$this->db->prepare($sql);
-        $query->bindValue('name', $name, PDO::PARAM_STR);
-        $query->bindValue('description', $description, PDO::PARAM_STR);
-        $query->bindValue('creator_id', (int) $creator_id, PDO::PARAM_INT);
-        $query->execute();
+        $query->execute(array(':name' => $name, ':description' => $description, ':creator_id' => $creator_id));
+    }
+
+    /**
+     * Update the workshop
+     * 
+     * @param string $id The id of the workshop.
+     * @param string $name The name for the new workshop.
+     * @param string $description The description for the new workshop.
+     * @param int $creator_id The ID of the user submitting this workshop. 
+     */
+    public function nominate_edit($id, $name, $description) {
+        $sql = 'UPDATE workshop SET `name` = :name, `description` = :description WHERE `id` = :id';
+
+        $query=$this->db->prepare($sql);
+        $query->execute(array(':id' => $id, ':name' => $name, ':description' => $description));
     }
 
     /**
@@ -984,6 +1066,31 @@ class DBO
 
         $query->bindValue('which', $which, PDO::PARAM_STR);
         $query->bindValue('dateTime', date('Y-m-d H:i:00', $timestamp), PDO::PARAM_STR);
+        $query->execute();
+    }
+
+    /**
+     * Sets the specified configuration parameter
+     * 
+     * @param string $which Which configuration to set. 
+     * @param string $value The value to set.
+     */
+    public function setConfigString($which, $value) {
+        static $query = null;
+        // Validate $which
+        if ($which != 'allow_edit_nomination') {
+                throw new RuntimeException('Invalid configuration item');
+        }
+
+        if ($query == null) {
+            $query = $this->db->prepare(
+                "UPDATE `config`
+                    SET value = :value
+                  WHERE item = :which");
+        }
+
+        $query->bindValue('which', $which, PDO::PARAM_STR);
+        $query->bindValue('value', $value, PDO::PARAM_STR);
         $query->execute();
     }
 

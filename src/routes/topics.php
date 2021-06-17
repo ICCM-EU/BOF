@@ -83,6 +83,7 @@ $app->get('/topics', function (Request $request, Response $response, array $args
 
     global $app;
     $dbo = $app->getContainer()->get('ICCM\BOF\DBO');
+    $config = $dbo->getConfig();
     $stage =$dbo->getStage();
     $params = $request->getQueryParams();
     $show_vote_message = array_key_exists('voted', $params) && $params['voted'] === '1';
@@ -94,7 +95,12 @@ $app->get('/topics', function (Request $request, Response $response, array $args
         'loggedin' => True,
         'left_votes' => $fullvotesleft,
         'voted_successfull' => $show_vote_message,
+        'allowedit' => $config['allow_edit_nomination'] != "false",
     ]);
 })->setName('topics');
+
+$app->get('/topics/{id}', 'ICCM\BOF\Nomination:editNomination')->setName('edittopic');
+
+$app->post('/topics/{id}', 'ICCM\BOF\Nomination:updateNomination')->setName('updatetopic');
 
 ?>

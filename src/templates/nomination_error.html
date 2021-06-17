@@ -2,10 +2,14 @@
 
 {% block body %}
 
-<p>A BOF with that title has already been submitted.</p>
+<p>{{errormsg}}</p>
 
 <p>
   <a href="{{ path_for('nomination')}}" class="btn btn--primary btn--block">Nominate another topic</a>
+</p>
+
+<p>
+  <a href="{{ path_for('topics')}}" class="btn btn--primary btn--block">Back to topics</a>
 </p>
 
 {% endblock %}

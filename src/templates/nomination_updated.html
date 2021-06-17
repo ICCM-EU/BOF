@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<p>The nomination has been updated!</p>
+
+<div class="button-block">
+  <a href="{{ path_for('topics')}}" class="btn btn--primary">Return to topics</a>
+  <a href="{{ path_for('nomination')}}" class="btn btn--secondary">Nominate another topic</a>
+</div>
+
+{% endblock %}

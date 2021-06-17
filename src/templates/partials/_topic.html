@@ -8,6 +8,10 @@
     <p>{{'Facilitator'|trans}}: {{ topic.leader }}</p>
     {% endif %}
 
+    {% if allowedit == true %}
+      <p><a href="topics/{{topic.id}}">{{'Details'|trans}}</a></p>
+    {% endif %}
+
     {% if stage == "voting" %}
     <form action="{{ path_for('votesaddpost')}}" method="POST" class="facilitation">
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
