@@ -412,7 +412,6 @@ class DBO
         $sql = "SELECT * FROM `config` WHERE item NOT IN ($columns_timestamp)";
         $query=$this->db->prepare($sql);
         $query->execute();
-        $config = array ();
         while ($row=$query->fetch(PDO::FETCH_OBJ)) {
             $config[$row->item] = $row->value;
         }
