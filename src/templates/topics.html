@@ -6,7 +6,7 @@
 		{% include 'partials/_created_new_user.html' %}
 	{% endif %}
 
-	{% if stage == "voting" %}
+	{% if stage == "voting" or stage == "call_for_papers" %}
 	<div class="notice notice--warning">
 		<h2>{{ left_votes }} {{'full votes left, and unlimited number of 1/4 votes'|trans}}</h2>
 	</div>

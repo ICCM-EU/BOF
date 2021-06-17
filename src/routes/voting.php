@@ -54,7 +54,7 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
 
     $dbo = $app->getContainer()->get('ICCM\BOF\DBO');
     $stage =$dbo->getStage();
-    if ($stage != 'voting')
+    if ($stage != 'voting' && $stage != "call_for_papers" )
        return $response->withRedirect($this->router->pathFor('home'), 302);
 
     // turn full votes for Prep BOF into quarter votes. we don't want to waste your full vote!

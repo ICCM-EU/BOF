@@ -718,6 +718,10 @@ class DBO
         }
         $sql = "SELECT CASE
             WHEN ".$now." > (SELECT value FROM config WHERE item = 'nomination_begins')
+             AND ".$now." < (SELECT value FROM config WHERE item = 'nomination_ends')
+             AND ".$now." > (SELECT value FROM config WHERE item = 'voting_begins')
+             AND ".$now." < (SELECT value FROM config WHERE item = 'voting_ends') THEN 'call_for_papers'
+            WHEN ".$now." > (SELECT value FROM config WHERE item = 'nomination_begins')
              AND ".$now." < (SELECT value FROM config WHERE item = 'nomination_ends') THEN 'nominating'
             WHEN ".$now." > (SELECT value FROM config WHERE item = 'voting_begins')
              AND ".$now." < (SELECT value FROM config WHERE item = 'voting_ends') THEN 'voting'
