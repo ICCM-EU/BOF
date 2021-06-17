@@ -96,11 +96,16 @@ $app->get('/topics', function (Request $request, Response $response, array $args
         'left_votes' => $fullvotesleft,
         'voted_successfull' => $show_vote_message,
         'allowedit' => $config['allow_edit_nomination'] != "false",
+        'allowcomments' => $config['allow_nomination_comments'] != "false",
     ]);
 })->setName('topics');
 
 $app->get('/topics/{id}', 'ICCM\BOF\Nomination:editNomination')->setName('edittopic');
 
 $app->post('/topics/{id}', 'ICCM\BOF\Nomination:updateNomination')->setName('updatetopic');
+
+$app->post('/topics/{id}/comment', 'ICCM\BOF\Nomination:addComment')->setName('addcomment');
+
+$app->post('/topics/{topic_id}/comment/{id}', 'ICCM\BOF\Nomination:updateComment')->setName('updatecomment');
 
 ?>

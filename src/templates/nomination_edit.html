@@ -35,6 +35,49 @@
     <label class="bof-form__label">{{'Description'|trans}}</label>
     <textarea name="description" class="bof-form__textarea" readonly>{{topic.description}}</textarea>
   </div>
+
+{% endif %}
+
+{% if allowcomments == true %}
+
+<h1>{{'Comments'|trans}}</h1>
+
+{% for comment in comments %}
+
+{{ comment.user_name }}
+<span class="bof-form__label">{{ comment.created_at }}</span>
+
+{% if comment.user_id == user_id %}
+<form action="{{ path_for( 'updatecomment', {'topic_id': topic.id, 'id': comment.id}) }}" method="POST" class="bof-form">
+  <input type="hidden" name="id" value="{{comment.id}}"/>
+  <input type="hidden" name="topic_id" value="{{topic.id}}"/>
+
+  <div class="bof-form__item">
+    <textarea name="comment" class="bof-form__textarea">{{comment.comment}}</textarea>
+  </div>
+  <input type="submit" value="{{'Update Comment'|trans}}" class="btn btn--primary" />
+</form>
+{% else %}
+  <div class="bof-form__item">
+    <textarea class="bof-form__textarea" readonly>{{comment.comment}}</textarea>
+  </div>
+{% endif %}
+
+{% endfor %}
+
+<h1>{{'Add Comment'|trans}}</h1>
+
+<form action="{{ path_for( 'addcomment', {'id': topic.id}) }}" method="POST" class="bof-form">
+  <input type="hidden" name="topic_id" value="{{topic.id}}"/>
+
+  <div class="bof-form__item">
+    <label class="bof-form__label">{{'Comment'|trans}}</label>
+    <textarea name="comment" class="bof-form__textarea"></textarea>
+  </div>
+
+  <input type="submit" value="{{'Add Comment'|trans}}" class="btn btn--primary" />
+</form>
+
 {% endif %}
 
 {% endblock %}

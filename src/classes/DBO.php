@@ -428,6 +428,9 @@ class DBO
         if (!array_key_exists('allow_edit_nomination', $config)) {
             $config['allow_edit_nomination'] = "false";
         }
+        if (!array_key_exists('allow_nomination_comments', $config)) {
+            $config['allow_nomination_comments'] = "false";
+        }
 
         return $config;
     }
@@ -850,11 +853,12 @@ class DBO
             // GROUP_CONCAT for mysql!
             $groupConcat = "GROUP_CONCAT(p.name, ', ')";
         }
-        $sql = "SELECT name, description, t.id, createdby, creator_id, leader, fullvoters
+        $sql = "SELECT name, description, t.id, createdby, creator_id, leader, fullvoters, t.created_at
                   FROM (SELECT w.name AS name,
                                  w.id AS id,
                         w.description AS description,
                             creator_id,
+                          w.created_at,
                               pc.name AS createdby, "
                    . $groupConcat . " AS leader
                           FROM workshop w
@@ -883,6 +887,43 @@ class DBO
               ORDER BY t.id ASC";
         $query = $this->db->prepare($sql);
         $query->execute(array(':topic_id' => $topic_id ));
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
+     * Returns the comments for one workshop.
+     * 
+     * @return array An array whose elements are an object representing the comments
+     */
+    public function getWorkshopComments($topic_id) {
+        $sql = "SELECT comment, wc.id as id, pc.name as user_name, user_id, wc.created_at
+              FROM workshop w
+              LEFT JOIN workshop_comment wc
+                    ON wc.workshop_id = w.id
+              LEFT JOIN participant pc
+                    ON wc.user_id = pc.id
+              WHERE w.id = :topic_id
+              ORDER BY wc.id ASC";
+        $query = $this->db->prepare($sql);
+        $query->execute(array(':topic_id' => $topic_id ));
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
+     * Returns one comment
+     * 
+     * @return object representing one comment
+     */
+    public function getWorkshopComment($comment_id) {
+        $sql = "SELECT comment, wc.id as id, pc.name as user_name, user_id, wc.created_at
+              FROM workshop w
+              LEFT JOIN workshop_comment wc
+                    ON wc.workshop_id = w.id
+              LEFT JOIN participant pc
+                    ON wc.user_id = pc.id
+              WHERE wc.id = :comment_id";
+        $query = $this->db->prepare($sql);
+        $query->execute(array(':comment_id' => $comment_id ));
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
@@ -1005,13 +1046,39 @@ class DBO
      * @param string $id The id of the workshop.
      * @param string $name The name for the new workshop.
      * @param string $description The description for the new workshop.
-     * @param int $creator_id The ID of the user submitting this workshop. 
      */
     public function nominate_edit($id, $name, $description) {
         $sql = 'UPDATE workshop SET `name` = :name, `description` = :description WHERE `id` = :id';
 
         $query=$this->db->prepare($sql);
         $query->execute(array(':id' => $id, ':name' => $name, ':description' => $description));
+    }
+
+    /**
+     * Add a comment
+     * 
+     * @param string $topic_id The id of the workshop.
+     * @param string $comment The text of the comment
+     * @param int $commentator_id The ID of the user submitting this comment 
+     */
+    public function comment_add($topic_id, $comment, $commentator_id) {
+        $sql = 'INSERT INTO workshop_comment(workshop_id, comment, user_id) VALUES(:topic_id, :comment, :user_id)';
+
+        $query=$this->db->prepare($sql);
+        $query->execute(array(':topic_id' => $topic_id, ':comment' => $comment, ':user_id' => $commentator_id));
+    }
+
+    /**
+     * Update the comment
+     * 
+     * @param string $id The id of the comment.
+     * @param string $comment The updated text.
+     */
+    public function comment_edit($id, $comment) {
+        $sql = 'UPDATE workshop_comment SET `comment` = :comment WHERE `id` = :id';
+
+        $query=$this->db->prepare($sql);
+        $query->execute(array(':id' => $id, ':comment' => $comment));
     }
 
     /**
@@ -1074,12 +1141,18 @@ class DBO
      * 
      * @param string $which Which configuration to set. 
      * @param string $value The value to set.
+     * @param string $oldvalue The previous value.
      */
-    public function setConfigString($which, $value) {
+    public function setConfigString($which, $value, $oldvalue) {
         static $query = null;
         // Validate $which
-        if ($which != 'allow_edit_nomination') {
+        if (($which != 'allow_edit_nomination')
+            && ($which != 'allow_nomination_comments')) {
                 throw new RuntimeException('Invalid configuration item');
+        }
+
+        if ($oldvalue == $value) {
+            return;
         }
 
         if ($query == null) {
@@ -1092,6 +1165,13 @@ class DBO
         $query->bindValue('which', $which, PDO::PARAM_STR);
         $query->bindValue('value', $value, PDO::PARAM_STR);
         $query->execute();
+        if ($query->rowCount() == 0) {
+            $query = $this->db->prepare(
+                "INSERT INTO `config`(`item`, `value`) VALUES(:which, :value)");
+            $query->bindValue('which', $which, PDO::PARAM_STR);
+            $query->bindValue('value', $value, PDO::PARAM_STR);
+            $query->execute();
+        }
     }
 
     /**

@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<p>{{errormsg}}</p>
+
+<p>
+  <a href="{{ path_for('edittopic', {'id': topic_id})}}" class="btn btn--primary btn--block">Add another comment</a>
+</p>
+
+<p>
+  <a href="{{ path_for('topics')}}" class="btn btn--primary btn--block">Back to topics</a>
+</p>
+
+{% endblock %}

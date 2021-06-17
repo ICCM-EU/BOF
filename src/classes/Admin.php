@@ -25,6 +25,9 @@ class Admin
 		if ($config['allow_edit_nomination'] == "true") {
 			$config['allow_edit_nomination_checked'] = "checked";
 		}
+		if ($config['allow_nomination_comments'] == "true") {
+			$config['allow_nomination_comments_checked'] = "checked";
+		}
 
 		return $this->view->render($response, 'admin.html', $config);
 	}
@@ -34,6 +37,8 @@ class Admin
 		if (!$is_admin) throw new RuntimeException("you don't have permissions for this page");
 
 		$data = $request->getParsedBody();
+
+		$config = $this->dbo->getConfig();
 
 		if (!empty($data["password1"])) {
 			if ($data["password1"] != $data["password2"]) {
@@ -93,9 +98,15 @@ class Admin
 		}
 
 		if (!empty($data['allow_edit_nomination']) && $data['allow_edit_nomination'] == "on") {
-			$this->dbo->setConfigString('allow_edit_nomination', 'true');
+			$this->dbo->setConfigString('allow_edit_nomination', 'true', $config['allow_edit_nomination']);
 		} else {
-			$this->dbo->setConfigString('allow_edit_nomination', 'false');
+			$this->dbo->setConfigString('allow_edit_nomination', 'false', $config['allow_edit_nomination']);
+		}
+
+		if (!empty($data['allow_nomination_comments']) && $data['allow_nomination_comments'] == "on") {
+			$this->dbo->setConfigString('allow_nomination_comments', 'true', $config['allow_nomination_comments']);
+		} else {
+			$this->dbo->setConfigString('allow_nomination_comments', 'false', $config['allow_nomination_comments']);
 		}
 
 		if (is_array($data['rounds']) && count($data['rounds']) > 0) {

@@ -179,6 +179,7 @@ CREATE TABLE `workshop` (
   `published` tinyint(1) NOT NULL DEFAULT '0',
   `votes` float DEFAULT NULL,
   `available` int(11) DEFAULT NULL,
+  `created_at` DATETIME DEFAULT NOW(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=96 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
@@ -201,6 +202,21 @@ CREATE TABLE `workshop_participant` (
   UNIQUE KEY `workshop_participant are unique` (`workshop_id`,`participant_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1333 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `workshop_comment`
+--
+
+DROP TABLE IF EXISTS `workshop_comment`;
+CREATE TABLE `workshop_comment` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `workshop_id` int(10) unsigned NOT NULL,
+  `comment` text COLLATE latin1_general_ci NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `created_at` DATETIME DEFAULT NOW(),
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1333 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

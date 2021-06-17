@@ -23,4 +23,5 @@ insert into config(id, item, value) values(5, 'branding', 'Australia');
 */
 insert into config(id, item, value) values(5, 'branding', 'Europe');
 insert into config(id, item, value) values(6, 'allow_edit_nomination', 'false');
+insert into config(id, item, value) values(7, 'allow_nomination_comments', 'false');
 insert into workshop(id, name, description) values(1, 'Prep Team', 'The Prep Team is a handful of people who plan these annual conferences. If you might be interested in joining this team please come to this BOF. We\'re always looking for new ideas and help to make ICCM special every year!');

@@ -8,7 +8,7 @@
     <p>{{'Facilitator'|trans}}: {{ topic.leader }}</p>
     {% endif %}
 
-    {% if allowedit == true %}
+    {% if allowedit == true or allowcomments == true %}
       <p><a href="topics/{{topic.id}}">{{'Details'|trans}}</a></p>
     {% endif %}
 
