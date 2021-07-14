@@ -53,19 +53,21 @@ class DBO
      * Adds auser to the participant table
      * 
      * @param string $login The name of the user
+     * @param string $email The email address of the user
      * @param string $password  The password of the user
      * 
      * @return mixed THe ID of the new user, or a string indicating an error
      */
-    public function addUser($login, $password) {
+    public function addUser($login, $email, $password) {
         $pass = password_hash($password, PASSWORD_DEFAULT,
             ['cost' => $this->passwordCost]);
         $sql = 'INSERT INTO `participant`
-            (`name`, `password`)
-            VALUES (:name, :password)';
+            (`name`, `email`, `password`)
+            VALUES (:name, :email, :password)';
 
         $query=$this->db->prepare($sql);
         $query->bindValue(':name', $login, PDO::PARAM_STR);
+        $query->bindValue(':email', $email, PDO::PARAM_STR);
         $query->bindValue(':password', $pass, PDO::PARAM_STR);
         try {
             $query->execute();
@@ -95,9 +97,10 @@ class DBO
                        COALESCE(name, ':name') AS name,
                        COALESCE(password, '\$2y\$" . $this->passwordCost . "\$NYriOyGGQ0AwLbOxUwaFneXQzI4prjcNbfTs.zOu3PSJPSLaHvvGH') AS password
                   FROM participant
-                 WHERE name = :name";
+                 WHERE name = :name or email = :email";
         $query=$this->db->prepare($sql);
         $query->bindValue(':name', $login, PDO::PARAM_STR);
+        $query->bindValue(':email', $login, PDO::PARAM_STR);
         $query->execute();
         $row = $query->fetch(PDO::FETCH_OBJ);
         // Always call password_verify! Note that we use bitwise AND to ensure
@@ -191,11 +194,12 @@ class DBO
      * 
      * @return true if the user exists, otherwise false.
      */
-    public function checkForUser($login) {
+    public function checkForUser($login, $email) {
         $sql = 'SELECT id FROM `participant`
-            WHERE `name` = :name';
+            WHERE `name` = :name OR `email` = :email';
         $query=$this->db->prepare($sql);
         $query->bindValue('name', $login, PDO::PARAM_STR);
+        $query->bindValue('email', $email, PDO::PARAM_STR);
         $query->execute();
         return $query->fetch(PDO::FETCH_OBJ) !== false;
     }

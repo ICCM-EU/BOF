@@ -54,18 +54,19 @@ class Auth
     public function new_user($request, $response, $args) {
         $data = $request->getParsedBody();
         $login = $data['user_name'];
+        $email = $data['email'];
         $password = $data['password'];
-        if (strlen($login) == 0 || strlen($password) == 0) {
+        if (strlen($login) == 0 || strlen($password) == 0 || strlen($email) == 0) {
             print $this->translator->trans("Empty user or pass. Don't do that!");
             return 0;
         }
-        if ($this->dbo->checkForUser($login)) {
+        if ($this->dbo->checkForUser($login, $email)) {
             # user already exist, so return with error code 0
             print $this->translator->trans("User already exists");
             return 0;
         }
         else {
-            $id = $this->dbo->addUser($login, $password);
+            $id = $this->dbo->addUser($login, $email, $password);
             //if (is_string($id)) {
                 //echo $id;
             //}
