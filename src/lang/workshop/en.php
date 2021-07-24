@@ -1,7 +1,7 @@
 <?php
 return array(
-    'Birds of a Feather' => 'Birds of a Feather',
-    'ICCM BOFs' => 'ICCM BOFs',
+    'Birds of a Feather' => 'Call for Workshops',
+    'ICCM BOFs' => 'ICCM Workshops',
     'Register' => 'Register',
     'Sign in' => 'Sign in',
     'Login' => 'Login',

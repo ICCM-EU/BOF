@@ -3,9 +3,16 @@
 {% block body %}
 <div class="landing">
 
+  {% if website_type == "bof" %}
   <svg class="landing__icon">
     <use xlink:href="/assets/svg/svg-symbols.svg#owl-green"></use>
   </svg>
+  {% elseif website_type == "workshop" %}
+  <svg class="landing__icon">
+    <title>Attribution Text: workshop by DailyPM from the Noun Project</title>
+    <use xlink:href="/assets/svg/svg-symbols.svg#{{workshop_icon}}"></use>
+  </svg>
+  {% endif %}
 
   <h1 class="landing__title">
     {{'Birds of a Feather'|trans}}

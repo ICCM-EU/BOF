@@ -17,13 +17,15 @@ $translator->setFallbackLocales([$settings['settings']['fallback_language']]);
 $translator->addLoader('php', new PhpFileLoader());
 
 // Add language files here
-if (strpos($_SERVER['HTTP_HOST'], 'cfp') !== false)
+$lang_path = '../lang/';
+$settings = require __DIR__.'/../cfg/settings.php';
+if ($settings['settings']['website_type'] == 'workshop')
 {
-    $cfp = 'cfp/';
+    $lang_path .= 'workshop/';
 }
-$translator->addResource('php', '../lang/'.$cfp.'en.php', 'en'); // English
-$translator->addResource('php', '../lang/'.$cfp.'fr.php', 'fr'); // French
-$translator->addResource('php', '../lang/'.$cfp.'de.php', 'de'); // German
+$translator->addResource('php', $lang_path.'en.php', 'en'); // English
+$translator->addResource('php', $lang_path.'fr.php', 'fr'); // French
+$translator->addResource('php', $lang_path.'de.php', 'de'); // German
 
 $container['view']->getEnvironment()->addExtension(new TranslationExtension($translator));
 

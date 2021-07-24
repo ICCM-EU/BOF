@@ -4,6 +4,8 @@
 node_modules/*
 cypress/plugins/*
 
+*licensed.svg
+
 src/public/assets/css/*
 src/public/assets/js/*
 src/public/assets/svg/*
