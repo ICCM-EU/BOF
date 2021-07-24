@@ -9,7 +9,6 @@ return array(
     'Error' => 'Error',
     'Invalid username or password.' => 'Invalid username or password.',
     'Register a new user' => 'Register a new user',
-    'Register' => 'Register',
     'User already exists' => 'User already exists',
     "Empty user or pass. Don't do that!" => "Empty user or pass. Don't do that!",
     'Nominate a BOF Session' => 'Nominate a BOF Session',

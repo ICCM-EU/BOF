@@ -1,7 +1,7 @@
 <?php
 return array(
-    'Birds of a Feather' => 'Aufruf für Konferenzbeiträge',
-    'ICCM BOFs' => 'ICCM Aufruf für Konferenzbeiträge',
+    'Birds of a Feather' => 'Aufruf für Workshops',
+    'ICCM BOFs' => 'ICCM Aufruf für Workshops',
     'Register' => 'Registrieren',
     'Sign in' => 'Anmelden',
     'Login' => 'Anmeldung',
@@ -10,7 +10,6 @@ return array(
     'Error' => 'Fehler',
     'Invalid username or password.' => 'Ungültiger Benutzername oder Passwort.',
     'Register a new user' => 'Neuen Benutzer anlegen',
-    'Register' => 'Anlegen',
     'User already exists' => 'Benutzername ist bereits vergeben',
     "Empty user or pass. Don't do that!" => 'Leerer Benutzername oder Passwort. Das geht nicht!',
     'Nominate a BOF Session' => 'Thema für einen Vortrag vorschlagen',
