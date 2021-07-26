@@ -17,7 +17,13 @@
     <label class="bof-form__label">{{'Password'|trans}}</label>
     <input type="password" name="password" class="bof-form__input" />
   </div>
-  
+  {% if moderated_registration == true %}
+  <div class="bof-form__item">
+    <label class="bof-form__label">{{'UserInfo'|trans}}</label>
+    <textarea name="userinfo" class="bof-form__input" rows="2"></textarea>
+  </div>
+  {% endif %}
+
   <input type="submit" value="{{'Register'|trans}}" class="btn btn--primary" />
   </form>
 {% endblock %}

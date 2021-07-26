@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h1 class="title">{{'Confirm user'|trans}}</h1>
+
+{% if message == 'confirmed' %}
+<div class="notice notice--error">
+<h1>{{'Success'|trans}}</h1>
+<p>{{'The Email address has been confirmed, now wait for activation by moderator'|trans}}</p>
+</div>
+{% elseif message == 'activated' %}
+<div class="notice notice--error">
+<h1>{{'Success'|trans}}</h1>
+<p>{{'The user has been activated'|trans}}</p>
+</div>
+{% else %}
+<form action="{{ path_for( 'confirm_user' )}}" method="POST" class="bof-form">
+  <input type="hidden" name="token" value="{{token}}"/>
+  <input type="hidden" name="confirm" value="true"/>
+  <div class="bof-form__item">
+    <label class="bof-form__label">{{'Email'|trans}}</label>
+    <input type="text" name="email" class="bof-form__input" value="{{email}}" readonly/>
+  </div>
+
+  <input type="submit" value="{{'Activate'|trans}}" class="btn btn--primary" />
+</form>
+{% endif %}
+
+{% endblock %}
