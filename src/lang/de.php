@@ -16,6 +16,7 @@ return array(
     'email_reset_pwd' => "Es soll das Password auf %site% zurückgesetzt werden.<br/>Falls Du das veranlasst hast, bestätige das bitte und klicke <a href=\"%link%\">hier</a><br/><br/>Falls du keine Ahnung hast um was es hier geht, dann ignoriere bitte diese E-Mail.<br/><br/>Diese E-Mail wurde automatisch verschickt.",
     'An Email has been sent for the password reset' => 'Es wurde eine E-Mail für das Zurücksetzen des Passworts verschickt.',
     'Password has been reset' => 'Passwort wurde zurückgesetzt',
+    'password_policy_violated' => 'Das Passwort muss aus mindestens 8 Zeichen bestehen, und muss mindestens einen Großbuchstaben, eine Ziffer und ein Sonderzeichen enthalten.',
     'Invalid username or password.' => 'Ungültiger Benutzername oder Passwort.',
     'Wait for moderation.' => 'Der Benutzer wurde noch nicht vom Moderator aktiviert, bitte noch etwas warten.',
     'Register a new user' => 'Neuen Benutzer anlegen',

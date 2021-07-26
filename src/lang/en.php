@@ -16,6 +16,7 @@ return array(
     'email_reset_pwd' => "We have a request to reset the password at %site%.<br/>If that was you, please confirm by visiting <a href=\"%link%\">this link</a><br/><br/>If you don't know anything about this, please ignore this email.<br/><br/>This email has been automatically generated.",
     'An Email has been sent for the password reset' => 'An Email has been sent for the password reset',
     'Password has been reset' => 'Password has been reset',
+    'password_policy_violated' => 'Password must be at least 8 characters in length and must include at least one upper case letter, one number, and one special character.',
     'Invalid username or password.' => 'Invalid username or password.',
     'Wait for moderation.' => 'Your account is not active yet, please wait for moderation.',
     'Register a new user' => 'Register a new user',

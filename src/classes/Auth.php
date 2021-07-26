@@ -80,6 +80,10 @@ class Auth
             print $this->translator->trans("Empty user or pass. Don't do that!");
             return 0;
         }
+        if (!$this->checkPasswordQuality($password)) {
+            print $this->translator->trans("password_policy_violated");
+            return 0;
+        }
         if ($this->dbo->checkForUser($login, $email)) {
             # user already exist, so return with error code 0
             print $this->translator->trans("User already exists");
@@ -144,11 +148,31 @@ class Auth
         }
 
         $password = $data['password'];
+        if (!$this->checkPasswordQuality($password)) {
+            print $this->translator->trans("password_policy_violated");
+            return 0;
+        }
         if ($this->dbo->resetPassword($email, $token, $password) === true) {
             return $this->view->render($response, 'login.html', array('message' => 'passwordreset'));
         }
 
         return $this->view->render($response, 'reset_pwd.html');
+    }
+
+    /**
+     * Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.
+     */
+    private function checkPasswordQuality($password) {
+
+        $uppercase = preg_match('@[A-Z]@', $password);
+        $lowercase = preg_match('@[a-z]@', $password);
+        $number    = preg_match('@[0-9]@', $password);
+        $specialChars = preg_match('@[^\w]@', $password);
+        if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($password) < 8) {
+            return false;
+        }
+
+        return true;
     }
 
     public function moderateNewUser($email) {

@@ -166,7 +166,7 @@ class DBO
     public function resetPassword($email, $token, $password) {
         $pass = password_hash($password, PASSWORD_DEFAULT,
             ['cost' => $this->passwordCost]);
-        $sql = 'UPDATE `participant` SET `password` = :password WHERE `email` = :email AND `active` = 1 AND `confirmed` = 1 AND `token` = :token';
+        $sql = "UPDATE `participant` SET `password` = :password, `token` = '' WHERE `email` = :email AND `active` = 1 AND `confirmed` = 1 AND `token` = :token AND `token` <> ''";
         $query=$this->db->prepare($sql); 
         $query->bindValue(':email', $email, PDO::PARAM_STR); 
         $query->bindValue(':token', $token, PDO::PARAM_STR); 
