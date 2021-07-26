@@ -28,6 +28,12 @@
 <p>{{'Please confirm your email address by visiting the link sent to your email address.'|trans}}</p>
 </div>
 {% endif %}
+{% if message == 'passwordreset' %}
+<div class="notice notice--error">
+<h1>{{'Hint'|trans}}</h1>
+<p>{{'Password has been reset'|trans}}</p>
+</div>
+{% endif %}
 
 
 <form action="{{ path_for( 'authenticate' )}}" method="POST" class="bof-form">
@@ -44,5 +50,19 @@
 
   <input type="submit" value="{{'Login'|trans}}" class="btn btn--primary" />
 </form>
+
+<br/><label class="bof-form__label">{{'No account yet?'|trans}}</label>
+<div class="button-block">
+    <a href="{{ path_for('register')}}" class="btn btn--primary btn--block">
+      {{'Register'|trans}}
+    </a>
+</div>
+
+<br/><label class="bof-form__label">{{'Forgot your password?'|trans}}</label>
+<div class="button-block">
+    <a href="{{ path_for('reset_pwd')}}" class="btn btn--primary btn--block">
+      {{'Reset Password'|trans}}
+    </a>
+</div>
 
 {% endblock %}

@@ -138,6 +138,47 @@ class DBO
         return false;
     }
 
+    /**
+     * Sets a token for resetting the password
+     * @param string $email The email address of the user
+     * @param string $token The token that was sent in the password reset email
+     */
+    public function startResetPassword($email, $token) {
+        $sql = 'UPDATE `participant` SET `token` = :token WHERE `email` = :email AND `active` = 1 AND `confirmed` = 1';
+        $query=$this->db->prepare($sql); 
+        $query->bindValue(':email', $email, PDO::PARAM_STR); 
+        $query->bindValue(':token', $token, PDO::PARAM_STR); 
+        try {
+            $query->execute(); 
+        } catch (\PDOException $e){ 
+            return $e->getMessage(); 
+        }
+
+        return $query->rowCount() === 1;
+    }
+
+    /**
+     * Reset the password
+     * @param string $email The email address of the user
+     * @param string $token The token that was sent in the password reset email
+     * @param string $password The new password
+     */
+    public function resetPassword($email, $token, $password) {
+        $pass = password_hash($password, PASSWORD_DEFAULT,
+            ['cost' => $this->passwordCost]);
+        $sql = 'UPDATE `participant` SET `password` = :password WHERE `email` = :email AND `active` = 1 AND `confirmed` = 1 AND `token` = :token';
+        $query=$this->db->prepare($sql); 
+        $query->bindValue(':email', $email, PDO::PARAM_STR); 
+        $query->bindValue(':token', $token, PDO::PARAM_STR); 
+        $query->bindValue(':password', $pass, PDO::PARAM_STR); 
+        try { 
+            $query->execute(); 
+        } catch (\PDOException $e){ 
+            return $e->getMessage(); 
+        }
+
+        return $query->rowCount() === 1;
+    }
 
     /**
      * Authenticates a given login name and password.

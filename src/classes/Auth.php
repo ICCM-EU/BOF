@@ -97,8 +97,6 @@ class Auth
                 $subject = $this->translator->trans("Please confirm your email address");
                 $accept_link = "https://".$this->site."/confirm_user?email=".urlencode($email)."&token=".$token;
                 $body_html = $this->translator->trans("email_confirm_user", ['%site%' => $this->site, '%login%' => $login, '%link%' => $accept_link]);
-
-                "Hello %login%,<br/>There has been a request to register for the site https://%site%<br/>If that was you, please confirm by visiting <a href=\"%link%\">this link</a><br/><br/>If you don't know anything about this, please ignore this email.<br/><br/>This email has been automatically generated.";
                 $body = str_replace("<br/>", "\n", $body_html);
                 $this->sendEmail($email, $subject, $body_html, $body);
 
@@ -110,6 +108,47 @@ class Auth
             # $payload = array("is_admin" => false, "userid" => $id);
             return $response->withRedirect($this->router->pathFor("login") . "?newuser=1")->withStatus(302);
         }
+    }
+
+    public function reset_pwd($request, $response, $args) {
+        $data = $request->getParsedBody();
+
+        if (!$data) {
+            $data = $request->getQueryParams();
+        }
+
+        if (!array_key_exists('email', $data) || $data['email'] == '') {
+            return $this->view->render($response, 'reset_pwd.html');
+        }
+
+        $email = $data['email'] = urldecode($data['email']);
+
+        if (!array_key_exists('token', $data)) {
+            $token = bin2hex(random_bytes(16));
+            $subject = $this->translator->trans("Reset Password");
+            $accept_link = "https://".$this->site."/reset_pwd?email=".urlencode($email)."&token=".$token;
+            $html_body = $this->translator->trans("email_reset_pwd", ['%site%' => $this->site, '%link%' => $accept_link]);
+            $text_body = str_replace("<br/>", "\n", $html_body);
+
+            if ($this->dbo->startResetPassword($email, $token)) {
+                $this->sendEmail($email, $subject, $html_body, $text_body);
+            }
+
+            return $this->view->render($response, 'reset_pwd.html', array('message' => $this->translator->trans("An Email has been sent for the password reset")));
+        }
+
+        $token = $data['token'];
+
+        if (!array_key_exists('password', $data) || $data['password'] == '') {
+            return $this->view->render($response, 'reset_pwd.html', array('token' => $token, 'email' => $email));
+        }
+
+        $password = $data['password'];
+        if ($this->dbo->resetPassword($email, $token, $password) === true) {
+            return $this->view->render($response, 'login.html', array('message' => 'passwordreset'));
+        }
+
+        return $this->view->render($response, 'reset_pwd.html');
     }
 
     public function moderateNewUser($email) {
@@ -160,13 +199,12 @@ class Auth
 
     public function confirm_user($request, $response, $args) {
         $data = $request->getParsedBody();
-        $token = $data['token'];
 
-        if ($token == '') {
+        if (!$data) {
             $data = $request->getQueryParams();
-            $token = $data['token'];
         }
 
+        $token = $data['token'];
         $email = $data['email'] = urldecode($data['email']);
 
         if (array_key_exists('confirm', $data)) {

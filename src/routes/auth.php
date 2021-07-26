@@ -32,6 +32,8 @@ $app->get('/register', function (Request $request, Response $response, array $ar
 $app->post('/authenticate', 'ICCM\BOF\Auth:authenticate')->setName('authenticate');
 
 $app->post('/new_user', 'ICCM\BOF\Auth:new_user')->setName('new_user');
+$app->get('/reset_pwd', 'ICCM\BOF\Auth:reset_pwd')->setName('reset_pwd_get');
+$app->post('/reset_pwd', 'ICCM\BOF\Auth:reset_pwd')->setName('reset_pwd');
 
 $app->post('/confirm_user', 'ICCM\BOF\Auth:confirm_user')->setName('confirm_user');
 $app->get('/confirm_user', 'ICCM\BOF\Auth:confirm_user')->setName('confirm_user_get');
