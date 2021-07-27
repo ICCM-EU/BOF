@@ -142,9 +142,16 @@ DROP TABLE IF EXISTS `participant`;
 CREATE TABLE `participant` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE latin1_general_ci NOT NULL,
+  `email` varchar(255) COLLATE latin1_general_ci NOT NULL,
   `password` varchar(255) COLLATE latin1_general_ci NOT NULL,
+  `userinfo` varchar(255) COLLATE latin1_general_ci NOT NULL DEFAULT '',
+  `language` varchar(5) COLLATE latin1_general_ci NOT NULL DEFAULT 'en',
+  `confirmed` tinyint(1) NOT NULL DEFAULT '0',
+  `token` varchar(255) COLLATE latin1_general_ci NOT NULL DEFAULT '',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=MyISAM AUTO_INCREMENT=401 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

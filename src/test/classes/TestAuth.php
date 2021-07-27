@@ -319,6 +319,7 @@ class TestAuth extends TestCase
     public function newUserFailsForEmptyPassword() {
         $data = [
             'user_name' => 'user1',
+            'email' => 'user1@example.org',
             'password' => ''
         ];
 
@@ -459,6 +460,7 @@ class TestAuth extends TestCase
     public function newUserFailsForExistingUser() {
         $data = [
             'user_name' => 'user1',
+            'email' => 'user1@example.org',
             'password' => 'password1'
         ];
 
@@ -535,6 +537,7 @@ class TestAuth extends TestCase
     public function newUserSuccessForNewUser() {
         $data = [
             'user_name' => 'user1',
+            'email' => 'user1@example.org',
             'password' => 'password1'
         ];
         $user = (object) [
@@ -550,12 +553,12 @@ class TestAuth extends TestCase
 
         $dbo->expects($this->once())
             ->method('addUser')
-            ->with($data['user_name'], $data['password'])
+            ->with($data['user_name'], $data['email'], $data['password'])
             ->willReturn(true);
 
         $dbo->expects($this->once())
             ->method('checkForUser')
-            ->with($data['user_name'])
+            ->with($data['user_name'], $data['email'])
             ->willReturn(false);
 
         // ServerRequestInterface mock
@@ -610,7 +613,7 @@ class TestAuth extends TestCase
             ->method('set');
 
         $auth = new Auth($view, $router, $dbo, 'secret_token', $cookies, null);
-        $this->assertEquals($response, $auth->new_user($request, $response, 'user1', 'password'));
+        $this->assertEquals($response, $auth->new_user($request, $response, 'user1', 'user1@example.org', 'password'));
     }
 
 }

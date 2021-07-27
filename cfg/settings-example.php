@@ -6,6 +6,20 @@ return [
         'secrettoken' => 'topsecret', // needed for authentication with JWT
         'PrepBofId' => 1, // BOF for the prep team
         'fallback_language' => 'en',
+
+        'moderated_registration' => false,
+        'moderation_email' => 'somewhere@example.org',
+        'moderation_token' => 'randomgenerated',
+
+        'smtp' => [
+            'host' => 'localhost',
+            'port' => 465,
+            'user' => 'example',
+            'passwd' => 'topsecret',
+            'from' => 'robot@example.org',
+            'from_name' => 'ICCM XYZ'
+        ],
+
         // DB Settings
         'db' => [
             'host' => 'localhost',
