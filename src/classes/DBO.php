@@ -504,7 +504,6 @@ class DBO
      * voting_ends_time,
      * loggedin, localservertime, rounds, num_rounds, locations,
      * num_locations, and stage.
-     * allow_edit_nomination
      */
     public function getConfig() {
         $columns_timestamp = "'nomination_begins', 'nomination_ends', 'voting_begins', 'voting_ends'";
@@ -531,13 +530,6 @@ class DBO
         $config['locations'] = $this->getLocationNames();
         $config['num_locations'] = count($config['locations']);
         $config['stage'] = $this->getStage();
-
-        if (!array_key_exists('allow_edit_nomination', $config)) {
-            $config['allow_edit_nomination'] = "false";
-        }
-        if (!array_key_exists('allow_nomination_comments', $config)) {
-            $config['allow_nomination_comments'] = "false";
-        }
 
         return $config;
     }
@@ -828,7 +820,7 @@ class DBO
             WHEN ".$now." > (SELECT value FROM config WHERE item = 'nomination_begins')
              AND ".$now." < (SELECT value FROM config WHERE item = 'nomination_ends')
              AND ".$now." > (SELECT value FROM config WHERE item = 'voting_begins')
-             AND ".$now." < (SELECT value FROM config WHERE item = 'voting_ends') THEN 'call_for_papers'
+             AND ".$now." < (SELECT value FROM config WHERE item = 'voting_ends') THEN 'call_for_workshops'
             WHEN ".$now." > (SELECT value FROM config WHERE item = 'nomination_begins')
              AND ".$now." < (SELECT value FROM config WHERE item = 'nomination_ends') THEN 'nominating'
             WHEN ".$now." > (SELECT value FROM config WHERE item = 'voting_begins')
@@ -1245,44 +1237,6 @@ class DBO
         $query->bindValue('which', $which, PDO::PARAM_STR);
         $query->bindValue('dateTime', date('Y-m-d H:i:00', $timestamp), PDO::PARAM_STR);
         $query->execute();
-    }
-
-    /**
-     * Sets the specified configuration parameter
-     * 
-     * @param string $which Which configuration to set. 
-     * @param string $value The value to set.
-     * @param string $oldvalue The previous value.
-     */
-    public function setConfigString($which, $value, $oldvalue) {
-        static $query = null;
-        // Validate $which
-        if (($which != 'allow_edit_nomination')
-            && ($which != 'allow_nomination_comments')) {
-                throw new RuntimeException('Invalid configuration item');
-        }
-
-        if ($oldvalue == $value) {
-            return;
-        }
-
-        if ($query == null) {
-            $query = $this->db->prepare(
-                "UPDATE `config`
-                    SET value = :value
-                  WHERE item = :which");
-        }
-
-        $query->bindValue('which', $which, PDO::PARAM_STR);
-        $query->bindValue('value', $value, PDO::PARAM_STR);
-        $query->execute();
-        if ($query->rowCount() == 0) {
-            $query = $this->db->prepare(
-                "INSERT INTO `config`(`item`, `value`) VALUES(:which, :value)");
-            $query->bindValue('which', $which, PDO::PARAM_STR);
-            $query->bindValue('value', $value, PDO::PARAM_STR);
-            $query->execute();
-        }
     }
 
     /**

@@ -1,10 +1,10 @@
 <ul class="foot-nav">
-  {% if (stage == 'nominating' or stage == "call_for_papers") %}
+  {% if (stage == 'nominating' or stage == "call_for_workshops") %}
   <li>
     <a href="{{ path_for('nomination')}}">{{'Nominate topic'|trans}}</a>
   </li>
   {% endif %}
-  {% if (is_admin and (stage=='nominating' or stage=='locked' or stage=='finished' or stage == "call_for_papers")) %}
+  {% if (is_admin and (stage=='nominating' or stage=='locked' or stage=='finished' or stage == "call_for_workshops")) %}
   <li>
     <a href="{{ path_for('moderation') }}">{{'Moderate topics'|trans}}</a>
   </li>  

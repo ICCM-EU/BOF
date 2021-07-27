@@ -76,7 +76,7 @@ class Projector
 		if ($stage == "nominating") {
 			$bofs = $this->_getNominationStage();
 		}
-		else if ($stage == "voting" || $stage == "locked" || $stage == "call_for_papers") {
+		else if ($stage == "voting" || $stage == "locked" || $stage == "call_for_workshops") {
 			$bofs = $this->_getVotingStage();
 		}
 		else if ($stage == "finished") {

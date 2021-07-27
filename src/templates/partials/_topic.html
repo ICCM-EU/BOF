@@ -12,7 +12,7 @@
       <p><a href="topics/{{topic.id}}">{{'Details'|trans}}</a></p>
     {% endif %}
 
-    {% if stage == "voting" or stage == "call_for_papers" %}
+    {% if stage == "voting" or stage == "call_for_workshops" %}
     <form action="{{ path_for('votesaddpost')}}" method="POST" class="facilitation">
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
       <input type="hidden" name="leader" value="{{username in topic.leader ? '0' : '1'}}" />
@@ -29,7 +29,7 @@
     </div>
   {% endif %}
 
-  {% if stage == "voting" or stage == "call_for_papers" %}
+  {% if stage == "voting" or stage == "call_for_workshops" %}
   <div class="topic__vote">
     <form action="{{ path_for('votesaddpost')}}" class="fullvote" method="POST">
       <input type="hidden" name="vote" value="1" />

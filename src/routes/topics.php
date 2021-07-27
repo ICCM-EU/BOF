@@ -10,11 +10,11 @@ use \Psr\Http\Message\ResponseInterface as Response;
  * or the possibility to vote for topics
  * in the last stage the list of selected topics will be there and location and time slot
  * 
- * 'stage' can be: 'nominating', 'voting', 'call_for_papers'
+ * 'stage' can be: 'nominating', 'voting', 'call_for_workshops'
  * System can be locked down with variable 'locked'
  * 
  * voting and nominating stages are configured in the config table by timestamps
- * call_for_papers is if the voting and nominating stages overlap
+ * call_for_workshops is if the voting and nominating stages overlap
  * locked is automatically when out of periods of voting and nominating
  * TODO: config item for locked False/True
  * 
@@ -88,6 +88,7 @@ $app->get('/topics', function (Request $request, Response $response, array $args
     $stage =$dbo->getStage();
     $params = $request->getQueryParams();
     $show_vote_message = array_key_exists('voted', $params) && $params['voted'] === '1';
+    $settings = require __DIR__.'/../../cfg/settings.php';
     return $this->view->render($response, 'topics.html', [
         'bofs' => $bofs,
         'stage' => $stage,
@@ -96,8 +97,8 @@ $app->get('/topics', function (Request $request, Response $response, array $args
         'loggedin' => True,
         'left_votes' => $fullvotesleft,
         'voted_successfull' => $show_vote_message,
-        'allowedit' => $config['allow_edit_nomination'] != "false",
-        'allowcomments' => $config['allow_nomination_comments'] != "false",
+        'allowedit' => $settings['settings']['allow_edit_nomination'] != false,
+        'allowcomments' => $settings['settings']['allow_nomination_comments'] != false,
     ]);
 })->setName('topics');
 

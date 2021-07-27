@@ -16,6 +16,7 @@ class Nomination
         $this->dbo = $dbo;
         $this->router = $router;
         $this->config = $dbo->getConfig();
+        $this->settings = require __DIR__.'/../../cfg/settings.php';
     }
 
     public function nominate($request, $response, $args) {
@@ -42,7 +43,7 @@ class Nomination
 
     // check if we can edit the nomination: either admin, or author, or facilitator
     private function canEditNomination($bof, $userid) {
-        if ($this->config['allow_edit_nomination'] == "false") {
+        if ($this->settings['settings']['allow_edit_nomination'] == false) {
             return false;
         }
         return ($userid == 1 || $bof->creator_id == $userid || $bof->leader == $userid);
@@ -57,7 +58,7 @@ class Nomination
             'topic' => $bof[0],
             'user_id' => $user_id,
             'canedit' => $this->canEditNomination($bof[0], $user_id),
-            'allowcomments' => $this->config['allow_nomination_comments'] != "false",
+            'allowcomments' => $this->settings['settings']['allow_nomination_comments'] != false,
             'comments' => $comments
             ]);
     }
@@ -96,7 +97,7 @@ class Nomination
 
     public function addComment($request, $response, $args) {
         global $app;
-        if ($this->config['allow_nomination_comments'] == "false") {
+        if ($this->settings['settings']['allow_nomination_comments'] == false) {
             print "Comments are disabled. Don't do that!";
             return 0;
         }
