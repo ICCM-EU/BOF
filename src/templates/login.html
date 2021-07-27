@@ -4,37 +4,18 @@
 
 <h1 class="title">{{'Login'|trans}}</h1>
 
-{% if message == 'invalid' %}
+{% if error != '' %}
 <div class="notice notice--error">
 <h1>{{'Error'|trans}}</h1>
-<p>{{'Invalid username or password.'|trans}}</p>
+<p>{{error}}</p>
 </div>
 {% endif %}
-{% if message == 'waitformoderation' %}
-<div class="notice notice--error">
-<h1>{{'Error'|trans}}</h1>
-<p>{{'Wait for moderation.'|trans}}</p>
-</div>
-{% endif %}
-{% if message == 'newuser_waitformoderation' %}
+{% if message != '' %}
 <div class="notice notice--error">
 <h1>{{'Hint'|trans}}</h1>
-<p>{{'Wait for moderation.'|trans}}</p>
+<p>{{message}}</p>
 </div>
 {% endif %}
-{% if message == 'confirmuser' %}
-<div class="notice notice--error">
-<h1>{{'Hint'|trans}}</h1>
-<p>{{'Please confirm your email address by visiting the link sent to your email address.'|trans}}</p>
-</div>
-{% endif %}
-{% if message == 'passwordreset' %}
-<div class="notice notice--error">
-<h1>{{'Hint'|trans}}</h1>
-<p>{{'Password has been reset'|trans}}</p>
-</div>
-{% endif %}
-
 
 <form action="{{ path_for( 'authenticate' )}}" method="POST" class="bof-form">
 

@@ -49,12 +49,12 @@ class Auth
         $login = $data['user_name'];
         if (($row = $this->dbo->authenticate($login, $data['password'])) && $row->valid) {
             if (!$row->active) {
-                return $this->view->render($response, 'login.html', array('message' => 'newuser_waitformoderation'));
+                return $this->view->render($response, 'login.html', array('error' => $this->translator->trans("Wait for moderation.")));
 	    } else {
                 return $this->signin($response, $login, $row->id);
 	    }
         } else {
-            return $this->view->render($response, 'login.html', array('message' => 'invalid'));
+            return $this->view->render($response, 'login.html', array('error' => $this->translator->trans("Invalid username or password.")));
         }
     }
 
@@ -108,7 +108,7 @@ class Auth
                 $body = str_replace("<br/>", "\n", $body_html);
                 $this->sendEmail($email, $subject, $body_html, $body);
 
-                return $this->view->render($response, 'login.html', array('message' => 'confirmuser'));
+                return $this->view->render($response, 'login.html', array('message' => $this->translator->trans('Please confirm your email address by visiting the link sent to your email address.')));
             }
 
             return $this->signin($response, $login, $id);
@@ -154,7 +154,7 @@ class Auth
                 'token' => $token, 'email' => $email));
         }
         if ($this->dbo->resetPassword($email, $token, $password) === true) {
-            return $this->view->render($response, 'login.html', array('message' => 'passwordreset'));
+            return $this->view->render($response, 'login.html', array('message' => $this->translator->trans('Password has been reset')));
         }
 
         return $this->view->render($response, 'reset_pwd.html');
