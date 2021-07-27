@@ -23,7 +23,7 @@ class Admin
 
 		$config = $this->dbo->getConfig();
 
-        return $this->view->render($response, 'admin.html', $config);
+		return $this->view->render($response, 'admin.html', $config);
 	}
 
 	public function update_config($request, $response, $args) {
