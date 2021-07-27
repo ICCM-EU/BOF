@@ -30,24 +30,29 @@ class Auth
         $this->site = $_SERVER['SERVER_NAME'];
     }
 
+    private function signin($response, $login, $userid) {
+        if ($login == "admin") {
+            $payload = array("is_admin" => true, "userid" => $userid);
+            $goto = $this->router->pathFor("admin");
+        } else {
+            # going to topics
+            $payload = array("is_admin" => false, "userid" => $userid);
+            $goto = $this->router->pathFor("topics");
+        }
+        $token = JWT::encode($payload, $this->secrettoken, "HS256");
+        $this->cookies->set("authtoken", $token, time()+3600);  // cookie expires in one hour
+        return $response->withRedirect($goto)->withStatus(302);
+    }
+
     public function authenticate($request, $response, $args) {
         $data = $request->getParsedBody();
         $login = $data['user_name'];
         if (($row = $this->dbo->authenticate($login, $data['password'])) && $row->valid) {
             if (!$row->active) {
                 return $response->withRedirect($this->router->pathFor("login") . "?message=waitformoderation")->withStatus(302);
-            }
-            else if ($login == "admin") {
-                $payload = array("is_admin" => true, "userid" => $row->id);
-                $goto = $this->router->pathFor("admin");
-            } else {
-                # going to topics
-                $payload = array("is_admin" => false, "userid" => $row->id);
-                $goto = $this->router->pathFor("topics");
-            }
-            $token = JWT::encode($payload, $this->secrettoken, "HS256");
-            $this->cookies->set("authtoken", $token, time()+3600);  // cookie expires in one hour
-            return $response->withRedirect($goto)->withStatus(302);
+	    } else {
+                return $this->signin($response, $login, $row->id);
+	    }
         } else {
             // echo json_encode("No valid user or password");
             return $response->withRedirect($this->router->pathFor("login") . "?message=invalid")->withStatus(302);
@@ -107,10 +112,7 @@ class Auth
                 return $response->withRedirect($this->router->pathFor("login") . "?confirmuser=1")->withStatus(302);
             }
 
-            # print the auto incremented user's ID
-            # print "User added, got ID : " . $id;
-            # $payload = array("is_admin" => false, "userid" => $id);
-            return $response->withRedirect($this->router->pathFor("login") . "?newuser=1")->withStatus(302);
+            return $this->signin($response, $login, $id);
         }
     }
 
