@@ -50,10 +50,10 @@ class TestDBO extends TestCase
     }
 
     private function _setupConfigDates($nomination_begins, $nomination_ends, $voting_begins, $voting_ends) {
-        self::$pdo->query("INSERT INTO config (item, value) VALUES('nomination_begins', '{$nomination_begins}')");
-        self::$pdo->query("INSERT INTO config (item, value) VALUES('nomination_ends', '{$nomination_ends}')");
-        self::$pdo->query("INSERT INTO config (item, value) VALUES('voting_begins', '{$voting_begins}')");
-        self::$pdo->query("INSERT INTO config (item, value) VALUES('voting_ends', '{$voting_ends}')");
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(0, 'nomination_begins', '{$nomination_begins}')");
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(1, 'nomination_ends', '{$nomination_ends}')");
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(2, 'voting_begins', '{$voting_begins}')");
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(3, 'voting_ends', '{$voting_ends}')");
     }
 
     private function _setupRounds($rounds, $valid) {
@@ -1246,7 +1246,57 @@ EOF;
      * @uses \ICCM\BOF\DBO::getStage
      * @test
      */
-    public function getConfig() {
+    public function getConfigReturnsExpectedData() {
+        $localservertime = date('Y-m-d H:i:s');
+        $nomination_begins = date("Y-m-d H:i:s", strtotime('-3 hours', strtotime($localservertime)));
+        $nomination_begins_time = date("H:i", strtotime('-3 hours', strtotime($localservertime)));
+        $nomination_ends = date("Y-m-d H:i:s", strtotime('-2 hours', strtotime($localservertime)));
+        $nomination_ends_time = date("H:i", strtotime('-2 hours', strtotime($localservertime)));
+        $voting_begins = date("Y-m-d H:i:s", strtotime('-1 hour', strtotime($localservertime)));
+        $voting_begins_time = date("H:i", strtotime('-1 hour', strtotime($localservertime)));
+        $voting_ends = date("Y-m-d H:i:s", strtotime('+1 hour', strtotime($localservertime)));
+        $voting_ends_time = date("H:i", strtotime('+1 hour', strtotime($localservertime)));
+        $this->_setupConfigDates($nomination_begins, $nomination_ends, $voting_begins, $voting_ends);
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(6, 'schedule_prep', 'False')");
+        $config = [
+            'nomination_begins' => date('Y-m-d', strtotime($nomination_begins)),
+            'nomination_begins_time' => $nomination_begins_time,
+            'nomination_ends' => date('Y-m-d', strtotime($nomination_ends)),
+            'nomination_ends_time' => $nomination_ends_time,
+            'voting_begins' => date('Y-m-d', strtotime($voting_begins)),
+            'voting_begins_time' => $voting_begins_time,
+            'voting_ends' => date('Y-m-d', strtotime($voting_ends)),
+            'voting_ends_time' => $voting_ends_time,
+            'loggedin' => true,
+            'localservertime' => $localservertime,
+            'rounds' => [
+                0 => 'Round 0',
+                1 => 'Round 1'
+            ],
+            'num_rounds' => 2,
+            'locations' => [
+                0 => 'Room A',
+                1 => 'Room B',
+                2 => 'Room C'
+            ],
+            'num_locations' => 3,
+            'stage' => 'voting',
+            'schedule_prep' => 'False'
+        ];
+        $this->_setupRounds(2, true);
+        $this->_setupLocations(3, true);
+        $dbo = new DBO(self::$pdo);
+        $this->assertEquals($config, $dbo->getConfig());
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::getConfig
+     * @uses \ICCM\BOF\DBO::getLocationNames
+     * @uses \ICCM\BOF\DBO::getRoundNames
+     * @uses \ICCM\BOF\DBO::getStage
+     * @test
+     */
+    public function getConfigReturnsSchedulePrepTrueIfNotConfigured() {
         $localservertime = date('Y-m-d H:i:s');
         $nomination_begins = date("Y-m-d H:i:s", strtotime('-3 hours', strtotime($localservertime)));
         $nomination_begins_time = date("H:i", strtotime('-3 hours', strtotime($localservertime)));
@@ -1279,7 +1329,8 @@ EOF;
                 2 => 'Room C'
             ],
             'num_locations' => 3,
-            'stage' => 'voting'
+            'stage' => 'voting',
+            'schedule_prep' => 'True',
         ];
         $this->_setupRounds(2, true);
         $this->_setupLocations(3, true);
@@ -1635,12 +1686,33 @@ EOF;
      */
     public function getPrepBoFReturnsExpectedData() {
         $this->_setupWorkshops(3, 3, true, 0);
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(6, 'schedule_prep', 'True')");
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(7, 'prep_location', '4')");
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(8, 'prep_round', '0')");
         $dbo = new DBO(self::$pdo);
         $prepBoF = $dbo->getPrepBoF();
         $this->assertNotFalse($prepBoF);
         $this->assertEquals(1, $prepBoF->id);
         $this->assertEquals("Prep Team", $prepBoF->name);
         $this->assertEquals(8, $prepBoF->available);
+        $this->assertEquals(3, $prepBoF->location);
+        $this->assertEquals(-1, $prepBoF->round);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::getPrepBoF
+     * @test
+     */
+    public function getPrepBoFReturnsExpectedDataIfNoConfig() {
+        $this->_setupWorkshops(3, 3, true, 0);
+        $dbo = new DBO(self::$pdo);
+        $prepBoF = $dbo->getPrepBoF();
+        $this->assertNotFalse($prepBoF);
+        $this->assertEquals(1, $prepBoF->id);
+        $this->assertEquals("Prep Team", $prepBoF->name);
+        $this->assertEquals(8, $prepBoF->available);
+        $this->assertEquals(-1, $prepBoF->location);
+        $this->assertEquals(-1, $prepBoF->round);
     }
 
     /**
@@ -1650,6 +1722,18 @@ EOF;
     public function getPrepBoFReturnsFalseIfNotFound() {
         // Remove all workshops, so getPrepBoF() won't return anything!
         $this->_resetWorkshops();
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(6, 'schedule_prep', 'True')");
+        $dbo = new DBO(self::$pdo);
+        $this->assertFalse($dbo->getPrepBoF());
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::getPrepBoF
+     * @test
+     */
+    public function getPrepBoFReturnsFalseIfConfigNoSchedule() {
+        $this->_setupWorkshops(3, 3, true, 0);
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(6, 'schedule_prep', 'False')");
         $dbo = new DBO(self::$pdo);
         $this->assertFalse($dbo->getPrepBoF());
     }
@@ -2333,6 +2417,41 @@ EOF;
         $dbo = new DBO(self::$pdo);
         $this->expectException(RuntimeException::class);
         $dbo->setConfigDateTime('blah', '06-25-2019', '10:03');
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::setConfigPrepBoF
+     * @uses \ICCM\BOF\DBO::_updateConfig
+     * @test
+     */
+    public function setConfigPrepBoFWorksIfNotAlreadyConfigured() {
+        $dbo = new DBO(self::$pdo);
+        $dbo->setConfigPrepBoF('False', -1, -1);
+        $row = self::$pdo->query("SELECT `value` FROM config WHERE `item`='schedule_prep'")->fetch(PDO::FETCH_NUM);
+	$this->assertEquals('False', $row[0]);
+        $row = self::$pdo->query("SELECT `value` FROM config WHERE `item`='prep_round'")->fetch(PDO::FETCH_NUM);
+	$this->assertEquals('0', $row[0]);
+        $row = self::$pdo->query("SELECT `value` FROM config WHERE `item`='prep_location'")->fetch(PDO::FETCH_NUM);
+	$this->assertEquals('0', $row[0]);
+    }
+
+    /**
+     * @covers \ICCM\BOF\DBO::setConfigPrepBoF
+     * @uses \ICCM\BOF\DBO::_updateConfig
+     * @test
+     */
+    public function setConfigPrepBoFWorksIfConfigured() {
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(6, 'schedule_prep', 'False')");
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(7, 'prep_location', '1')");
+        self::$pdo->query("INSERT INTO config (id, item, value) VALUES(8, 'prep_round', '2')");
+        $dbo = new DBO(self::$pdo);
+        $dbo->setConfigPrepBoF('False', 3, 4);
+        $row = self::$pdo->query("SELECT `value` FROM config WHERE `item`='schedule_prep'")->fetch(PDO::FETCH_NUM);
+	$this->assertEquals('False', $row[0]);
+        $row = self::$pdo->query("SELECT `value` FROM config WHERE `item`='prep_round'")->fetch(PDO::FETCH_NUM);
+	$this->assertEquals('4', $row[0]);
+        $row = self::$pdo->query("SELECT `value` FROM config WHERE `item`='prep_location'")->fetch(PDO::FETCH_NUM);
+	$this->assertEquals('5', $row[0]);
     }
 
     /**

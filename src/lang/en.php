@@ -68,5 +68,9 @@ return array(
     'Add Room' => 'Add Room',
     'Room' => 'Room',
     'Topic' => 'Topic',
+    'Prep BoF has its own slot' => 'Prep BoF has its own slot',
+    'Slot for Prep BoF' => 'Slot for Prep BoF',
+    'Room for Prep BoF' => 'Room for Prep BoF',
+    'Default' => 'Default',
     'dummy' => 'dummy'
 );

@@ -634,7 +634,7 @@ class TestAdmin extends TestCase
         // DBO mock
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getConfig', 'setConfigDateTime'])
+            ->onlyMethods(['getConfig', 'setConfigDateTime', 'setConfigPrepBoF'])
             ->getMock();
 
         if ($failType == 0) {
@@ -646,6 +646,10 @@ class TestAdmin extends TestCase
             $dbo->expects($this->never())
                 ->method('setConfigDateTime');
         }
+
+        $dbo->expects($this->once())
+            ->method('setConfigPrepBoF')
+            ->with('True');
 
         $dbo->expects($this->once())
             ->method('getConfig')
@@ -763,12 +767,16 @@ class TestAdmin extends TestCase
         // DBO mock
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getConfig'])
+            ->onlyMethods(['getConfig', 'setConfigPrepBoF'])
             ->getMock();
 
         $dbo->expects($this->once())
             ->method('getConfig')
             ->willReturn($config);
+
+        $dbo->expects($this->once())
+            ->method('setConfigPrepBoF')
+            ->with('True');
 
         // Request mock
         $request = $this->getMockBuilder(Request::class)
@@ -832,17 +840,23 @@ class TestAdmin extends TestCase
                 'Room A',
                 'Room B'
             ],
+            'prep_bof_round' => -1,
+            'prep_bof_location' => 'Room B'
         ];
 
         // DBO mock
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['setLocationNames', 'getConfig'])
+            ->onlyMethods(['setLocationNames', 'setConfigPrepBoF', 'getConfig'])
             ->getMock();
 
         $dbo->expects($this->once())
             ->method('setLocationNames')
             ->with($data['locations']);
+
+        $dbo->expects($this->once())
+            ->method('setConfigPrepBoF')
+            ->with('True', -1, 1);
 
         $dbo->expects($this->once())
             ->method('getConfig')
@@ -907,17 +921,23 @@ class TestAdmin extends TestCase
             'time_voting_ends' => null,
             'rounds' => null,
             'locations' => null,
+            'prep_bof_round' => -1,
+            'prep_bof_location' => -1
         ];
 
         // DBO mock
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['changepassword', 'getConfig'])
+            ->onlyMethods(['changepassword', 'setConfigPrepBoF', 'getConfig'])
             ->getMock();
 
         $dbo->expects($this->once())
             ->method('changePassword')
             ->with('admin', $data['password1']);
+
+        $dbo->expects($this->once())
+            ->method('setConfigPrepBoF')
+            ->with('True', -1, -1);
 
         $dbo->expects($this->once())
             ->method('getConfig')
@@ -986,13 +1006,19 @@ class TestAdmin extends TestCase
                 'Round 3'
             ],
             'locations' => null,
+            'prep_bof_round' => 'Round 2',
+            'prep_bof_location' => -1
         ];
 
         // DBO mock
         $dbo = $this->getMockBuilder(DBO::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['setRoundNames', 'getConfig'])
+            ->onlyMethods(['setRoundNames', 'setConfigPrepBoF', 'getConfig'])
             ->getMock();
+
+        $dbo->expects($this->once())
+            ->method('setConfigPrepBoF')
+            ->with('True', 1, -1);
 
         $dbo->expects($this->once())
             ->method('setRoundNames')
@@ -1037,4 +1063,174 @@ class TestAdmin extends TestCase
         $this->assertEquals(4, $admin->update_config($request, $response, null));
     }
 
+    /**
+     * @covers \ICCM\BOF\Admin::update_config
+     * @uses \ICCM\BOF\Admin::showAdminView
+     * @test
+     */
+    public function updateConfigUpdatesPrepBoF() {
+        $config = [
+            'loggedin' => true,
+        ];
+        $data = [
+            'password1' => null,
+            'password2' => null,
+            'reset_database' => null,
+            'download_database' => null,
+            'nomination_begins' => null,
+            'time_nomination_begins' => null,
+            'nomination_ends' => null,
+            'time_nomination_ends' => null,
+            'voting_begins' => null,
+            'time_voting_begins' => null,
+            'voting_ends' => null,
+            'time_voting_ends' => null,
+            'rounds' => null,
+            'locations' => null,
+            'schedule_prep' => 'False',
+            'prep_bof_round' => -1,
+            'prep_bof_location' => -1
+        ];
+
+        // DBO mock
+        $dbo = $this->getMockBuilder(DBO::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['setConfigPrepBoF', 'getConfig'])
+            ->getMock();
+
+        $dbo->expects($this->once())
+            ->method('setConfigPrepBoF')
+            ->with($data['schedule_prep']);
+
+        $dbo->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($config);
+
+        // Request mock
+        $request = $this->getMockBuilder(Request::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getAttribute', 'getParsedBody'])
+            ->getMock();
+
+        $request->expects($this->exactly(2))
+            ->method('getAttribute')
+            ->with('is_admin')
+            ->willReturn(true);
+
+        $request->expects($this->once())
+            ->method('getParsedBody')
+            ->willReturn($data);
+
+        // ResponseInterface mock
+        $response = $this->getMockBuilder(ResponseInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Twig view mock
+        $view = $this->getMockBuilder(Twig::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['render'])
+            ->getMock();
+
+        $view->expects($this->once())
+            ->method('render')
+            ->with($response, 'admin.html', $config)
+            ->willReturn(4);
+
+        $admin = new Admin($view, null, $dbo, null);
+        $this->assertEquals(4, $admin->update_config($request, $response, null));
+    }
+
+    /**
+     * @covers \ICCM\BOF\Admin::update_config
+     * @uses \ICCM\BOF\Admin::showAdminView
+     * @test
+     */
+    public function updateConfigUpdatesPrepBoFWithInvalidRoundAndLocation() {
+        $config = [
+            'loggedin' => true,
+        ];
+        $data = [
+            'password1' => null,
+            'password2' => null,
+            'reset_database' => null,
+            'download_database' => null,
+            'nomination_begins' => null,
+            'time_nomination_begins' => null,
+            'nomination_ends' => null,
+            'time_nomination_ends' => null,
+            'voting_begins' => null,
+            'time_voting_begins' => null,
+            'voting_ends' => null,
+            'time_voting_ends' => null,
+            'rounds' => [
+                'Round 1',
+                'Round 2',
+                'Round 3'
+            ],
+            'locations' => [
+                'Room A',
+                'Room B'
+            ],
+            'schedule_prep' => 'False',
+            'prep_bof_location' => 'Room C',
+            'prep_bof_round' => 'Round 5'
+        ];
+
+        // DBO mock
+        $dbo = $this->getMockBuilder(DBO::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['setRoundNames', 'setLocationNames', 'setConfigPrepBoF', 'getConfig'])
+            ->getMock();
+
+        $dbo->expects($this->once())
+            ->method('setRoundNames')
+            ->with($data['rounds']);
+
+        $dbo->expects($this->once())
+            ->method('setLocationNames')
+            ->with($data['locations']);
+
+        $dbo->expects($this->once())
+            ->method('setConfigPrepBoF')
+            ->with($data['schedule_prep'], -1, -1);
+
+        $dbo->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($config);
+
+        // Request mock
+        $request = $this->getMockBuilder(Request::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getAttribute', 'getParsedBody'])
+            ->getMock();
+
+        $request->expects($this->exactly(2))
+            ->method('getAttribute')
+            ->with('is_admin')
+            ->willReturn(true);
+
+        $request->expects($this->once())
+            ->method('getParsedBody')
+            ->willReturn($data);
+
+        // ResponseInterface mock
+        $response = $this->getMockBuilder(ResponseInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Twig view mock
+        $view = $this->getMockBuilder(Twig::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['render'])
+            ->getMock();
+
+        $view->expects($this->once())
+            ->method('render')
+            ->with($response, 'admin.html', $config)
+            ->willReturn(4);
+
+        $admin = new Admin($view, null, $dbo, null);
+        $this->assertEquals(4, $admin->update_config($request, $response, null));
+    }
 }

@@ -89,12 +89,41 @@ class Admin
 			$this->dbo->setConfigDateTime('voting_ends', strtotime($data['voting_ends']." ".$data['time_voting_ends']));
 		}
 
+		$prepRound = -1;
 		if (is_array($data['rounds']) && count($data['rounds']) > 0) {
 			$this->dbo->setRoundNames($data['rounds']);
+			$prepRound = 0;
+			foreach ($data['rounds'] as $round) {
+				if ($round == $data['prep_bof_round']) {
+					break;
+				}
+				$prepRound++;
+			}
+			if ($prepRound >= count($data['rounds'])) {
+				$prepRound = -1;
+			}
 		}
 
+		$prepLocation = -1;
 		if (is_array($data['locations']) && count($data['locations']) > 0) {
 			$this->dbo->setLocationNames($data['locations']);
+			$prepLocation = 0;
+			foreach ($data['locations'] as $location) {
+				if ($location == $data['prep_bof_location']) {
+					break;
+				}
+				$prepLocation++;
+			}
+			if ($prepLocation >= count($data['locations'])) {
+				$prepLocation = -1;
+			}
+		}
+
+		if (!empty($data['schedule_prep'])) {
+			$this->dbo->setConfigPrepBoF('False', -1, -1);
+                }
+		else {
+			$this->dbo->setConfigPrepBoF('True', $prepRound, $prepLocation);
 		}
 
 		return $this->showAdminView($request, $response, $args);

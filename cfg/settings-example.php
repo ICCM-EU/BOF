@@ -24,6 +24,7 @@ return [
             'from' => 'robot@example.org',
             'from_name' => 'ICCM XYZ'
         ],
+
         // DB Settings
         'db' => [
             'host' => 'localhost',
