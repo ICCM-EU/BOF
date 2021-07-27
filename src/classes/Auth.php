@@ -81,17 +81,17 @@ class Auth
             $active = 1;
         }
         if (strlen($login) == 0 || strlen($password) == 0 || strlen($email) == 0) {
-            print $this->translator->trans("Empty user or pass. Don't do that!");
-            return 0;
+            return $this->view->render($response, 'register.html', array('error' => $this->translator->trans("Empty user or pass. Don't do that!"),
+                'user_name' => $login, 'email' => $email, 'userinfo' => $userinfo));
         }
         if (!$this->checkPasswordQuality($password)) {
-            print $this->translator->trans("password_policy_violated");
-            return 0;
+            return $this->view->render($response, 'register.html', array('error' => $this->translator->trans("password_policy_violated"),
+                'user_name' => $login, 'email' => $email, 'userinfo' => $userinfo));
         }
         if ($this->dbo->checkForUser($login, $email)) {
-            # user already exist, so return with error code 0
-            print $this->translator->trans("User already exists");
-            return 0;
+            # user already exist
+            return $this->view->render($response, 'register.html', array('error' => $this->translator->trans("User already exists"),
+                'user_name' => $login, 'email' => $email, 'userinfo' => $userinfo));
         }
         else {
             $token = bin2hex(random_bytes(16));
@@ -149,9 +149,9 @@ class Auth
         }
 
         $password = $data['password'];
-        if (!$this->checkPasswordQuality($password)) {
-            print $this->translator->trans("password_policy_violated");
-            return 0;
+	if (!$this->checkPasswordQuality($password)) {
+            return $this->view->render($response, 'reset_pwd.html', array('error' => $this->translator->trans("password_policy_violated"),
+                'token' => $token, 'email' => $email));
         }
         if ($this->dbo->resetPassword($email, $token, $password) === true) {
             return $this->view->render($response, 'login.html', array('message' => 'passwordreset'));

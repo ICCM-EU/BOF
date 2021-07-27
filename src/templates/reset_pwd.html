@@ -13,6 +13,13 @@
 
 <form action="{{ path_for( 'reset_pwd' )}}" method="POST" class="bof-form">
 
+{% if error != '' %}
+<div class="notice notice--error">
+<h1>{{'Error'|trans}}</h1>
+<p>{{error}}</p>
+</div>
+{% endif %}
+
   {% if token != '' %}
   <input type="hidden" name="token" value="{{token}}"/>
   <input type="hidden" name="email" value="{{email}}"/>
@@ -23,7 +30,7 @@
   {% else %}
   <div class="bof-form__item">
     <label class="bof-form__label">{{'Email'|trans}}</label>
-    <input type="text" name="email" class="bof-form__input"/>
+    <input type="email" name="email" class="bof-form__input"/>
   </div>
   {% endif %}
 
