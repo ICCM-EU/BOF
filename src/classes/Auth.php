@@ -49,13 +49,12 @@ class Auth
         $login = $data['user_name'];
         if (($row = $this->dbo->authenticate($login, $data['password'])) && $row->valid) {
             if (!$row->active) {
-                return $response->withRedirect($this->router->pathFor("login") . "?message=waitformoderation")->withStatus(302);
+                return $this->view->render($response, 'login.html', array('message' => 'newuser_waitformoderation'));
 	    } else {
                 return $this->signin($response, $login, $row->id);
 	    }
         } else {
-            // echo json_encode("No valid user or password");
-            return $response->withRedirect($this->router->pathFor("login") . "?message=invalid")->withStatus(302);
+            return $this->view->render($response, 'login.html', array('message' => 'invalid'));
         }
     }
 
@@ -109,7 +108,7 @@ class Auth
                 $body = str_replace("<br/>", "\n", $body_html);
                 $this->sendEmail($email, $subject, $body_html, $body);
 
-                return $response->withRedirect($this->router->pathFor("login") . "?confirmuser=1")->withStatus(302);
+                return $this->view->render($response, 'login.html', array('message' => 'confirmuser'));
             }
 
             return $this->signin($response, $login, $id);
