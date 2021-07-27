@@ -6,21 +6,6 @@ use \Psr\Http\Message\ResponseInterface as Response;
 require __DIR__.'/../classes/Auth.php';
 
 $app->get('/login', function (Request $request, Response $response, array $args) {
-    $allgetvars = $request->getQueryParams();
-    $message = '';
-    if (($allgetvars['message'] == 'invalid') || ($allgetvars['message'] == 'waitformoderation')) {
-        $message = $allgetvars['message'];
-    } else if ($allgetvars['newuser'] == 1) {
-        $settings = require __DIR__.'/../../cfg/settings.php';
-        if ($settings['settings']['moderated_registration']) {
-            $message = 'newuser_waitformoderation';
-        }
-    } else if ($allgetvars['confirmuser'] == 1) {
-        $message = 'confirmuser';
-    }
-    if ($message != '') {
-        return $this->view->render($response, 'login.html', ['message' => $message]);
-    }
     return $this->view->render($response, 'login.html');
 })->setName('login');
 
