@@ -2,15 +2,23 @@
 
 {% block body %}
 <h1>{{'Register a new user'|trans}}</h1>
+
+{% if error != '' %}
+<div class="notice notice--error">
+<h1>{{'Error'|trans}}</h1>
+<p>{{error}}</p>
+</div>
+{% endif %}
+
 <form action="{{ path_for( 'new_user' )}}" method="POST" class="bof-form">
   <div class="bof-form__item">
     <label class="bof-form__label">{{'Username'|trans}}</label>
-    <input type="text" name="user_name" class="bof-form__input" />
+    <input type="text" name="user_name" value="{{user_name}}" class="bof-form__input" />
   </div>
   
   <div class="bof-form__item">
     <label class="bof-form__label">{{'E-Mail'|trans}}</label>
-    <input type="email" name="email" class="bof-form__input" />
+    <input type="email" name="email" value="{{email}}" class="bof-form__input" />
   </div>
 
   <div class="bof-form__item">
@@ -20,7 +28,7 @@
   {% if moderated_registration == true %}
   <div class="bof-form__item">
     <label class="bof-form__label">{{'UserInfo'|trans}}</label>
-    <textarea name="userinfo" class="bof-form__input" rows="2"></textarea>
+    <textarea name="userinfo" class="bof-form__input" rows="2">{{userinfo}}</textarea>
   </div>
   {% endif %}
 

@@ -49,12 +49,12 @@ class Auth
         $login = $data['user_name'];
         if (($row = $this->dbo->authenticate($login, $data['password'])) && $row->valid) {
             if (!$row->active) {
-                return $this->view->render($response, 'login.html', array('message' => 'newuser_waitformoderation'));
+                return $this->view->render($response, 'login.html', array('error' => $this->translator->trans("Wait for moderation.")));
 	    } else {
                 return $this->signin($response, $login, $row->id);
 	    }
         } else {
-            return $this->view->render($response, 'login.html', array('message' => 'invalid'));
+            return $this->view->render($response, 'login.html', array('error' => $this->translator->trans("Invalid username or password.")));
         }
     }
 
@@ -81,17 +81,17 @@ class Auth
             $active = 1;
         }
         if (strlen($login) == 0 || strlen($password) == 0 || strlen($email) == 0) {
-            print $this->translator->trans("Empty user or pass. Don't do that!");
-            return 0;
+            return $this->view->render($response, 'register.html', array('error' => $this->translator->trans("Empty user or pass. Don't do that!"),
+                'user_name' => $login, 'email' => $email, 'userinfo' => $userinfo));
         }
         if (!$this->checkPasswordQuality($password)) {
-            print $this->translator->trans("password_policy_violated");
-            return 0;
+            return $this->view->render($response, 'register.html', array('error' => $this->translator->trans("password_policy_violated"),
+                'user_name' => $login, 'email' => $email, 'userinfo' => $userinfo));
         }
         if ($this->dbo->checkForUser($login, $email)) {
-            # user already exist, so return with error code 0
-            print $this->translator->trans("User already exists");
-            return 0;
+            # user already exist
+            return $this->view->render($response, 'register.html', array('error' => $this->translator->trans("User already exists"),
+                'user_name' => $login, 'email' => $email, 'userinfo' => $userinfo));
         }
         else {
             $token = bin2hex(random_bytes(16));
@@ -108,7 +108,7 @@ class Auth
                 $body = str_replace("<br/>", "\n", $body_html);
                 $this->sendEmail($email, $subject, $body_html, $body);
 
-                return $this->view->render($response, 'login.html', array('message' => 'confirmuser'));
+                return $this->view->render($response, 'login.html', array('message' => $this->translator->trans('Please confirm your email address by visiting the link sent to your email address.')));
             }
 
             return $this->signin($response, $login, $id);
@@ -149,12 +149,12 @@ class Auth
         }
 
         $password = $data['password'];
-        if (!$this->checkPasswordQuality($password)) {
-            print $this->translator->trans("password_policy_violated");
-            return 0;
+	if (!$this->checkPasswordQuality($password)) {
+            return $this->view->render($response, 'reset_pwd.html', array('error' => $this->translator->trans("password_policy_violated"),
+                'token' => $token, 'email' => $email));
         }
         if ($this->dbo->resetPassword($email, $token, $password) === true) {
-            return $this->view->render($response, 'login.html', array('message' => 'passwordreset'));
+            return $this->view->render($response, 'login.html', array('message' => $this->translator->trans('Password has been reset')));
         }
 
         return $this->view->render($response, 'reset_pwd.html');
