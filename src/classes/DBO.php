@@ -300,9 +300,10 @@ class DBO
      */
     public function checkForUser($login, $email = '') {
         $sql = 'SELECT id FROM `participant`
-	    WHERE `name` = :name';
-	if ($email != '') {
+            WHERE `name` = :name';
+        if ($email != '') {
             $sql .= ' OR `email` = :email';
+        }
         $query=$this->db->prepare($sql);
         $query->bindValue('name', $login, PDO::PARAM_STR);
         if ($email != '') {
