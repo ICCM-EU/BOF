@@ -86,6 +86,28 @@ class DBO
     }
 
     /**
+     * get the login and userinfo by email
+     */
+    public function getUserDetails($email, &$login, &$userinfo)
+    {
+        $sql = "SELECT `name`, `userinfo` FROM `participant` WHERE `email` = :email";
+
+        $query=$this->db->prepare($sql);
+        $query->bindValue(':email', $email, PDO::PARAM_STR);
+        try {
+            $query->execute();
+        } catch (\PDOException $e){
+            return $e->getMessage();
+        }
+        if ($query->rowCount() == 1) {
+            $row = $query->fetch(PDO::FETCH_OBJ);
+            $login = $row->name;
+            $userinfo = $row->userinfo;
+            return TRUE;
+        }
+    }
+
+    /**
      * User confirms his own email address
      * @param string $email The email address of the user
      * @param string $token The token that was sent to that email address
