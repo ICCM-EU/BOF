@@ -28,7 +28,7 @@
   {% if moderated_registration == true %}
   <div class="bof-form__item">
     <label class="bof-form__label">{{'UserInfo'|trans}}</label>
-    <textarea name="userinfo" class="bof-form__input" rows="2">{{userinfo}}</textarea>
+    <textarea name="userinfo" class="bof-form__input" rows="2" maxlength="250">{{userinfo}}</textarea>
   </div>
   {% endif %}
 
