@@ -7,7 +7,7 @@ return array(
     'Username' => 'Username',
     'Password' => 'Password',
     'E-Mail' => 'E-Mail Address',
-    'UserInfo' => 'Short description or reference for the moderator',
+    'UserInfo' => 'Short description or reference for the moderator. Did you attend the ICCM Europe before, in which year? Which mission organisation are you involved with? Can you tell us who to contact for reference, that has attended ICCM Europe before?',
     'Error' => 'Error',
     'Hint' => 'Hint',
     'No account yet?' => 'No account yet?',

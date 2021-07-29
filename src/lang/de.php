@@ -7,7 +7,7 @@ return array(
     'Username' => 'Benutzername',
     'Password' => 'Passwort',
     'E-Mail' => 'E-Mail Adresse',
-    'UserInfo' => 'Kurze Beschreibung oder Referenz für den Moderator',
+    'UserInfo' => 'Kurze Beschreibung oder Referenz für den Moderator. Warst du schon einmal bei einer ICCM Konferenz, in welchem Jahr? Mit welchem Missionswerk arbeitest du? Oder kannst du uns eine Referenzperson nennen, die schon mal bei der ICCM Europe war?',
     'Error' => 'Fehler',
     'Hint' => 'Hinweis',
     'No account yet?' => 'Noch nicht registriert?',
