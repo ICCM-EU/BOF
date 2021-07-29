@@ -86,7 +86,7 @@ class Auth
         }
         if (!$this->checkPasswordQuality($password)) {
             return $this->view->render($response, 'register.html', array('error' => $this->translator->trans("password_policy_violated"),
-                'user_name' => $login, 'email' => $email, 'userinfo' => $userinfo));
+                'user_name' => $login, 'email' => $email, 'userinfo' => $userinfo, 'moderated_registration' => $this->settings['settings']['moderated_registration']));
         }
         if ($this->dbo->checkForUser($login, $email)) {
             # user already exist
@@ -149,7 +149,7 @@ class Auth
         }
 
         $password = $data['password'];
-	if (!$this->checkPasswordQuality($password)) {
+        if (!$this->checkPasswordQuality($password)) {
             return $this->view->render($response, 'reset_pwd.html', array('error' => $this->translator->trans("password_policy_violated"),
                 'token' => $token, 'email' => $email));
         }
@@ -176,7 +176,7 @@ class Auth
         return true;
     }
 
-    public function moderateNewUser($email) {
+    public function moderateNewUser($email, $login, $userinfo) {
         $userLang = $this->translator->getLocale();
         $this->translator->setLocale($this->settings['settings']['fallback_language']);
         $subject = $this->translator->trans('new registration %email%', ['%email%' => $email]);
@@ -260,9 +260,9 @@ class Auth
                 else {
                     // user must confirm his own email
                     if ($this->dbo->confirmEmail($email, $token)) {
-
+                        $this->dbo->getUserDetails($email, $login, $userinfo);
                         // send an email notification for the moderators
-                        $this->moderateNewUser($email);
+                        $this->moderateNewUser($email, $login, $userinfo);
 
                         return $this->view->render($response, 'confirm_user.html', array('message' => 'confirmed'));
                     }
