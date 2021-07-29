@@ -67,7 +67,7 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
     $sth = $this->db->prepare($sql_get_totalvotes);
     $sth->execute(['uid' => $userid]);
     $totalvotes = $sth->fetch();
-    if($totalvotes[0] >= 3 && $data['vote'] >= 1)
+    if($totalvotes[0] >= 20 && $data['vote'] >= 1)
         return $response->withRedirect($this->router->pathFor('topics'), 302);
 
     // find existing vote entries from this user on this workshop

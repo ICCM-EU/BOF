@@ -55,7 +55,7 @@ $app->get('/topics', function (Request $request, Response $response, array $args
     $query = $this->db->prepare($sql);
     $query->execute(['uid' => $userid]);
     $votes = $query->fetchAll();
-    $fullvotesleft = 3;
+    $fullvotesleft = 20;
 
     foreach($votes as $vote) {
         $fullvotesleft -= float_eq($vote['participant'], 1) ? 1 : 0;
