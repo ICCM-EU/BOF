@@ -6,6 +6,7 @@ return [
         'secrettoken' => 'topsecret', // needed for authentication with JWT
         'PrepBofId' => 1, // BOF for the prep team
         'fallback_language' => 'en',
+        'session_duration_days' => 1,
 
         'website_type' => 'bof',
         'workshop_icon' => 'noun_workshop_2457878',
