@@ -9,6 +9,7 @@ return [
 
         'website_type' => 'bof',
         'workshop_icon' => 'noun_workshop_2457878',
+        'max_length_description_preview' => 200,
         'allow_edit_nomination' => false,
         'allow_nomination_comments' => false,
 

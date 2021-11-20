@@ -3,7 +3,12 @@
 
   <div class="topic__detail">
     <h1>{{ topic.name }}</h1>
-    <p>{{ topic.description }}</p>
+    <p>
+        {{ topic.description }}
+        {% if topic.more %}
+        <a href="{{ topic.more }}">[..]</a>
+        {% endif %}
+    </p>
     {% if topic.leader %}
     <p>{{'Facilitator'|trans}}: {{ topic.leader }}</p>
     {% endif %}
