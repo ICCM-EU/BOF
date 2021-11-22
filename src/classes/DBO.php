@@ -861,6 +861,53 @@ class DBO
     }
 
 
+    public function getWorkshopDetails($topic_id) {
+        $groupConcat = "GROUP_CONCAT(p.name ORDER BY p.name ASC SEPARATOR ', ')";
+        if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            // Note that we can't make ORDER BY work inside the GROUP_CONCAT,
+            // and the trick used in getFacilitiators doesn't work, either. To
+            // get around these problems, we use a subquery and sort the
+            // subquery by p.name. But we still have to specify ORDER BY in the
+            // GROUP_CONCAT for mysql!
+            $groupConcat = "GROUP_CONCAT(p.name, ', ')";
+        }
+        $sql = "SELECT name, description, t.id, createdby, creator_id, leader, fullvoters
+                  FROM (SELECT w.name AS name,
+                                 w.id AS id,
+                        w.description AS description,
+                            creator_id,
+                              pc.name AS createdby, "
+                   . $groupConcat . " AS leader
+                          FROM workshop w
+                     LEFT JOIN workshop_participant wp
+                            ON wp.workshop_id = w.id
+                           AND wp.leader = 1
+                     LEFT JOIN participant pc
+                            ON w.creator_id = pc.id
+                     LEFT JOIN participant p
+                            ON wp.participant_id = p.id
+                      GROUP BY w.id
+                      ORDER BY w.id ASC) AS t
+             LEFT JOIN (SELECT w.id AS id, "
+                 . $groupConcat . " AS fullvoters
+                          FROM workshop w
+                     LEFT JOIN workshop_participant wp
+                            ON wp.workshop_id = w.id
+                           AND wp.participant = 1
+                     LEFT JOIN participant p
+                            ON wp.participant_id = p.id
+                     GROUP BY w.id
+                     ORDER BY w.id ASC) AS t2
+                    ON t.id = t2.id
+              WHERE t.id = :topic_id
+              GROUP BY t.id
+              ORDER BY t.id ASC";
+        $query = $this->db->prepare($sql);
+        $query->execute(array(':topic_id' => $topic_id ));
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
+
     /**
      * Gets booking information for a workshop with a particular vote total to
      * book. Note that this method accounts for availability of the
@@ -975,6 +1022,20 @@ class DBO
         $query->bindValue('description', $description, PDO::PARAM_STR);
         $query->bindValue('creator_id', (int) $creator_id, PDO::PARAM_INT);
         $query->execute();
+    }
+
+    /**
+     * Update the workshop
+     *
+     * @param string $id The id of the workshop.
+     * @param string $name The name for the new workshop.
+     * @param string $description The description for the new workshop.
+     */
+    public function nominate_edit($id, $name, $description) {
+        $sql = 'UPDATE workshop SET `name` = :name, `description` = :description WHERE `id` = :id';
+
+        $query=$this->db->prepare($sql);
+        $query->execute(array(':id' => $id, ':name' => $name, ':description' => $description));
     }
 
     /**

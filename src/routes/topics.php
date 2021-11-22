@@ -23,12 +23,24 @@ function float_eq($a, $b) {
 }
 $app->get('/topics', function (Request $request, Response $response, array $args) {
     $userid = $request->getAttribute('userid');
+    $settings = require __DIR__.'/../../cfg/settings.php';
 
     $sql = "SELECT *, '' as leader
             FROM `workshop`";
     $query=$this->db->prepare($sql);
     $query->execute();
     $bofs = $query->fetchAll();
+
+    // only display the first 200 characters of the description
+    if ($settings['settings']['max_length_description_preview'] > 0) {
+        $maxlength = $settings['settings']['max_length_description_preview'];
+        foreach($bofs as &$bof) {
+            if (strlen($bof['description']) > $maxlength) {
+                $bof['description'] = substr($bof['description'], 0, $maxlength);
+                $bof['more'] = '/topics/'.$bof['id'];
+            }
+        }
+    }
 
     $sql = 'SELECT participant.name, workshop_id
             FROM workshop_participant
@@ -96,5 +108,9 @@ $app->get('/topics', function (Request $request, Response $response, array $args
         'voted_successfull' => $show_vote_message,
     ]);
 })->setName('topics');
+
+$app->get('/topics/{id}', 'ICCM\BOF\Nomination:editNomination')->setName('edittopic');
+
+$app->post('/topics/{id}', 'ICCM\BOF\Nomination:updateNomination')->setName('updatetopic');
 
 ?>
