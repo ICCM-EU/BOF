@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+{% if canedit == true %}
+<h1>{{'Edit a BOF Session'|trans}}</h1>
+
+<form action="{{ path_for( 'updatetopic', {'id': topic.id})}}" method="POST" class="bof-form">
+  <input type="hidden" name="id" value="{{topic.id}}"/>
+  <div class="bof-form__item">
+    <label class="bof-form__label">{{'Title'|trans}}</label>
+    <input type="text" name="title" class="bof-form__input" value="{{topic.name}}"/>
+  </div>
+
+  <div class="bof-form__item">
+    <label class="bof-form__label">{{'Description'|trans}}</label>
+    <textarea name="description" class="bof-form__textarea">{{topic.description}}</textarea>
+  </div>
+
+  <input type="submit" value="{{'Save'|trans}}" class="btn btn--primary" />
+</form>
+
+<a href="/topics"><input type="submit" value="{{'Cancel'|trans}}" class="btn btn--secondary" /></a>
+
+{% else %}
+
+<a href="/topics"><input type="submit" value="{{'Back'|trans}}" class="btn btn--secondary" /></a>
+
+<h1>{{'Details of a BOF Session'|trans}}</h1>
+
+  <div class="bof-form__item">
+    <label class="bof-form__label">{{'Title'|trans}}</label>
+    <input type="text" name="title" class="bof-form__input" value="{{topic.name}}" readonly/>
+  </div>
+
+  <div class="bof-form__item">
+    <label class="bof-form__label">{{'Description'|trans}}</label>
+    <textarea name="description" class="bof-form__textarea" readonly>{{topic.description}}</textarea>
+  </div>
+
+{% endif %}
+
+{% endblock %}
+
