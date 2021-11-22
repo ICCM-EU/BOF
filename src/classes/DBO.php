@@ -53,26 +53,153 @@ class DBO
      * Adds auser to the participant table
      * 
      * @param string $login The name of the user
+     * @param string $email The email address of the user
      * @param string $password  The password of the user
+     * @param string $userinfo Helps to identify the user, for moderation
+     * @param string $language The browser language of the user when he registered
+     * @param bool   $active Is this user already activated, or must be moderated first?
+     * @param string $token the user must confirm his own email address with this token
      * 
      * @return mixed THe ID of the new user, or a string indicating an error
      */
-    public function addUser($login, $password) {
+    public function addUser($login, $email, $password, $language = 'en', $userinfo = '', $active = true, $token = '') {
         $pass = password_hash($password, PASSWORD_DEFAULT,
             ['cost' => $this->passwordCost]);
         $sql = 'INSERT INTO `participant`
-            (`name`, `password`)
-            VALUES (:name, :password)';
+            (`name`, `email`, `password`, `language`, `userinfo`, `active`, `token`)
+            VALUES (:name, :email, :password, :language, :userinfo, :active, :token)';
 
         $query=$this->db->prepare($sql);
         $query->bindValue(':name', $login, PDO::PARAM_STR);
+        $query->bindValue(':email', $email, PDO::PARAM_STR);
         $query->bindValue(':password', $pass, PDO::PARAM_STR);
+        $query->bindValue(':userinfo', $userinfo, PDO::PARAM_STR);
+        $query->bindValue(':language', $language, PDO::PARAM_STR);
+        $query->bindValue(':active', $active, PDO::PARAM_BOOL);
+        $query->bindValue(':token', $token, PDO::PARAM_STR);
         try {
             $query->execute();
         } catch (\PDOException $e){
             return $e->getMessage();
         }
         return $this->db->lastInsertId();
+    }
+
+    /**
+     * get the login and userinfo by email
+     */
+    public function getUserDetails($email, &$login, &$userinfo)
+    {
+        $sql = "SELECT `name`, `userinfo` FROM `participant` WHERE `email` = :email";
+
+        $query=$this->db->prepare($sql);
+        $query->bindValue(':email', $email, PDO::PARAM_STR);
+        try {
+            $query->execute();
+        } catch (\PDOException $e){
+            return $e->getMessage();
+        }
+        if ($query->rowCount() == 1) {
+            $row = $query->fetch(PDO::FETCH_OBJ);
+            $login = $row->name;
+            $userinfo = $row->userinfo;
+            return TRUE;
+        }
+    }
+
+    /**
+     * User confirms his own email address
+     * @param string $email The email address of the user
+     * @param string $token The token that was sent to that email address
+     *
+     * @return boolean If email has been confirmed successfully
+     */
+    public function confirmEmail($email, $token) {
+        $sql = 'UPDATE `participant` SET `confirmed` = 1 WHERE `email` = :email AND `confirmed` = 0 AND `token` = :token';
+        $query=$this->db->prepare($sql);
+        $query->bindValue(':email', $email, PDO::PARAM_STR);
+        $query->bindValue(':token', $token, PDO::PARAM_STR);
+        try {
+            $query->execute();
+        } catch (\PDOException $e){
+            return $e->getMessage();
+        }
+        return $query->rowCount() == 1;
+    }
+
+    /**
+     * Activates a user that has not been activated yet
+     * @param string $email The email address of the user
+     * @param string $userlang Will return the language of the user
+     *
+     * @return boolean Only true if the user has not been active before, and if the email exists and has been confirmed
+     */
+    public function activateUser($email, &$userlang) {
+        $sql = 'UPDATE `participant` SET `active` = 1 WHERE `email` = :email AND `active` = 0 AND `confirmed` = 1';
+        $query=$this->db->prepare($sql);
+        $query->bindValue(':email', $email, PDO::PARAM_STR);
+        try {
+            $query->execute();
+        } catch (\PDOException $e){
+            return $e->getMessage();
+        }
+        if ($query->rowCount() == 1) {
+            $sql = 'SELECT `language` FROM `participant` WHERE `email` = :email';
+            $query=$this->db->prepare($sql);
+            $query->bindValue(':email', $email, PDO::PARAM_STR);
+            try {
+                $query->execute();
+                $row = $query->fetch(PDO::FETCH_OBJ);
+                $userlang = $row->language;
+            } catch (\PDOException $e){
+                return $e->getMessage();
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Sets a token for resetting the password
+     * @param string $email The email address of the user
+     * @param string $token The token that was sent in the password reset email
+     */
+    public function startResetPassword($email, $token) {
+        $sql = 'UPDATE `participant` SET `token` = :token WHERE `email` = :email AND `active` = 1 AND `confirmed` = 1';
+        $query=$this->db->prepare($sql); 
+        $query->bindValue(':email', $email, PDO::PARAM_STR); 
+        $query->bindValue(':token', $token, PDO::PARAM_STR); 
+        try {
+            $query->execute(); 
+        } catch (\PDOException $e){ 
+            return $e->getMessage(); 
+        }
+
+        return $query->rowCount() === 1;
+    }
+
+    /**
+     * Reset the password
+     * @param string $email The email address of the user
+     * @param string $token The token that was sent in the password reset email
+     * @param string $password The new password
+     */
+    public function resetPassword($email, $token, $password) {
+        $pass = password_hash($password, PASSWORD_DEFAULT,
+            ['cost' => $this->passwordCost]);
+        $sql = "UPDATE `participant` SET `password` = :password, `token` = '' WHERE `email` = :email AND `active` = 1 AND `confirmed` = 1 AND `token` = :token AND `token` <> ''";
+        $query=$this->db->prepare($sql); 
+        $query->bindValue(':email', $email, PDO::PARAM_STR); 
+        $query->bindValue(':token', $token, PDO::PARAM_STR); 
+        $query->bindValue(':password', $pass, PDO::PARAM_STR); 
+        try { 
+            $query->execute(); 
+        } catch (\PDOException $e){ 
+            return $e->getMessage(); 
+        }
+
+        return $query->rowCount() === 1;
     }
 
     /**
@@ -91,13 +218,15 @@ class DBO
         // Even if it's correct, we know our fake password was used because
         // count will be 0, and we validate count below.
         $sql = "SELECT COUNT(id) AS count,
+                       `active`,
                        COALESCE(id, -1) AS id,
                        COALESCE(name, ':name') AS name,
                        COALESCE(password, '\$2y\$" . $this->passwordCost . "\$NYriOyGGQ0AwLbOxUwaFneXQzI4prjcNbfTs.zOu3PSJPSLaHvvGH') AS password
                   FROM participant
-                 WHERE name = :name";
+                 WHERE name = :name or email = :email";
         $query=$this->db->prepare($sql);
         $query->bindValue(':name', $login, PDO::PARAM_STR);
+        $query->bindValue(':email', $login, PDO::PARAM_STR);
         $query->execute();
         $row = $query->fetch(PDO::FETCH_OBJ);
         // Always call password_verify! Note that we use bitwise AND to ensure
@@ -191,11 +320,17 @@ class DBO
      * 
      * @return true if the user exists, otherwise false.
      */
-    public function checkForUser($login) {
+    public function checkForUser($login, $email = '') {
         $sql = 'SELECT id FROM `participant`
             WHERE `name` = :name';
+        if ($email != '') {
+            $sql .= ' OR `email` = :email';
+        }
         $query=$this->db->prepare($sql);
         $query->bindValue('name', $login, PDO::PARAM_STR);
+        if ($email != '') {
+            $query->bindValue('email', $email, PDO::PARAM_STR);
+	}
         $query->execute();
         return $query->fetch(PDO::FETCH_OBJ) !== false;
     }

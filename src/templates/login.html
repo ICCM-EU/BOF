@@ -4,10 +4,16 @@
 
 <h1 class="title">{{'Login'|trans}}</h1>
 
-{% if message == 'invalid' %}
+{% if error != '' %}
 <div class="notice notice--error">
 <h1>{{'Error'|trans}}</h1>
-<p>{{'Invalid username or password.'|trans}}</p>
+<p>{{error}}</p>
+</div>
+{% endif %}
+{% if message != '' %}
+<div class="notice notice--error">
+<h1>{{'Hint'|trans}}</h1>
+<p>{{message}}</p>
 </div>
 {% endif %}
 
@@ -25,5 +31,19 @@
 
   <input type="submit" value="{{'Login'|trans}}" class="btn btn--primary" />
 </form>
+
+<br/><label class="bof-form__label">{{'No account yet?'|trans}}</label>
+<div class="button-block">
+    <a href="{{ path_for('register')}}" class="btn btn--primary btn--block">
+      {{'Register'|trans}}
+    </a>
+</div>
+
+<br/><label class="bof-form__label">{{'Forgot your password?'|trans}}</label>
+<div class="button-block">
+    <a href="{{ path_for('reset_pwd')}}" class="btn btn--primary btn--block">
+      {{'Reset Password'|trans}}
+    </a>
+</div>
 
 {% endblock %}

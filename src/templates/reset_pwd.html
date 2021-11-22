@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h1 class="title">{{'Reset Password'|trans}}</h1>
+
+{% if message != '' %}
+<div class="notice notice--error">
+<h1>{{'Success'|trans}}</h1>
+<p>{{message}}</p>
+</div>
+{% else %}
+
+<form action="{{ path_for( 'reset_pwd' )}}" method="POST" class="bof-form">
+
+{% if error != '' %}
+<div class="notice notice--error">
+<h1>{{'Error'|trans}}</h1>
+<p>{{error}}</p>
+</div>
+{% endif %}
+
+  {% if token != '' %}
+  <input type="hidden" name="token" value="{{token}}"/>
+  <input type="hidden" name="email" value="{{email}}"/>
+  <div class="bof-form__item">
+    <label class="bof-form__label">{{'Password'|trans}}</label>
+    <input type="password" name="password" class="bof-form__input"/>
+  </div>
+  {% else %}
+  <div class="bof-form__item">
+    <label class="bof-form__label">{{'Email'|trans}}</label>
+    <input type="email" name="email" class="bof-form__input"/>
+  </div>
+  {% endif %}
+
+  <input type="submit" value="{{'Reset Password'|trans}}" class="btn btn--primary" />
+</form>
+{% endif %}
+
+{% endblock %}
