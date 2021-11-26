@@ -1291,6 +1291,7 @@ class DBO
 
         $query=$this->db->prepare($sql);
         $query->execute(array(':id' => $id, ':name' => $name, ':description' => $description));
+        return $query->rowCount() > 0;
     }
 
     /**
@@ -1320,6 +1321,7 @@ class DBO
 
         $query=$this->db->prepare($sql);
         $query->execute(array(':id' => $id, ':comment' => $comment));
+        return $query->rowCount() > 0;
     }
 
     /**

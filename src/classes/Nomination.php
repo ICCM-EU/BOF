@@ -87,8 +87,9 @@ class Nomination
 
         try
         {
-            $this->dbo->nominate_edit($id, $title, $description, $userid);
-            $this->send_notification('edit_post', $userid, $id, -1);
+            if ($this->dbo->nominate_edit($id, $title, $description, $userid)) {
+                $this->send_notification('edit_post', $userid, $id, -1);
+            }
             return $this->view->render($response, 'nomination_updated.html', [
                 'loggedin' => True,
             ]);
@@ -149,8 +150,9 @@ class Nomination
 
         try
         {
-            $this->dbo->comment_edit($id, $comment_text);
-            $this->send_notification('edit_comment', $userid, $topic_id, $id);
+            if ($this->dbo->comment_edit($id, $comment_text)) {
+                $this->send_notification('edit_comment', $userid, $topic_id, $id);
+            }
             return $response->withRedirect($this->router->pathFor('edittopic', ['id' => $topic_id]), 302);
         }
         catch (\Exception $ex) { $ex; }
