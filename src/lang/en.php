@@ -72,5 +72,12 @@ return array(
     'Slot for Prep BoF' => 'Slot for Prep BoF',
     'Room for Prep BoF' => 'Room for Prep BoF',
     'Default' => 'Default',
+    'Settings' => 'Settings',
+    'Notification by E-Mail' => 'Notification by E-Mail',
+    'notification_none' => 'None - I don\'t want any notifications',
+    'notification_own' => 'Own - I want notifications for comments on topics that I voted for',
+    'notification_new' => 'New - I want notifications for new topics, plus notifications on my topics that I voted for',
+    'notification_all' => 'All - I want notifications for all new topics and all comments',
+    'Your choice has been saved.' => 'Your choice has been saved.',
     'dummy' => 'dummy'
 );

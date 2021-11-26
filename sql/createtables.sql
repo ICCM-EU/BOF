@@ -146,6 +146,7 @@ CREATE TABLE `participant` (
   `password` varchar(255) COLLATE latin1_general_ci NOT NULL,
   `userinfo` varchar(255) COLLATE latin1_general_ci NOT NULL DEFAULT '',
   `language` varchar(5) COLLATE latin1_general_ci NOT NULL DEFAULT 'en',
+  `notifications` int(2) unsigned NOT NULL DEFAULT 10,
   `confirmed` tinyint(1) NOT NULL DEFAULT '0',
   `token` varchar(255) COLLATE latin1_general_ci NOT NULL DEFAULT '',
   `active` tinyint(1) NOT NULL DEFAULT '1',

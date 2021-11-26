@@ -316,6 +316,59 @@ class DBO
     }
 
     /**
+     * Save the settings
+     *
+     * @param int $userid The id of the current user
+     * @param int $notifications The selected option for notifications per email
+     *
+     * @return None
+     */
+    public function saveUserSettings($userid, $notifications) {
+        $sql="UPDATE participant
+                 SET notifications = :notifications
+                 WHERE id = :userid";
+        $query=$this->db->prepare($sql);
+        $query->bindValue('notifications', $notifications, PDO::PARAM_INT);
+        $query->bindValue('userid', $userid, PDO::PARAM_INT);
+        $query->execute();
+    }
+
+    /**
+     * Get the settings of the given user
+     *
+     * @param int $userid The id of the current user
+     *
+     * @return array with settings
+     */
+    public function getUserSettings($userid) {
+        $sql="SELECT notifications FROM participant
+                 WHERE id = :userid";
+        $query=$this->db->prepare($sql);
+        $query->bindValue('userid', $userid, PDO::PARAM_INT);
+        $query->execute();
+        $result = array();
+        if ($query->rowCount() == 1) {
+            $row = $query->fetch(PDO::FETCH_OBJ);
+            $result['notifications'] = $row->notifications;
+        }
+        return $result;
+    }
+
+    // get the user name and email if it has this notification setting
+    public function getUsersByNotificationsSetting($notifications) {
+        $sql="SELECT name, email FROM participant
+                 WHERE notifications = :notifications AND active = 1 and confirmed = 1";
+        $query=$this->db->prepare($sql);
+        $query->bindValue('notifications', $notifications, PDO::PARAM_INT);
+        $query->execute();
+        $result = array();
+        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+            $result[] = $row;
+        }
+        return $result;
+    }
+
+    /**
      * Checks if a user exists in the participant database.
      * 
      * @return true if the user exists, otherwise false.
@@ -1056,6 +1109,25 @@ class DBO
     }
 
     /**
+     * returns all voters for a topic. needed for notifications
+     *
+     * @return all voters for a topic
+     */
+    public function getAllVotersForWorkshop($topic_id) {
+        $sql = "SELECT w.id AS topic_id, wp.participant_id AS voter_id, pc.email as email
+                          FROM workshop w
+                     LEFT JOIN workshop_participant wp
+                            ON wp.workshop_id = w.id
+                           AND wp.participant > 0
+                     LEFT JOIN participant pc
+                            ON wp.participant_id = pc.id
+                WHERE w.id = :topic_id";
+        $query = $this->db->prepare($sql);
+        $query->execute(array(':topic_id' => $topic_id ));
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
      * Returns the comments for one workshop.
      * 
      * @return array An array whose elements are an object representing the comments
@@ -1203,6 +1275,8 @@ class DBO
 
         $query=$this->db->prepare($sql);
         $query->execute(array(':name' => $name, ':description' => $description, ':creator_id' => $creator_id));
+
+        return $this->db->lastInsertId();
     }
 
     /**
@@ -1231,6 +1305,8 @@ class DBO
 
         $query=$this->db->prepare($sql);
         $query->execute(array(':topic_id' => $topic_id, ':comment' => $comment, ':user_id' => $commentator_id));
+
+        return $this->db->lastInsertId();
     }
 
     /**

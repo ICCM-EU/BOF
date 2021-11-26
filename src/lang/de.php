@@ -72,5 +72,12 @@ return array(
     'Slot for Prep BoF' => 'Slot für Prep BoF',
     'Room for Prep BoF' => 'Raum für Prep BoF',
     'Default' => 'Standard',
+    'Settings' => 'Einstellungen',
+    'Notification by E-Mail' => 'Benachrichtigung per E-Mail',
+    'notification_none' => 'Keine - Ich will keine Benachrichtigung',
+    'notification_own' => 'Eigene - Ich will Benachrichtigungen für Kommentare von Themen, die ich gewählt habe',
+    'notification_new' => 'Neu - Ich will Benachrichtigungen für neue Themen, plus Benachrichtigungen für Themen die ich gewählt habe',
+    'notification_all' => 'Alles - Ich will Benachrichtigungen für jedes neue Thema und alle Kommentare',
+    'Your choice has been saved.' => 'Deine Einstellungen wurden gespeichert.',
     'dummy' => 'dummy'
 );

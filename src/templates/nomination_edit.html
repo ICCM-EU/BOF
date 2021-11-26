@@ -44,6 +44,7 @@
 
 {% for comment in comments %}
 
+<a name="comment{{ comment.id }}"></a>
 {{ comment.user_name }}
 <span class="bof-form__label">{{ comment.created_at }}</span>
 

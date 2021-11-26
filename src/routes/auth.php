@@ -22,6 +22,8 @@ $app->post('/reset_pwd', 'ICCM\BOF\Auth:reset_pwd')->setName('reset_pwd');
 
 $app->post('/confirm_user', 'ICCM\BOF\Auth:confirm_user')->setName('confirm_user');
 $app->get('/confirm_user', 'ICCM\BOF\Auth:confirm_user')->setName('confirm_user_get');
+$app->get('/settings', 'ICCM\BOF\Auth:edit_settings')->setName('settings');
+$app->post('/settings', 'ICCM\BOF\Auth:edit_settings')->setName('settings_save');
 
 $app->get('/logout', 'ICCM\BOF\Auth:logout')->setName('logout');
 

@@ -3,6 +3,7 @@
 namespace ICCM\BOF;
 use \Firebase\JWT\JWT;
 use \PDO;
+use ICCM\BOF\Mailer;
 
 class Nomination
 {
@@ -17,6 +18,7 @@ class Nomination
         $this->router = $router;
         $this->config = $dbo->getConfig();
         $this->settings = require __DIR__.'/../../cfg/settings.php';
+        $this->mailer = new \ICCM\BOF\Mailer($dbo);
     }
 
     public function nominate($request, $response, $args) {
@@ -30,7 +32,8 @@ class Nomination
         }
         try
         {
-            $this->dbo->nominate($title, $description, $userid);
+            $topic_id = $this->dbo->nominate($title, $description, $userid);
+            $this->send_notification('new_post', $userid, $topic_id, -1);
             return $this->view->render($response, 'nomination_response.html', [
                 'loggedin' => True,
             ]);
@@ -85,6 +88,7 @@ class Nomination
         try
         {
             $this->dbo->nominate_edit($id, $title, $description, $userid);
+            $this->send_notification('edit_post', $userid, $id, -1);
             return $this->view->render($response, 'nomination_updated.html', [
                 'loggedin' => True,
             ]);
@@ -113,7 +117,8 @@ class Nomination
 
         try
         {
-            $this->dbo->comment_add($topic_id, $comment, $userid);
+            $comment_id = $this->dbo->comment_add($topic_id, $comment, $userid);
+            $this->send_notification('new_comment', $userid, $topic_id, $comment_id);
             return $response->withRedirect($this->router->pathFor('edittopic', ['id' => $topic_id]), 302);
         }
         catch (\Exception $ex) { $ex; }
@@ -145,6 +150,7 @@ class Nomination
         try
         {
             $this->dbo->comment_edit($id, $comment_text);
+            $this->send_notification('edit_comment', $userid, $topic_id, $id);
             return $response->withRedirect($this->router->pathFor('edittopic', ['id' => $topic_id]), 302);
         }
         catch (\Exception $ex) { $ex; }
@@ -153,6 +159,74 @@ class Nomination
         return $this->view->render($response, 'comment_error.html', ['errormsg' => 'Error updating comment', 'topic_id' => $topic_id]);
     }
 
+    /**
+     * send a notification per email to all people interested
+     *
+     * @param $action: new_post, edit_post, new_comment, edit_comment
+     * @param $user_id
+     * @param $topic_id
+     * @param $comment_id
+     */
+    private function send_notification($action, $user_id, $topic_id, $comment_id) {
+
+        $users_sent = array();
+
+        // all users that voted for this bof
+        $UsersThatVotedForThisWorkshop = $this->dbo->getAllVotersForWorkshop($topic_id);
+        foreach ($UsersThatVotedForThisWorkshop as $user) {
+            $users_sent[$user->email] = 1;
+        }
+
+        // if new topic, send to all users that want to know about new topics
+        if ($action == 'new_post') {
+            $UsersWithNewNotifications = $this->dbo->getUsersByNotificationsSetting(20);
+            foreach ($UsersWithNewNotifications as $user) {
+                $users_sent[$user->email] = 1;
+            }
+        }
+
+        // send to all users that want everything
+        $UsersWithAllNotifications = $this->dbo->getUsersByNotificationsSetting(99);
+        foreach ($UsersWithAllNotifications as $user) {
+            $users_sent[$user->email] = 1;
+        }
+
+        $bof = $this->dbo->getWorkshopDetails($topic_id);
+        $bof = $bof[0];
+        $comment = $this->dbo->getWorkshopComment($comment_id);
+        $comment = $comment[0];
+        $title = $bof->name;
+        if (strlen($title) > 20) {
+            $title = substr($title, 0, 20)."...";
+        }
+        $topic_url = "https://".$_SERVER['HTTP_HOST']."/topics/$topic_id";
+        $comment_url = "https://".$_SERVER['HTTP_HOST']."/topics/$topic_id#comment$comment_id";
+
+        // now send all the emails, in english.
+        // TODO: use the language of each user???
+        foreach (array_keys($users_sent) as $email) {
+            if ($action == 'new_post') {
+                $this->mailer->sendEmail($email, 'ICCM Workshops: new topic '.$title,
+                    "see new topic at <a href='$topic_url'>".$_SERVER['HTTP_HOST']."</a><br/><br/>topic title: ".$bof->name ."<br/><br/>description: ". $bof->description,
+                    "see new topic at $topic_url\n\ntopic title: ".$bof->name ."\n\ndescription: ". $bof->description);
+            }
+            if ($action == 'edit_post') {
+                $this->mailer->sendEmail($email, 'ICCM Workshops: modified topic '.$title,
+                    "see modified topic at <a href='$topic_url'>".$_SERVER['HTTP_HOST']."</a><br/><br/>topic title: ".$bof->name ."<br/><br/>description: ". $bof->description,
+                    "see modified topic at $topic_url\n\ntopic title: ".$bof->name ."\n\ndescription: ". $bof->description);
+            }
+            if ($action == 'new_comment') {
+                $this->mailer->sendEmail($email, 'ICCM Workshops: new comment on topic '.$title,
+                    "see new comment at <a href='$comment_url'>".$_SERVER['HTTP_HOST']."</a><br/><br/>topic title: ".$bof->name ."<br/><br/>comment: ". $comment->comment,
+                    "see new comment at $comment_url\n\ntopic title: ".$bof->name ."\n\ncomment: ". $comment->comment);
+            }
+            if ($action == 'edit_comment') {
+                $this->mailer->sendEmail($email, 'ICCM Workshops: modified comment on topic '.$title,
+                    "see modified comment at <a href='$comment_url'>".$_SERVER['HTTP_HOST']."</a><br/><br/>topic title: ".$bof->name ."<br/><br/>comment: ". $comment->comment,
+                    "see modified comment at $comment_url\n\ntopic title: ".$bof->name ."\n\ncomment: ". $comment->comment);
+            }
+        }
+    }
 }
 
 ?>

@@ -4,9 +4,7 @@ namespace ICCM\BOF;
 use \Firebase\JWT\JWT;
 use ICCM\BOF\Cookies;
 use \PDO;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
+use ICCM\BOF\Mailer;
 
 class Auth
 {
@@ -28,6 +26,7 @@ class Auth
         $this->translator = $translator;
         $this->settings = require __DIR__.'/../../cfg/settings.php';
         $this->site = $_SERVER['SERVER_NAME'];
+        $this->mailer = new \ICCM\BOF\Mailer($dbo);
     }
 
     private function signin($response, $login, $userid) {
@@ -113,7 +112,7 @@ class Auth
                 $accept_link = "https://".$this->site."/confirm_user?email=".urlencode($email)."&token=".$token;
                 $body_html = $this->translator->trans("email_confirm_user", ['%site%' => $this->site, '%login%' => $login, '%link%' => $accept_link]);
                 $body = str_replace("<br/>", "\n", $body_html);
-                $this->sendEmail($email, $subject, $body_html, $body);
+                $this->mailer->sendEmail($email, $subject, $body_html, $body);
 
                 return $this->view->render($response, 'login.html', array('message' => $this->translator->trans('Please confirm your email address by visiting the link sent to your email address.')));
             }
@@ -143,7 +142,7 @@ class Auth
             $text_body = str_replace("<br/>", "\n", $html_body);
 
             if ($this->dbo->startResetPassword($email, $token)) {
-                $this->sendEmail($email, $subject, $html_body, $text_body);
+                $this->mailer->sendEmail($email, $subject, $html_body, $text_body);
             }
 
             return $this->view->render($response, 'reset_pwd.html', array('message' => $this->translator->trans("An Email has been sent for the password reset")));
@@ -192,41 +191,7 @@ class Auth
         $text_body = str_replace("<br/>", "\n", $html_body);
         $email_to = $this->settings['settings']['moderation_email'];
         $this->translator->setLocale($userLang);
-        $this->sendEmail($email_to, $subject, $html_body, $text_body);
-    }
-
-    public function sendEmail($email_to, $subject, $html_body, $text_body) {
-
-        $mail = new PHPMailer();
-        $mail->isSMTP();
-        $mail->Host       = $this->settings['settings']['smtp']['host'];
-        $mail->SMTPAuth   = true;
-        $mail->Username   = $this->settings['settings']['smtp']['user'];
-        $mail->Password   = $this->settings['settings']['smtp']['passwd'];
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        $mail->Port       = $this->settings['settings']['smtp']['port'];
-        $mail->setFrom($this->settings['settings']['smtp']['from'], $this->settings['settings']['smtp']['from_name']);
-        $mail->addAddress($email_to);
-        $mail->Subject = $subject;
-        $mail->CharSet = "UTF-8";
-
-        if ($html_body != '') {
-            $mail->isHTML(true);
-            $mail->Body = $html_body;
-            $mail->AltBody = $text_body;
-        }
-        else
-        {
-            $mail->Body = $text_body;
-        }
-
-        try {
-            if (!$mail->send()) {
-                error_log($mail->ErrorInfo);
-            }
-        } catch (Exception $e) {
-            error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
-        }
+        $this->mailer->sendEmail($email_to, $subject, $html_body, $text_body);
     }
 
     public function confirm_user($request, $response, $args) {
@@ -251,7 +216,7 @@ class Auth
                         $adminLang = $this->translator->getLocale();
                         $this->translator->setLocale($userLang);
                         // $this->translator->trans(
-                        $this->sendEmail($email,
+                        $this->mailer->sendEmail($email,
                             $this->translator->trans("Account has been activated"),
                             "",
                             $this->translator->trans("Your account at %site% has been activated", ['%site%' => 'https://'.$this->site]));
@@ -259,7 +224,7 @@ class Auth
 
                         // send an email notification for the moderators
                         $email_to = $this->settings['settings']['moderation_email'];
-                        $this->sendEmail($email_to, "$email has been activated", "", "$email has been activated");
+                        $this->mailer->sendEmail($email_to, "$email has been activated", "", "$email has been activated");
 
                         return $this->view->render($response, 'confirm_user.html', array('message' => 'activated'));
                     }
@@ -285,6 +250,28 @@ class Auth
         $config['show_githubforkme'] = true;
         return $this->view->render($response, 'home.html', $config);
     }
+
+    public function edit_settings($request, $response, $args) {
+        $data = $request->getParsedBody();
+
+        if (!$data) {
+            $data = $request->getQueryParams();
+        }
+
+        if (!array_key_exists('notifications', $data) || $data['notifications'] == '') {
+            $data = $this->dbo->getUserSettings($request->getAttribute('userid'));
+            return $this->view->render($response, 'settings.html',
+                ['loggedin' => True, 'notifications'.$data['notifications'] => 'selected']);
+        }
+
+        $this->dbo->saveUserSettings($request->getAttribute('userid'), $data['notifications']);
+
+        return $this->view->render($response, 'settings.html',
+            ['message' => $this->translator->trans("Your choice has been saved."),
+            'loggedin' => True,
+            'notifications'.$data['notifications'] => 'selected']);
+    }
+
 }
 
 ?>

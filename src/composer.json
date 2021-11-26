@@ -13,5 +13,10 @@
         "phpunit/phpunit": "^9.1",
         "phpspec/prophecy-phpunit": "^2.0.1",
         "php-mock/php-mock": "^2.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "ICCM\\BOF\\": "classes/"
+        }
     }
 }
