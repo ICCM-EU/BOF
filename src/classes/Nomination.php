@@ -58,6 +58,7 @@ class Nomination
         $user_id = $request->getAttribute('userid');
 
         return $this->view->render($response, 'nomination_edit.html', [
+            'loggedin' => True,
             'topic' => $bof[0],
             'user_id' => $user_id,
             'canedit' => $this->canEditNomination($bof[0], $user_id),
