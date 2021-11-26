@@ -68,7 +68,8 @@ class Admin
 
 			header('Content-Type: application/octet-stream');
 			header('Content-Disposition: attachment; filename=db-backup-BOF-'.date('Y-m-d_hi').'.sql');
-			passthru("mysqldump --user=$dbuser --password=$dbpassword --host=$dbhost $dbname");
+			passthru("mysqldump --user=$dbuser --password='$dbpassword' --host=$dbhost $dbname");
+			die();
 
 			throw new RuntimeException();
 		}
