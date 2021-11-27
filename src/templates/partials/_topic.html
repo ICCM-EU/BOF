@@ -39,13 +39,13 @@
     <form action="{{ path_for('votesaddpost')}}" class="fullvote" method="POST">
       <input type="hidden" name="vote" value="1" />
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
-      <input type="submit" class="btn btn--primary {{topic.fullvote ? 'btn--toggled' : ''}}" value="{{'Full vote'|trans}}" {{left_votes == 0 ? 'disabled' : ''}}/>
+      <input type="submit" class="btn btn--primary {{topic.fullvote ? ' btn--toggled' : ''}}" value="{{'Full vote'|trans}}" {{left_votes == 0 ? 'disabled' : ''}}/>
     </form>
 
     <form action="{{ path_for('votesaddpost') }}" class="quartervote" method="POST">
       <input type="hidden" name="vote" value="0.25" />
       <input type="hidden" name="workshopid" value="{{ topic.id }}" />
-      <input type="submit" class="btn btn--secondary {{topic.quartervote ? 'btn--toggled' : ''}}" value="{{'1⁄4 vote'|trans}}" />
+      <input type="submit" class="btn btn--secondary {{topic.quartervote ? ' btn--toggled' : ''}}" value="{{'1⁄4 vote'|trans}}" />
     </form>
 
     <form action="{{ path_for('votesaddpost') }}" class="clearvote" method="POST">
