@@ -33,6 +33,7 @@ class Nomination
         try
         {
             $topic_id = $this->dbo->nominate($title, $description, $userid);
+            $this->dbo->addQuarterVote($topic_id, $userid);
             $this->send_notification('new_post', $userid, $topic_id, -1);
             return $this->view->render($response, 'nomination_response.html', [
                 'loggedin' => True,
@@ -120,6 +121,7 @@ class Nomination
         try
         {
             $comment_id = $this->dbo->comment_add($topic_id, $comment, $userid);
+            $this->dbo->addQuarterVote($topic_id, $userid);
             $this->send_notification('new_comment', $userid, $topic_id, $comment_id);
             return $response->withRedirect($this->router->pathFor('edittopic', ['id' => $topic_id]), 302);
         }

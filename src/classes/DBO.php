@@ -32,20 +32,42 @@ class DBO
      */
     public function addFacilitator($workshop, $participant) {
         $sql = 'INSERT INTO `workshop_participant` (`workshop_id`,`participant_id`,`leader`, participant) 
-                VALUES (:workshop_id, :participant_id, 1, 0)
-                ON DUPLICATE KEY UPDATE `leader` = 1';
+                VALUES (:workshop_id, :participant_id, 1, 0.25)
+                ON DUPLICATE KEY UPDATE `leader` = 1, `participant` = GREATEST(0.25, `participant`)';
         if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
             $sql = 'INSERT INTO workshop_participant
                                 (workshop_id, participant_id, leader, participant)
-                                VALUES(:workshop_id, :participant_id, 1, 0)
+                                VALUES(:workshop_id, :participant_id, 1, 0.25)
                     ON CONFLICT(workshop_id, participant_id) DO UPDATE
-                            SET leader = 1';
+                            SET leader = 1, participant = MAX(0.25, participant)';
         }
 
         $query = $this->db->prepare($sql);
         $query->bindValue('workshop_id', (int) $workshop, PDO::PARAM_INT);
         $query->bindValue('participant_id', (int) $participant, PDO::PARAM_INT);
         
+        $query->execute();
+    }
+
+    /**
+     * this adds a quarter vote for the creator of a topic, and for the commentator of a topic
+     * this is useful for the notifications. people can unsubscribe from the notification by removing their vote
+     */
+    public function addQuarterVote($workshop, $participant) {
+        $sql = 'INSERT INTO `workshop_participant` (`workshop_id`,`participant_id`, `participant`) 
+                VALUES (:workshop_id, :participant_id, 0.25)
+                ON DUPLICATE KEY UPDATE `participant` = GREATEST(0.25, `participant`)';
+        if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            $sql = 'INSERT INTO workshop_participant
+                                (workshop_id, participant_id, participant)
+                                VALUES(:workshop_id, :participant_id, 0.25)
+                    ON CONFLICT(workshop_id, participant_id) DO UPDATE SET participant = MAX(0.25, participant)';
+        }
+
+        $query = $this->db->prepare($sql);
+        $query->bindValue('workshop_id', (int) $workshop, PDO::PARAM_INT);
+        $query->bindValue('participant_id', (int) $participant, PDO::PARAM_INT);
+
         $query->execute();
     }
 
