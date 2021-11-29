@@ -240,9 +240,9 @@ class DBO
         // Even if it's correct, we know our fake password was used because
         // count will be 0, and we validate count below.
         $sql = "SELECT COUNT(id) AS count,
-                       COALESCE(`active`, 0) AS active,^M
-                       COALESCE(`is_admin`, 0) AS is_admin,^M
-                       COALESCE(`is_moderator`, 0) AS is_moderator,^M
+                       COALESCE(`active`, 0) AS active,
+                       COALESCE(`is_admin`, 0) AS is_admin,
+                       COALESCE(`is_moderator`, 0) AS is_moderator,
                        COALESCE(id, -1) AS id,
                        COALESCE(name, ':name') AS name,
                        COALESCE(password, '\$2y\$" . $this->passwordCost . "\$NYriOyGGQ0AwLbOxUwaFneXQzI4prjcNbfTs.zOu3PSJPSLaHvvGH') AS password
