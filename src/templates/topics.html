@@ -20,6 +20,16 @@
 	</div>
 	{% endif %}
 
+	<div class="notice">
+		<form action="{{ path_for( 'topics')}}" method="GET" class="bof-form">
+		  <div class="bof-form__item">
+			<label class="bof-form__label">{{'Filter Expression'|trans}}</label>
+			<input type="text" name="filtertags" class="bof-form__input" value="{{filtertags}}" placeholder="ALL AND NOT Cancelled"/>
+		  </div>
+		  <input type="submit" value="{{'Filter'|trans}}" class="btn btn--primary" />
+		</form>
+	</div>
+
 	{% for topic in bofs %}           
 		{% include 'partials/_topic.html' %}
   {% endfor %}

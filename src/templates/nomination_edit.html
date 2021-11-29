@@ -17,6 +17,11 @@
     <textarea name="description" class="bof-form__textarea">{{topic.description}}</textarea>
   </div>
 
+  <div class="bof-form__item">
+    <label class="bof-form__label">{{'Tags'|trans}}</label>
+    <input type="text" name="tags" class="bof-form__input" value="{{topic.tags}}" placeholder="test1; Cancelled" {% if not is_moderator %} readonly{%endif%}/>
+  </div>
+
   <input type="submit" value="{{'Save'|trans}}" class="btn btn--primary" />
 </form>
 

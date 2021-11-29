@@ -81,6 +81,12 @@ class Nomination
 
         $bof = $this->dbo->getWorkshopDetails($id);
 
+        if ($request->getAttribute('is_admin')) {
+            $tags = $data['tags'];
+        } else {
+            $tags = $bof[0]->tags;
+        }
+
         if (!$this->canEditNomination($bof[0], $request->getAttribute('userid')))
         {
             print "You don't have permissions to edit this topic. Don't do that!";
@@ -89,7 +95,7 @@ class Nomination
 
         try
         {
-            if ($this->dbo->nominate_edit($id, $title, $description, $userid)) {
+            if ($this->dbo->nominate_edit($id, $title, $description, $tags, $userid)) {
                 $this->send_notification('edit_post', $userid, $id, -1);
             }
             return $this->view->render($response, 'nomination_updated.html', [
@@ -217,8 +223,8 @@ class Nomination
             }
             if ($action == 'edit_post') {
                 $this->mailer->sendEmail($email, 'ICCM Workshops: modified topic '.$title,
-                    "see modified topic at <a href='$topic_url'>".$_SERVER['HTTP_HOST']."</a><br/><br/>topic title: ".$bof->name ."<br/><br/>description: ". $bof->description,
-                    "see modified topic at $topic_url\n\ntopic title: ".$bof->name ."\n\ndescription: ". $bof->description);
+                    "see modified topic at <a href='$topic_url'>".$_SERVER['HTTP_HOST']."</a><br/><br/>topic title: ".$bof->name ."<br/><br/>description: ". $bof->description."<br/><br/>tags: ". $bof->tags,
+                    "see modified topic at $topic_url\n\ntopic title: ".$bof->name ."\n\ndescription: ". $bof->description."\n\ntags: ". $bof->tags);
             }
             if ($action == 'new_comment') {
                 $this->mailer->sendEmail($email, 'ICCM Workshops: new comment on topic '.$title,

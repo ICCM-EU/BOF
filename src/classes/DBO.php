@@ -1040,10 +1040,11 @@ class DBO
             // GROUP_CONCAT for mysql!
             $groupConcat = "GROUP_CONCAT(p.name, ', ')";
         }
-        $sql = "SELECT name, description, t.id, createdby, leader, fullvoters
+        $sql = "SELECT name, description, tags, t.id, createdby, leader, fullvoters
                   FROM (SELECT w.name AS name,
                                  w.id AS id,
                         w.description AS description,
+                               w.tags AS tags,
                               pc.name AS createdby, "
                    . $groupConcat . " AS leader
                           FROM workshop w
@@ -1093,10 +1094,11 @@ class DBO
             // GROUP_CONCAT for mysql!
             $groupConcat = "GROUP_CONCAT(p.name, ', ')";
         }
-        $sql = "SELECT name, description, t.id, createdby, creator_id, leader, fullvoters, t.created_at
+        $sql = "SELECT name, description, tags, t.id, createdby, creator_id, leader, fullvoters, t.created_at
                   FROM (SELECT w.name AS name,
                                  w.id AS id,
                         w.description AS description,
+                               w.tags AS tags,
                             creator_id,
                           w.created_at,
                               pc.name AS createdby, "
@@ -1305,14 +1307,18 @@ class DBO
      * Update the workshop
      * 
      * @param string $id The id of the workshop.
-     * @param string $name The name for the new workshop.
-     * @param string $description The description for the new workshop.
+     * @param string $name The name for the workshop.
+     * @param string $description The description for the workshop.
+     * @param string $tags The tags for the workshop.
      */
-    public function nominate_edit($id, $name, $description) {
-        $sql = 'UPDATE workshop SET `name` = :name, `description` = :description WHERE `id` = :id';
+    public function nominate_edit($id, $name, $description, $tags) {
+        $sql = 'UPDATE workshop SET `name` = :name, `description` = :description, `tags` = :tags WHERE `id` = :id';
 
+        if (strlen($tags) > 0 && $tags[strlen($tags) - 1] != ';') {
+            $tags .= ";";
+        }
         $query=$this->db->prepare($sql);
-        $query->execute(array(':id' => $id, ':name' => $name, ':description' => $description));
+        $query->execute(array(':id' => $id, ':name' => $name, ':description' => $description, ':tags' => $tags));
         return $query->rowCount() > 0;
     }
 

@@ -26,8 +26,27 @@ $app->get('/topics', function (Request $request, Response $response, array $args
     $userid = $request->getAttribute('userid');
     $settings = require __DIR__.'/../../cfg/settings.php';
 
+    $filter = trim($request->getQueryParam('filtertags', ''));
+
     $sql = "SELECT *, '' as leader
             FROM `workshop`";
+    if ($filter != '') {
+        $sql .= " WHERE 1=1";
+        $filtertags = explode(" AND ", strtoupper($filter));
+        foreach ($filtertags as $tag) {
+            $negate = '';
+            if (strlen($tag) > 4 && strtoupper(substr($tag, 0,3)) == "NOT") {
+                $negate = 'NOT';
+                $tag = substr($tag, 4);
+            }
+            if (strtoupper($tag) == "ALL") {
+                $sql .= " AND 1=1";
+            } else {
+                $sql .= " AND LOWER(`tags`) $negate LIKE '%".trim(strtolower($tag)).";%'";
+            }
+        }
+    }
+
     $query=$this->db->prepare($sql);
     $query->execute();
     $bofs = $query->fetchAll();
@@ -83,6 +102,17 @@ $app->get('/topics', function (Request $request, Response $response, array $args
         }
     }
 
+    // format the tags
+    foreach($bofs as &$bof) {
+        $bof['formatted_tags'] = '';
+        if ($bof['tags'] != '') {
+            $tags = explode(";", $bof['tags']);
+            foreach($tags as $tag) {
+                $bof['formatted_tags'] .= "<a href='?filtertags=$tag'>$tag</a>&nbsp;";
+            }
+        }
+    }
+
     function cmp($a, $b)
     {
         if ($a['vote'] > $b['vote']) return -1;
@@ -101,6 +131,7 @@ $app->get('/topics', function (Request $request, Response $response, array $args
     $params = $request->getQueryParams();
     $show_vote_message = array_key_exists('voted', $params) && $params['voted'] === '1';
     return $this->view->render($response, 'topics.html', [
+        'is_moderator' => $request->getAttribute('is_moderator'),
         'bofs' => $bofs,
         'stage' => $stage,
         'locked' =>  $stage=='locked',
@@ -108,6 +139,7 @@ $app->get('/topics', function (Request $request, Response $response, array $args
         'loggedin' => True,
         'left_votes' => $fullvotesleft,
         'voted_successfull' => $show_vote_message,
+        'filtertags' => $filter,
         'allowedit' => $settings['settings']['allow_edit_nomination'] != false,
         'allowcomments' => $settings['settings']['allow_nomination_comments'] != false,
     ]);

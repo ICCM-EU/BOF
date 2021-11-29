@@ -141,6 +141,8 @@ DROP TABLE IF EXISTS `participant`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `participant` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `is_admin` tinyint(1) NOT NULL DEFAULT '0',
+  `is_moderator` tinyint(1) NOT NULL DEFAULT '0',
   `name` varchar(255) COLLATE latin1_general_ci NOT NULL,
   `email` varchar(255) COLLATE latin1_general_ci NOT NULL,
   `password` varchar(255) COLLATE latin1_general_ci NOT NULL,
@@ -184,6 +186,7 @@ CREATE TABLE `workshop` (
   `location_id` int(10) unsigned DEFAULT NULL,
   `name` varchar(255) COLLATE latin1_general_ci NOT NULL,
   `description` text COLLATE latin1_general_ci NOT NULL,
+  `tags` text COLLATE latin1_general_ci NOT NULL DEFAULT '',
   `published` tinyint(1) NOT NULL DEFAULT '0',
   `votes` float DEFAULT NULL,
   `available` int(11) DEFAULT NULL,

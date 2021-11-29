@@ -79,5 +79,8 @@ return array(
     'notification_new' => 'New - I want notifications for new topics, plus notifications on my topics that I voted for',
     'notification_all' => 'All - I want notifications for all new topics and all comments',
     'Your choice has been saved.' => 'Your choice has been saved.',
+    'Tags' => 'Tags',
+    'Filter Expression' => 'Filter Expression for Tags',
+    'Filter' => 'Filter',
     'dummy' => 'dummy'
 );

@@ -88,4 +88,8 @@ TODO: Update database:
 
 ```
   alter table participant add column `notifications` int(2) unsigned NOT NULL DEFAULT 10 after `language`;
+  alter table workshop add column `tags` text COLLATE latin1_general_ci NOT NULL DEFAULT '' after `description`;
+  alter table participant add column `is_admin` tinyint(1) NOT NULL DEFAULT '0' after `id`;
+  alter table participant add column `is_moderator` tinyint(1) NOT NULL DEFAULT '0' after `is_admin`;
+  UPDATE participant SET is_admin=1, is_moderator=1 WHERE name='admin';
 ```

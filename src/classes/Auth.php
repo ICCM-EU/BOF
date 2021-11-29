@@ -29,13 +29,12 @@ class Auth
         $this->mailer = new \ICCM\BOF\Mailer($dbo);
     }
 
-    private function signin($response, $login, $userid) {
-        if ($login == "admin") {
-            $payload = array("is_admin" => true, "userid" => $userid);
+    private function signin($response, $login, $userid, $is_admin, $is_moderator) {
+        $payload = array("is_admin" => $is_admin, "is_moderator" => $is_moderator, "userid" => $userid);
+        if ($is_admin) {
             $goto = $this->router->pathFor("admin");
         } else {
             # going to topics
-            $payload = array("is_admin" => false, "userid" => $userid);
             $goto = $this->router->pathFor("topics");
         }
         $token = JWT::encode($payload, $this->secrettoken, "HS256");
@@ -57,7 +56,7 @@ class Auth
             if (!$row->active) {
                 return $this->view->render($response, 'login.html', array('error' => $this->translator->trans("Wait for moderation.")));
 	        } else {
-                return $this->signin($response, $login, $row->id);
+                return $this->signin($response, $login, $row->id, $row->is_admin, $row->is_moderator);
 	        }
         } else {
             return $this->view->render($response, 'login.html', array('error' => $this->translator->trans("Invalid username or password.")));
@@ -117,7 +116,7 @@ class Auth
                 return $this->view->render($response, 'login.html', array('message' => $this->translator->trans('Please confirm your email address by visiting the link sent to your email address.')));
             }
 
-            return $this->signin($response, $login, $id);
+            return $this->signin($response, $login, $id, false, false);
         }
     }
 

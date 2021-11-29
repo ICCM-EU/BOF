@@ -12,6 +12,9 @@
     {% if topic.leader %}
     <p>{{'Facilitator'|trans}}: {{ topic.leader }}</p>
     {% endif %}
+    {% if topic.tags %}
+    <p>{{'Tags'|trans}}:&nbsp;{{ topic.formatted_tags | raw }}</p>
+    {% endif %}
 
     {% if allowedit == true or allowcomments == true %}
       <p><a href="topics/{{topic.id}}">{{'Details'|trans}}</a></p>
