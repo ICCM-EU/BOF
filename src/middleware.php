@@ -24,19 +24,24 @@ $app->add(function($request, $response, $next) {
 
     $cookie = (array)JWT::decode($encodedcookie, $settings['settings']['secrettoken'], array('HS256'));
 
-    $sql_username = 'SELECT name FROM participant WHERE id = :uid';
+    $sql_username = 'SELECT name, is_admin, is_moderator FROM participant WHERE id = :uid';
     $sth = $this->db->prepare($sql_username);
     $sth->execute(['uid' => $cookie['userid']]);
     $username = NULL;
     $results = $sth->fetchAll();
-    if(count($results) > 0)
-        $username = $results[0];
+    if(count($results) > 0) {
+        $username = $results[0]['name'];
+        $is_admin = $results[0]['is_admin'];
+        $is_moderator = $results[0]['is_moderator'];
+    }
 
     $container['view']['userid'] = $cookie['userid'];
-    $container['view']['username'] = $username['name'];
-    $container['view']['is_admin'] = $cookie['is_admin'];
+    $container['view']['username'] = $username;
+    $container['view']['is_admin'] = $is_admin;
+    $container['view']['is_moderator'] = $is_moderator;
     $request = $request->withAttribute('userid', $cookie['userid']);
-    $request = $request->withAttribute('is_admin', $cookie['is_admin']);
+    $request = $request->withAttribute('is_admin', $is_admin);
+    $request = $request->withAttribute('is_moderator', $is_moderator);
 
     return $next($request, $response);
 });

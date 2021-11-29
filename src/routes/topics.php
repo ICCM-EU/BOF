@@ -39,7 +39,9 @@ $app->get('/topics', function (Request $request, Response $response, array $args
                 $negate = 'NOT';
                 $tag = substr($tag, 4);
             }
-            if (strtoupper($tag) == "ALL") {
+            if ($tag == "NONE") {
+                $sql .= " AND `tags` = ''";
+            } else if (strtoupper($tag) == "ALL") {
                 $sql .= " AND 1=1";
             } else {
                 $sql .= " AND LOWER(`tags`) $negate LIKE '%".trim(strtolower($tag)).";%'";
@@ -108,7 +110,7 @@ $app->get('/topics', function (Request $request, Response $response, array $args
         if ($bof['tags'] != '') {
             $tags = explode(";", $bof['tags']);
             foreach($tags as $tag) {
-                $bof['formatted_tags'] .= "<a href='?filtertags=$tag'>$tag</a>&nbsp;";
+                $bof['formatted_tags'] .= "<a href='?filtertags=".rawurlencode($tag)."'>$tag</a>&nbsp;";
             }
         }
     }

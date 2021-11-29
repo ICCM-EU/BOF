@@ -55,9 +55,9 @@ class Auth
         if (($row = $this->dbo->authenticate($login, $data['password'])) && $row->valid) {
             if (!$row->active) {
                 return $this->view->render($response, 'login.html', array('error' => $this->translator->trans("Wait for moderation.")));
-	        } else {
+            else {
                 return $this->signin($response, $login, $row->id, $row->is_admin, $row->is_moderator);
-	        }
+            }
         } else {
             return $this->view->render($response, 'login.html', array('error' => $this->translator->trans("Invalid username or password.")));
         }
