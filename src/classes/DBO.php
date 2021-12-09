@@ -751,9 +751,10 @@ class DBO
             // GROUP_CONCAT for mysql!
             $groupConcat = "GROUP_CONCAT(leader, ', ')";
         }
-        $sql = "SELECT name, id, SUM(vote) as votes, "
+        $sql = "SELECT name, id, tags, SUM(vote) as votes, "
                        . $groupConcat . " AS leader
                   FROM (SELECT w.name AS name, w.id AS id,
+                               w.tags as tags,
                                wp.participant AS vote, p.name AS leader
                           FROM workshop w
                      LEFT JOIN workshop_participant wp

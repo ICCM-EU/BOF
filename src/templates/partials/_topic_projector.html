@@ -13,13 +13,16 @@
   <div class="topic__detail">
     <h1>{{ topic.name }}</h1>
     {% if topic.leader %}
-    <p>{{'Facilitator'|trans}}: {{ topic.leader }}</p>
+    <p>{{'Facilitator'|trans}}:&nbsp;{{ topic.leader }}</p>
+    {% endif %}
+    {% if topic.tags %}
+    <p style="text-align: right">{{'Tags'|trans}}:&nbsp;{{ topic.tags }}</p>
     {% endif %}
   </div>
 
   {% if topic.votes > 0 %}
     <div class="topic__vote-count">
-      {{'Votes'|trans}}: {{ topic.votes }}
+      {{'Votes'|trans}}:&nbsp;{{ topic.votes }}
     </div>
   {% endif %}
 

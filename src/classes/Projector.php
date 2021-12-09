@@ -37,7 +37,10 @@ class Projector
 					$bof['rooms'][$locationId]['topic'] = $row->name;
 					$bof['rooms'][$locationId]['description'] = $row->description;
 					$bof['rooms'][$locationId]['votes'] = $row->votes;
-					$bof['rooms'][$locationId]['facilitators'] = $this->dbo->getFacilitators($row->id);
+
+					$workshop = $this->dbo->getWorkshopDetails($row->id);
+					$bof['rooms'][$locationId]['facilitators'] = $workshop->leader;
+					$bof['rooms'][$locationId]['tags'] = $workshop->tags;
 				}
 			}
 			$bofs[$roundId] = $bof;
