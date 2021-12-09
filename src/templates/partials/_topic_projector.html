@@ -16,7 +16,7 @@
     <p>{{'Facilitator'|trans}}:&nbsp;{{ topic.leader }}</p>
     {% endif %}
     {% if topic.tags %}
-    <p style="text-align: right">{{'Tags'|trans}}:&nbsp;{{ topic.tags }}</p>
+    <p style="text-align: right">{{'Tags'|trans}}:&nbsp;{{ topic.tags | trim(';')}}</p>
     {% endif %}
   </div>
 
