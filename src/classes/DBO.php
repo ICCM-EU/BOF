@@ -762,6 +762,7 @@ class DBO
                      LEFT JOIN participant p
                             ON wp.participant_id = p.id
                            AND wp.leader = 1
+                     WHERE w.tags NOT LIKE '%Cancelled%'
                       ORDER BY p.name) AS t
               GROUP BY id
               ORDER BY votes DESC, id DESC";
