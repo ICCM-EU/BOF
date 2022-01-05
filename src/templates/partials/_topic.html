@@ -9,8 +9,9 @@
         <a href="{{ topic.more }}">[..]</a>
         {% endif %}
     </p>
+    <p>{{'Suggested by'|trans}}:&nbsp;{{ topic.createdby }}{% if is_moderator == true%} ({{topic.createdby_email}}){%endif%}</p>
     {% if topic.leader %}
-    <p>{{'Facilitator'|trans}}: {{ topic.leader }}</p>
+    <p>{{'Facilitator'|trans}}:&nbsp;{{ topic.leader }}{% if is_moderator == true%} ({{topic.leader_email}}){%endif%}</p>
     {% endif %}
     {% if topic.tags %}
     <p>{{'Tags'|trans}}:&nbsp;{{ topic.formatted_tags | raw }}</p>

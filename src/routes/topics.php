@@ -28,7 +28,7 @@ $app->get('/topics', function (Request $request, Response $response, array $args
 
     $filter = trim($request->getQueryParam('filtertags', ''));
 
-    $sql = "SELECT *, '' as leader
+    $sql = "SELECT *, '' as leader, '' as createdby
             FROM `workshop`";
     if ($filter != '') {
         $sql .= " WHERE 1=1";
@@ -64,7 +64,7 @@ $app->get('/topics', function (Request $request, Response $response, array $args
         }
     }
 
-    $sql = 'SELECT participant.name, workshop_id
+    $sql = 'SELECT participant.name, participant.email, workshop_id
             FROM workshop_participant
             JOIN participant ON workshop_participant.participant_id = participant.id
             WHERE workshop_participant.leader = 1';
@@ -76,8 +76,25 @@ $app->get('/topics', function (Request $request, Response $response, array $args
             if($bof['id'] === $row->workshop_id) {
                 if (strlen($bof['leader']) > 0) {
                     $bof['leader'] .= ', ';
+                    $bof['leader_email'] .= ', ';
                 }
                 $bof['leader'] .= $row->name;
+                $bof['leader_email'] .= $row->email;
+            }
+        }
+    }
+
+    $sql = 'SELECT participant.name, participant.email, workshop.id as workshop_id
+            FROM workshop
+            JOIN participant ON workshop.creator_id = participant.id';
+    $query=$this->db->prepare($sql);
+    $param = array ();
+    $query->execute($param);
+    while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+        foreach($bofs as &$bof) {
+            if($bof['id'] === $row->workshop_id) {
+                $bof['createdby'] = $row->name;
+                $bof['createdby_email'] = $row->email;
             }
         }
     }
