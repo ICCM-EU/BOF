@@ -30,8 +30,8 @@ $app->get('/topics', function (Request $request, Response $response, array $args
 
     $sql = "SELECT *, '' as leader, '' as createdby
             FROM `workshop`";
+    $sql .= " WHERE 1=1";
     if ($filter != '') {
-        $sql .= " WHERE 1=1";
         $filtertags = explode(" AND ", strtoupper($filter));
         foreach ($filtertags as $tag) {
             $negate = '';
@@ -47,6 +47,10 @@ $app->get('/topics', function (Request $request, Response $response, array $args
                 $sql .= " AND LOWER(`tags`) $negate LIKE '%".trim(strtolower($tag)).";%'";
             }
         }
+    }
+
+    if (strpos($filter, 'ARCHIVE_') === false) {
+        $sql .= " AND `tags` NOT LIKE 'ARCHIVE_%'";
     }
 
     $query=$this->db->prepare($sql);
@@ -99,9 +103,10 @@ $app->get('/topics', function (Request $request, Response $response, array $args
         }
     }
 
-    $sql = 'SELECT workshop_id, participant
-            FROM `workshop_participant`
-            WHERE participant_id = :uid';
+    $sql = "SELECT wp.workshop_id, wp.participant
+            FROM `workshop` AS w JOIN `workshop_participant` AS wp ON w.id = wp.workshop_id
+            WHERE participant_id = :uid
+            AND w.tags NOT LIKE 'ARCHIVE_%'";
     $query = $this->db->prepare($sql);
     $query->execute(['uid' => $userid]);
     $votes = $query->fetchAll();

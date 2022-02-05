@@ -39,6 +39,16 @@ class Admin
 			$this->dbo->changePassword('admin', $data['password1']);
 		}
 
+		if (!empty($data["archive_this_year"])) {
+			if ($data["archive_this_year"] != "yes") {
+				throw new RuntimeException("invalid request");
+			}
+
+			$this->dbo->archive_this_year("ARCHIVE_".date("Y"));
+
+			return $this->showAdminView($request, $response, $args);
+		}
+
 		if (!empty($data["reset_database"])) {
 			if ($data["reset_database"] != "yes") {
 				throw new RuntimeException("invalid request");

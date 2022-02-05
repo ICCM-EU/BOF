@@ -168,6 +168,13 @@
 
 	<br/>
 	<br/>
+	<form action="{{ path_for( 'admin_config' )}}" method="POST">
+		<input type="hidden" name="archive_this_year" value="yes"/>
+		<input type="submit" value="Archive this year" class="btn btn--primary"/>
+	</form>
+
+	<br/>
+	<br/>
 	<form action="{{ path_for( 'admin_config' )}}" method="POST"
 		onsubmit="return confirm('This will delete all participants apart from admin, and all nominations and votes. Do you really want to delete the database?');">
 		<input type="hidden" name="reset_database" value="yes"/>

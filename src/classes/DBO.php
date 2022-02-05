@@ -580,20 +580,23 @@ class DBO
      * 
      * @param int $roundId The id of the round to retrieve workshop info
      * @param int $locationId The id of the location to retrieve workshop info
+     * @param string $archivetag If we want to filter for previous years
      *
      * @return stdClass containing the workshop details.
      */
-    public function getBookedWorkshop($roundId, $locationId) {
+    public function getBookedWorkshop($roundId, $locationId, $archivetag) {
         static $queryWorkshop = null;
         if ($queryWorkshop == null) {
             $sqlWorkshop = "SELECT id, name, description, votes
                             FROM workshop
                             WHERE location_id=:room
-                            AND round_id=:round";
+                            AND round_id=:round
+                            AND (tags NOT LIKE 'ARCHIVE_%' OR tags LIKE CONCAT('%',:archivetag,';%'))";
             $queryWorkshop = $this->db->prepare($sqlWorkshop);
         }
         $queryWorkshop->bindValue(':room', $locationId);
         $queryWorkshop->bindValue(':round', $roundId);
+        $queryWorkshop->bindValue(':archivetag', $archivetag);
         $queryWorkshop->execute();
         
         return $queryWorkshop->fetch(PDO::FETCH_OBJ);
@@ -737,11 +740,13 @@ class DBO
      * Returns the current number of votes for each workshop, as well as some
      * detailed information about the workshop.
      * 
+     * @param string $archivetag If we want to filter for previous years
+     * 
      * @return array An array whose elements are an object representing the
      * name, id, number of votes, and leader of each workshop. The leader
      * member is a comma-delimited list of users' names as a string.
      */
-    public function getCurrentVotes() {
+    public function getCurrentVotes($archivetag) {
         $groupConcat = "GROUP_CONCAT(leader ORDER BY leader ASC SEPARATOR ', ')";
         if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
             // Note that we can't make ORDER BY work inside the GROUP_CONCAT,
@@ -762,11 +767,13 @@ class DBO
                      LEFT JOIN participant p
                             ON wp.participant_id = p.id
                            AND wp.leader = 1
-                     WHERE w.tags NOT LIKE '%Cancelled%'
+                     WHERE w.tags NOT LIKE '%Cancelled%' AND (w.tags NOT LIKE 'ARCHIVE_%' OR w.tags LIKE CONCAT('%',:archivetag,';%'))
                       ORDER BY p.name) AS t
               GROUP BY id
               ORDER BY votes DESC, id DESC";
         $query = $this->db->prepare($sql);
+        $query->bindValue(':archivetag', $archivetag);
+
         $query->execute();
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
@@ -1019,7 +1026,7 @@ class DBO
      * according to id.
      */
     public function getWorkshops() {
-        $sql = "SELECT workshop.name, workshop.id FROM workshop ORDER BY id DESC";
+        $sql = "SELECT workshop.name, workshop.id FROM workshop WHERE tags NOT LIKE 'ARCHIVE_%' ORDER BY id DESC";
         $query=$this->db->prepare($sql);
         $query->execute();
         return $query->fetchAll(PDO::FETCH_OBJ);
@@ -1059,6 +1066,7 @@ class DBO
                             ON w.creator_id = pc.id
                      LEFT JOIN participant p
                             ON wp.participant_id = p.id
+                      WHERE w.tags NOT LIKE 'ARCHIVE_%'
                       GROUP BY w.id
                       ORDER BY w.id ASC) AS t
              LEFT JOIN (SELECT w.id AS id, "
@@ -1353,6 +1361,21 @@ class DBO
 
         $query=$this->db->prepare($sql);
         $query->execute(array(':id' => $id, ':comment' => $comment));
+        return $query->rowCount() > 0;
+    }
+
+    /**
+     * All workshops that have not an archive tag, get this new archive tag
+     * It must start with ARCHIVE_
+     */
+    public function archive_this_year($archivetag) {
+        if (strpos($archivetag, "ARCHIVE_") !== 0) {
+            throw new RuntimeException('Invalid archive tag');
+        }
+
+        $sql = "UPDATE workshop SET `tags` = CONCAT(:archive, ';', `tags`) WHERE `tags` NOT LIKE 'ARCHIVE_%'";
+        $query=$this->db->prepare($sql);
+        $query->execute(array(':archive' => $archivetag));
         return $query->rowCount() > 0;
     }
 

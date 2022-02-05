@@ -20,7 +20,7 @@ class Projector
 		return $this->dbo->getWorkshops();
 	}
 
-	function _getFinishedStage() {
+	function _getFinishedStage($archivetag) {
 		$locations = $this->dbo->getLocationNames();
 		$rounds = $this->dbo->getRoundNames();
 
@@ -33,7 +33,7 @@ class Projector
 			// for each room....
 			foreach (array_keys($locations) as $locationId) {
 				$bof['rooms'][$locationId]['name'] = $locations[$locationId];
-				if ($row=$this->dbo->getBookedWorkshop($roundId, $locationId)) {
+				if ($row=$this->dbo->getBookedWorkshop($roundId, $locationId, $archivetag)) {
 					$bof['rooms'][$locationId]['topic'] = $row->name;
 					$bof['rooms'][$locationId]['description'] = $row->description;
 					$bof['rooms'][$locationId]['votes'] = $row->votes;
@@ -51,8 +51,8 @@ class Projector
 		return $bofs;
 	}
 
-	function _getVotingStage() {
-		$bofs = $this->dbo->getCurrentVotes();
+	function _getVotingStage($archivetag) {
+		$bofs = $this->dbo->getCurrentVotes($archivetag);
 		return $bofs;
 	}
 
@@ -75,15 +75,16 @@ class Projector
 	public function showProjectorView($request, $response, $args) {
 		$stage = $this->dbo->getStage();
 		$bofs = array();
+		$archivetag = trim($request->getQueryParam('filtertags', ''));
 
 		if ($stage == "nominating") {
 			$bofs = $this->_getNominationStage();
 		}
 		else if ($stage == "voting" || $stage == "locked" || $stage == "call_for_workshops") {
-			$bofs = $this->_getVotingStage();
+			$bofs = $this->_getVotingStage($archivetag);
 		}
 		else if ($stage == "finished") {
-			$bofs = $this->_getFinishedStage();
+			$bofs = $this->_getFinishedStage($archivetag);
 		}
 
 		return $this->view->render($response, 'proj_layout.html', [
