@@ -69,7 +69,7 @@ class Auth
         $login = $data['user_name'];
         $email = $data['email'];
         $password = $data['password'];
-        $language = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+        $language = substr($_SERVER && array_key_exists('HTTP_ACCEPT_LANGUAGE', $_SERVER)?$_SERVER['HTTP_ACCEPT_LANGUAGE']:'en', 0, 2);
         if (array_key_exists('userinfo', $data)) {
             $userinfo = $data['userinfo'];
         } else {
