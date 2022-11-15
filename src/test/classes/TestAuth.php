@@ -390,7 +390,8 @@ class TestAuth extends TestCase
     public function newUserFailsForEmptyUser() {
         $data = [
             'user_name' => '',
-            'password' => 'password'
+            'password' => 'Test1234!',
+            'email' => 'test@example.org'
         ];
 
         $dbo = $this->getMockBuilder(DBO::class)
