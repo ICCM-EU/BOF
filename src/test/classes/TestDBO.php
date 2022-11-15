@@ -407,6 +407,7 @@ class TestDBO extends TestCase
         $sql = str_replace("int(10)  NOT NULL", "INTEGER NOT NULL", $sql);
         $sql = str_replace("AUTO_INCREMENT", "", $sql);
         $sql = str_replace("DEFAULT", "", $sql);
+        $sql = str_replace("NOT NULL", "", $sql);
         $sql = str_replace("CHARACTER SET latin1 ", "", $sql);
         $sql = str_replace("ENGINE=InnoDB", "", $sql);
         $sql = str_replace("ENGINE=MyISAM", "", $sql);
