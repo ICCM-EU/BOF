@@ -525,7 +525,7 @@ class TestDBO extends TestCase
         }
         self::$pdo->query($sql);
         $dbo = new DBO(self::$pdo);
-        $ret = $dbo->addUser('user1', 'blah', 'user1@example.org');
+        $ret = $dbo->addUser('user1', 'user1@example.org', 'Test1234!');
         $this->assertTrue(is_string($ret));
     }
 
@@ -548,7 +548,7 @@ class TestDBO extends TestCase
         }
         self::$pdo->query($sql);
         $dbo = new DBO(self::$pdo);
-        $ret = $dbo->addUser('newuser', 'Test1234!', 'newuser@example.org');
+        $ret = $dbo->addUser('newuser', 'newuser@example.org', 'Test1234!');
         $this->assertEquals(106, $ret);
         $sql = "SELECT password
                   FROM participant
