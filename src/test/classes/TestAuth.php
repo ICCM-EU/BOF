@@ -462,7 +462,7 @@ class TestAuth extends TestCase
         $data = [
             'user_name' => 'user1',
             'email' => 'user1@example.org',
-            'password' => 'password1'
+            'password' => 'Test1234!'
         ];
 
         $dbo = $this->getMockBuilder(DBO::class)
