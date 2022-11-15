@@ -21,7 +21,7 @@ class TestAuth extends TestCase
      * @covers \ICCM\BOF\Auth::authenticate
      * @test
      */
-    public function authenitcateFailsForBadPassword() {
+    public function authenticateFailsForBadPassword() {
         $data = [
             'user_name' => 'user1',
             'password' => 'password1'
