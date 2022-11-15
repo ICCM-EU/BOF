@@ -18,7 +18,7 @@ describe('test nomination stage', function() {
   })
 
   it('nominate topics', function() {
-    cy.typeLogin({username: "user1", password: "pwd1"})
+    cy.typeLogin({username: "user1", password: "Test123!pwd1"})
     var i
     for(i=1; i < 15; i++) {
       create_topic("topic" + i)

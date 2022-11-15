@@ -130,7 +130,7 @@ describe('test voting stage', function() {
   it('cast votes', function() {
     var i
     for(i=1; i < 60; i++) {
-      cy.typeLogin({username: "user" + i, password: "pwd" + i})
+      cy.typeLogin({username: "user" + i, password: "Test123!pwd" + i})
 
       var topic
       for (topic=0; topic < 14; topic++)
