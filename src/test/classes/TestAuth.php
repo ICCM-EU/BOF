@@ -93,7 +93,17 @@ class TestAuth extends TestCase
         $cookies->expects($this->never())
             ->method('set');
 
-        $auth = new Auth($view, $router, $dbo, 'secret_token', $cookies, null);
+        # Translator mock
+        $translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['trans'])
+            ->getMock();
+
+        $translator->expects($this->once())
+            ->method('trans')
+            ->with("Invalid username or password.");
+
+        $auth = new Auth($view, $router, $dbo, 'secret_token', $cookies, $translator);
         $this->assertEquals($response, $auth->authenticate($request, $response, null));
     }
 
@@ -109,7 +119,8 @@ class TestAuth extends TestCase
         $user = (object) [
            'id' => 101,
            'name' => $data['user_name'],
-           'valid' => true
+           'valid' => true,
+           'active' => true,
         ];
 
         $payload = array("is_admin" => false, "userid" => $user->id);
@@ -197,7 +208,8 @@ class TestAuth extends TestCase
         $user = (object) [
            'id' => 1,
            'name' => $data['user_name'],
-           'valid' => true
+           'valid' => true,
+           'active' => true,
         ];
 
         $payload = array("is_admin" => true, "userid" => $user->id);
