@@ -27,7 +27,7 @@ class Auth
         $this->cookies = $cookies;
         $this->translator = $translator;
         $this->settings = require __DIR__.'/../../cfg/settings.php';
-        $this->site = $_SERVER['SERVER_NAME'];
+        $this->site = ($_SERVER && array_key_exists('SERVER_NAME',$_SERVER)?$_SERVER['SERVER_NAME':'localhost')];
     }
 
     private function signin($response, $login, $userid) {
