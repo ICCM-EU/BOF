@@ -146,14 +146,14 @@ class TestDBO extends TestCase
         $this->_setupLocations($locations, true);
 
         // Create the users, but don't forget the special admin user
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '*14E65567ABDB5135D0CFD9A70B3032C179A49EE7')";
+                $sql .= ",({$id}, 'user{$count}', '*14E65567ABDB5135D0CFD9A70B3032C179A49EE7', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '*14E65567ABDB5135D0CFD9A70B3032C179A49EE7')";
+                $sql .= "(1, 'admin', '*14E65567ABDB5135D0CFD9A70B3032C179A49EE7', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
@@ -510,16 +510,16 @@ class TestDBO extends TestCase
      * @test
      */
     public function addUserFailsForExistingUser() {
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         $users = 5;
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+                $sql .= ",({$id}, 'user{$count}', '{$pass}', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '{$pass}')";
+                $sql .= "(1, 'admin', '{$pass}', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
@@ -533,16 +533,16 @@ class TestDBO extends TestCase
      * @test
      */
     public function addUserSucceedsForNewUser() {
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         $users = 5;
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+                $sql .= ",({$id}, 'user{$count}', '{$pass}', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '{$pass}')";
+                $sql .= "(1, 'admin', '{$pass}', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
@@ -563,16 +563,16 @@ class TestDBO extends TestCase
      * @test
      */
     public function authenticateFailsForEmptyPassword() {
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         $users = 5;
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+                $sql .= ",({$id}, 'user{$count}', '{$pass}', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '{$pass}')";
+                $sql .= "(1, 'admin', '{$pass}', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
@@ -586,16 +586,16 @@ class TestDBO extends TestCase
      * @test
      */
     public function authenticateFailsForEmptyUser() {
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         $users = 5;
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+                $sql .= ",({$id}, 'user{$count}', '{$pass}', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '{$pass}')";
+                $sql .= "(1, 'admin', '{$pass}', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
@@ -609,16 +609,16 @@ class TestDBO extends TestCase
      * @test
      */
     public function authenticateFailsForUnknownUser() {
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         $users = 5;
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+                $sql .= ",({$id}, 'user{$count}', '{$pass}', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '{$pass}')";
+                $sql .= "(1, 'admin', '{$pass}', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
@@ -632,16 +632,16 @@ class TestDBO extends TestCase
      * @test
      */
     public function authenticateFailsForWrongPassword() {
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         $users = 5;
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+                $sql .= ",({$id}, 'user{$count}', '{$pass}', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '{$pass}')";
+                $sql .= "(1, 'admin', '{$pass}', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
@@ -655,16 +655,16 @@ class TestDBO extends TestCase
      * @test
      */
     public function authenticateSucceedsForKnownUser() {
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         $users = 5;
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+                $sql .= ",({$id}, 'user{$count}', '{$pass}', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '{$pass}')";
+                $sql .= "(1, 'admin', '{$pass}', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
@@ -732,16 +732,16 @@ class TestDBO extends TestCase
      * @test
      */
     public function changePasswordChangesPassword() {
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         $users = 5;
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+                $sql .= ",({$id}, 'user{$count}', '{$pass}', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '{$pass}')";
+                $sql .= "(1, 'admin', '{$pass}', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
@@ -763,16 +763,16 @@ class TestDBO extends TestCase
      * @test
      */
     public function changePasswordFailsForNonExistentUser() {
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         $users = 5;
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+                $sql .= ",({$id}, 'user{$count}', '{$pass}', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '{$pass}')";
+                $sql .= "(1, 'admin', '{$pass}', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
@@ -818,16 +818,16 @@ class TestDBO extends TestCase
      * @test
      */
     public function checkForUserReturnsFalseForUserThatDoesntExist() {
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         $users = 5;
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+                $sql .= ",({$id}, 'user{$count}', '{$pass}', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '{$pass}')";
+                $sql .= "(1, 'admin', '{$pass}', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
@@ -840,16 +840,16 @@ class TestDBO extends TestCase
      * @test
      */
     public function checkForUserReturnsTrueForUserThatExists() {
-        $sql = "INSERT INTO participant (id, name, password) VALUES";
+        $sql = "INSERT INTO participant (id, name, password, email) VALUES";
         $users = 5;
         $pass = password_hash('password', PASSWORD_DEFAULT, ['cost' => 5]);
         for ($count = 0; $count <= $users; $count++) {
             if ($count != 0) {
                 $id = $count + 100;
-                $sql .= ",({$id}, 'user{$count}', '{$pass}')";
+                $sql .= ",({$id}, 'user{$count}', '{$pass}', 'user{$count}@example.org')";
             }
             else {
-                $sql .= "(1, 'admin', '{$pass}')";
+                $sql .= "(1, 'admin', '{$pass}', 'admin@example.org')";
             }
         }
         self::$pdo->query($sql);
