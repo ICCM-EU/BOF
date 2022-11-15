@@ -96,7 +96,7 @@ class Auth
         else {
             $token = bin2hex(random_bytes(16));
             $id = $this->dbo->addUser($login, $email, $password, $language, $userinfo, $active, $token);
-            if (!is_numeric($id)) {
+            if (!is_numeric($id) && $id !== true) {
                 error_log($id);
                 die('error creating user');
             }
