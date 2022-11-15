@@ -537,8 +537,8 @@ class TestAuth extends TestCase
      */
     public function newUserSuccessForNewUser() {
         $data = [
-            'user_name' => 'user1',
-            'email' => 'user1@example.org',
+            'user_name' => 'user2',
+            'email' => 'user2@example.org',
             'password' => 'Test1234!'
         ];
         $user = (object) [
