@@ -13,7 +13,7 @@ describe('test nomination stage', function() {
   it('create users', function() {
     var i
     for(i=1; i < 60; i++) {
-      cy.createUser({username: "user" + i, password: "pwd" + i})
+      cy.createUser({username: "user" + i, password: "Test123!pwd" + i, email: "user" + i + "@example.org"})
     }
   })
 

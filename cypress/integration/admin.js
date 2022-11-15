@@ -1,11 +1,11 @@
 describe('The admin page', function() {
   before(() => {
     require('../support/reset_database.js').reset()
-    cy.createUser({username: 'user1', password: 'pwd1'})
+    cy.createUser({username: 'user1', password: 'Test123!pwd1', email: 'user1@example.org'})
   })
 
   it('rejects a non-admin user', function() {
-    cy.typeLogin({username: 'user1', password: 'pwd1'})
+    cy.typeLogin({username: 'user1', password: 'Test123!pwd1'})
     cy.request({url: '/admin', failOnStatusCode: false}).then((response) => {
       expect(response.status).to.eq(500)
       expect(response.body).to.eq('you don\'t have permissions for this page')
