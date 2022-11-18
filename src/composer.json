@@ -4,8 +4,8 @@
         "monolog/monolog": "^2.8",
         "slim/twig-view": "^2.5",
         "tuupola/slim-jwt-auth": "^3.6",
-        "symfony/translation": "^5.4",
-        "symfony/twig-bridge": "^5.4",
+        "symfony/translation": "^4.4",
+        "symfony/twig-bridge": "^4.4",
         "phpmailer/phpmailer": "^6.6"
     },
     "require-dev": {

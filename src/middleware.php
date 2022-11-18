@@ -2,7 +2,7 @@
 use \Firebase\JWT\JWT;
 
 // the authentication
-$app->add(new \Slim\Middleware\JwtAuthentication([
+$app->add(new \Tuupola\Middleware\JwtAuthentication([
     "secure" => false, // we know we are using https behind a proxy
     "cookie" => "authtoken",
     "path" => [ "/admin", "/vote", "/nomination", "/topics", "/moderation", "/projector"],
