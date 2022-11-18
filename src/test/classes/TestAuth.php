@@ -21,7 +21,7 @@ class TestAuth extends TestCase
      * @covers \ICCM\BOF\Auth::authenticate
      * @test
      */
-    public function authenitcateFailsForBadPassword() {
+    public function authenticateFailsForBadPassword() {
         $data = [
             'user_name' => 'user1',
             'password' => 'password1'
@@ -57,11 +57,11 @@ class TestAuth extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['withRedirect', 'withStatus'])
             ->getMock();
-        $response->expects($this->once())
+        $response->expects($this->never())
             ->method('withRedirect')
             ->with('path/to/login?message=invalid')
             ->willReturn($response);
-        $response->expects($this->once())
+        $response->expects($this->never())
             ->method('withStatus')
             ->with(302)
             ->willReturn($response);
@@ -71,7 +71,7 @@ class TestAuth extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['pathFor'])
             ->getMock();
-        $router->expects($this->once())
+        $router->expects($this->never())
             ->method('pathFor')
             ->with('login')
             ->willReturn('path/to/login');
@@ -82,8 +82,10 @@ class TestAuth extends TestCase
             ->onlyMethods(['render'])
             ->getMock();
 
-        $view->expects($this->never())
-            ->method('render');
+        $view->expects($this->once())
+            ->method('render')
+            ->with($response, 'login.html')
+            ->willReturn($response);
 
         $cookies = $this->getMockBuilder(Cookies::class)
             ->disableOriginalConstructor()
@@ -93,7 +95,17 @@ class TestAuth extends TestCase
         $cookies->expects($this->never())
             ->method('set');
 
-        $auth = new Auth($view, $router, $dbo, 'secret_token', $cookies, null);
+        # Translator mock
+        $translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['trans'])
+            ->getMock();
+
+        $translator->expects($this->once())
+            ->method('trans')
+            ->with("Invalid username or password.");
+
+        $auth = new Auth($view, $router, $dbo, 'secret_token', $cookies, $translator);
         $this->assertEquals($response, $auth->authenticate($request, $response, null));
     }
 
@@ -109,7 +121,8 @@ class TestAuth extends TestCase
         $user = (object) [
            'id' => 101,
            'name' => $data['user_name'],
-           'valid' => true
+           'valid' => true,
+           'active' => true,
         ];
 
         $payload = array("is_admin" => false, "userid" => $user->id);
@@ -197,7 +210,8 @@ class TestAuth extends TestCase
         $user = (object) [
            'id' => 1,
            'name' => $data['user_name'],
-           'valid' => true
+           'valid' => true,
+           'active' => true,
         ];
 
         $payload = array("is_admin" => true, "userid" => $user->id);
@@ -357,8 +371,10 @@ class TestAuth extends TestCase
             ->onlyMethods(['render'])
             ->getMock();
 
-        $view->expects($this->never())
-            ->method('render');
+        $view->expects($this->once())
+            ->method('render')
+            ->with($response, 'register.html')
+            ->willReturn(0);
 
         # Cookies mock
         $cookies = $this->getMockBuilder(Cookies::class)
@@ -380,7 +396,7 @@ class TestAuth extends TestCase
             ->with("Empty user or pass. Don't do that!");
 
         $auth = new Auth($view, null, $dbo, 'secret_token', $cookies, $translator);
-        $this->assertEquals(0, $auth->new_user($request, $response, $data['user_name'], $data['password']));
+        $this->assertEquals(0, $auth->new_user($request, $response, null));
     }
 
     /**
@@ -390,7 +406,8 @@ class TestAuth extends TestCase
     public function newUserFailsForEmptyUser() {
         $data = [
             'user_name' => '',
-            'password' => 'password'
+            'password' => 'Test1234!',
+            'email' => 'test@example.org'
         ];
 
         $dbo = $this->getMockBuilder(DBO::class)
@@ -427,8 +444,10 @@ class TestAuth extends TestCase
             ->onlyMethods(['render'])
             ->getMock();
 
-        $view->expects($this->never())
-            ->method('render');
+        $view->expects($this->once())
+            ->method('render')
+            ->with($response, 'register.html')
+            ->willReturn(0);
 
         # Cookies mock
         $cookies = $this->getMockBuilder(Cookies::class)
@@ -450,7 +469,7 @@ class TestAuth extends TestCase
             ->with("Empty user or pass. Don't do that!");
 
         $auth = new Auth($view, null, $dbo, 'secret_token', $cookies, $translator);
-        $this->assertEquals(0, $auth->new_user($request, $response, $data['user_name'], $data['password']));
+        $this->assertEquals(0, $auth->new_user($request, $response, null));
     }
 
     /**
@@ -461,7 +480,7 @@ class TestAuth extends TestCase
         $data = [
             'user_name' => 'user1',
             'email' => 'user1@example.org',
-            'password' => 'password1'
+            'password' => 'Test1234!'
         ];
 
         $dbo = $this->getMockBuilder(DBO::class)
@@ -504,8 +523,10 @@ class TestAuth extends TestCase
             ->onlyMethods(['render'])
             ->getMock();
 
-        $view->expects($this->never())
-            ->method('render');
+        $view->expects($this->once())
+            ->method('render')
+            ->with($response, 'register.html')
+            ->willReturn(0);
 
         # Cookies mock
         $cookies = $this->getMockBuilder(Cookies::class)
@@ -527,7 +548,7 @@ class TestAuth extends TestCase
             ->with("User already exists");
 
         $auth = new Auth($view, null, $dbo, 'secret_token', $cookies, $translator);
-        $this->assertEquals(0, $auth->new_user($request, $response, $data['user_name'], $data['password']));
+        $this->assertEquals(0, $auth->new_user($request, $response, null));
     }
 
     /**
@@ -536,9 +557,9 @@ class TestAuth extends TestCase
      */
     public function newUserSuccessForNewUser() {
         $data = [
-            'user_name' => 'user1',
-            'email' => 'user1@example.org',
-            'password' => 'password1'
+            'user_name' => 'user2',
+            'email' => 'user2@example.org',
+            'password' => 'Test1234!'
         ];
         $user = (object) [
            'id' => 1,
@@ -578,7 +599,7 @@ class TestAuth extends TestCase
             ->getMock();
         $response->expects($this->once())
             ->method('withRedirect')
-            ->with('path/to/login?newuser=1')
+            ->with('path/to/topics')
             ->willReturn($response);
         $response->expects($this->once())
             ->method('withStatus')
@@ -592,8 +613,8 @@ class TestAuth extends TestCase
             ->getMock();
         $router->expects($this->once())
             ->method('pathFor')
-            ->with('login')
-            ->willReturn('path/to/login');
+            ->with('topics')
+            ->willReturn('path/to/topics');
 
         // Twig view mock
         $view = $this->getMockBuilder(Twig::class)
@@ -609,11 +630,11 @@ class TestAuth extends TestCase
             ->onlyMethods(['set'])
             ->getMock();
 
-        $cookies->expects($this->never())
+        $cookies->expects($this->once())
             ->method('set');
 
         $auth = new Auth($view, $router, $dbo, 'secret_token', $cookies, null);
-        $this->assertEquals($response, $auth->new_user($request, $response, 'user1', 'user1@example.org', 'password'));
+        $this->assertEquals($response, $auth->new_user($request, $response, null));
     }
 
 }

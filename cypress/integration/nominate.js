@@ -1,8 +1,8 @@
 describe('In the Nomination stage, the Nominate topic page', function() {
   before(() => {
     require('../support/reset_database.js').reset()
-    cy.createUser({username: 'user1', password: 'pwd1'})
-    cy.typeLogin({username: 'user1', password: 'pwd1'})
+    cy.createUser({username: 'user1', password: 'Test123!pwd1', email: 'user1@example.org'})
+    cy.typeLogin({username: 'user1', password: 'Test123!pwd1'})
   })
 
   beforeEach(() => {
@@ -53,8 +53,8 @@ describe('In the Nomination stage, the Nominate topic page', function() {
 describe('In the Voting stage, the Nominate topic page', function() {
   before(() => {
     require('../support/reset_database.js').resetVoting()
-    cy.createUser({username: 'user1', password: 'pwd1'})
-    cy.typeLogin({username: 'user1', password: 'pwd1'})
+    cy.createUser({username: 'user1', password: 'Test123!pwd1', email: 'user1@example.org'})
+    cy.typeLogin({username: 'user1', password: 'Test123!pwd1'})
   })
 
   it('fails to load', function() {

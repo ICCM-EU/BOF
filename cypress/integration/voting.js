@@ -123,14 +123,14 @@ describe('test voting stage', function() {
     var resetDB = require('../support/reset_database.js')
     resetDB.resetVoting()
     for(var i=1; i < 60; i++) {
-      cy.createUser({username: "user" + i, password: "pwd" + i})
+      cy.createUser({username: "user" + i, password: "Test123!pwd" + i, email: 'user' + i + '@example.org'})
     }
   })
 
   it('cast votes', function() {
     var i
     for(i=1; i < 60; i++) {
-      cy.typeLogin({username: "user" + i, password: "pwd" + i})
+      cy.typeLogin({username: "user" + i, password: "Test123!pwd" + i})
 
       var topic
       for (topic=0; topic < 14; topic++)

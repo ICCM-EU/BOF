@@ -1,7 +1,7 @@
 describe('The login page', function() {
   before(() => {
     require('../support/reset_database.js').reset()
-    cy.createUser({username: 'user1', password: 'pwd1'})
+    cy.createUser({username: 'user1', password: 'Test123!pwd1', email: 'user1@example.org'})
   })
 
   it('loads successfully', function() {

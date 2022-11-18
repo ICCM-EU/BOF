@@ -34,5 +34,5 @@ Cypress.Commands.add('logout', () => {
 })
 
 Cypress.Commands.add('createUser', (user) => {
-  cy.request('POST', "/new_user", { user_name: user.username, password: user.password })
+  cy.request('POST', "/new_user", { user_name: user.username, password: user.password, email: user.email }).its('body').should('include', 'All topics')
 })

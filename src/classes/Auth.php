@@ -27,7 +27,7 @@ class Auth
         $this->cookies = $cookies;
         $this->translator = $translator;
         $this->settings = require __DIR__.'/../../cfg/settings.php';
-        $this->site = $_SERVER['SERVER_NAME'];
+        $this->site = ($_SERVER && array_key_exists('SERVER_NAME',$_SERVER)?$_SERVER['SERVER_NAME']:'localhost');
     }
 
     private function signin($response, $login, $userid) {
@@ -69,7 +69,7 @@ class Auth
         $login = $data['user_name'];
         $email = $data['email'];
         $password = $data['password'];
-        $language = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+        $language = substr($_SERVER && array_key_exists('HTTP_ACCEPT_LANGUAGE', $_SERVER)?$_SERVER['HTTP_ACCEPT_LANGUAGE']:'en', 0, 2);
         if (array_key_exists('userinfo', $data)) {
             $userinfo = $data['userinfo'];
         } else {
@@ -96,7 +96,7 @@ class Auth
         else {
             $token = bin2hex(random_bytes(16));
             $id = $this->dbo->addUser($login, $email, $password, $language, $userinfo, $active, $token);
-            if (!is_numeric($id)) {
+            if (!is_numeric($id) && $id !== true) {
                 error_log($id);
                 die('error creating user');
             }
