@@ -5,7 +5,7 @@
     "cypress": "^5.0.0",
     "gulp-svg-symbols": "^2.0.2",
     "gulp-svgmin": "^2.2.0",
-    "typescript": "^4.3.2"
+    "typescript": "^4.9.3"
   },
   "version": "0.0.0",
   "description": "Birds of a Feather Submission",
