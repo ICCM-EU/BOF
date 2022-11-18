@@ -40,7 +40,14 @@ class Auth
             $goto = $this->router->pathFor("topics");
         }
         $token = JWT::encode($payload, $this->secrettoken, "HS256");
-        $this->cookies->set("authtoken", $token, time()+3600);  // cookie expires in one hour
+        $session_duration = 3600; // cookie expires in one hour by default
+        if (array_key_exists('session_duration_days', $this->settings['settings'])) {
+            $session_duration = $this->settings['settings']['session_duration_days']*24*3600;
+        }
+        else if (array_key_exists('session_duration_hours', $this->settings['settings'])) {
+            $session_duration = $this->settings['settings']['session_duration_hours']*3600;
+        }
+        $this->cookies->set("authtoken", $token, time()+$session_duration);
         return $response->withRedirect($goto)->withStatus(302);
     }
 
@@ -50,9 +57,9 @@ class Auth
         if (($row = $this->dbo->authenticate($login, $data['password'])) && $row->valid) {
             if (!$row->active) {
                 return $this->view->render($response, 'login.html', array('error' => $this->translator->trans("Wait for moderation.")));
-	    } else {
+	        } else {
                 return $this->signin($response, $login, $row->id);
-	    }
+	        }
         } else {
             return $this->view->render($response, 'login.html', array('error' => $this->translator->trans("Invalid username or password.")));
         }
