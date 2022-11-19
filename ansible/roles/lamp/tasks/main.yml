@@ -29,7 +29,7 @@
   command: cp "{{ web_directory }}/cfg/settings-example.php" "{{ web_directory }}/cfg/settings.php"
   when: example_settings_stat.stat.exists
 
-- name: "install composer modules
+- name: "install composer modules"
   # somehow the internal composer task won't work on Debian Buster
   #composer:
   #  command: install
