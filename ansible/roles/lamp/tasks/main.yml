@@ -8,13 +8,13 @@
   apt:
     pkg: ['apache2', 'libapache2-mod-php', 'php', 'php-mysql', 'python3-mysqldb', 'mariadb-server', 'php-zip', 'ca-certificates', 'composer', 'php-dom', 'php-mbstring', 'nodejs']
     state: present
-  when: php_version == "default"
+  when: {{ php_version }} == "default"
 
 - name: "Install Apache with PHP 7.4"
   apt:
     pkg: ['apache2', 'libapache2-mod-php', 'php-7.4', 'php7.4-mysql', 'python3-mysqldb', 'mariadb-server', 'php7.4-zip', 'ca-certificates', 'composer', 'php7.4-dom', 'php7.4-mbstring', 'nodejs']
     state: present
-  when: php_version == "7.4"
+  when: {{ php_version }} == "7.4"
 
 - name: "Install Packages required for Testing"
   apt:
