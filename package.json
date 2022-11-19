@@ -23,6 +23,7 @@
     "gulp-sass": "^5.1.0",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-util": "^3.0.8",
+    "sass": "^1.56.1",
     "vinyl-source-stream": "^2.0.0"
   }
 }
