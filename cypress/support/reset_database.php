@@ -6,7 +6,7 @@ $settings = require '/var/www/bof/cfg/settings.php';
 $db = $settings['settings']['db'];
 $pdo = new PDO("mysql:host=" . $db['host'] . ";dbname=" . $db['name'], $db['user'], $db['pass']);
 
-$sql = file_get_contents('../../sql/testdata.sql');
+$sql = file_get_contents(__DIR__.'/../../sql/testdata.sql');
 $pdo->exec($sql);
 $pdo->exec('DELETE FROM config');
 $pdo->exec("INSERT INTO config(item, value) VALUES('branding', 'Europe')");

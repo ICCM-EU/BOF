@@ -2,13 +2,12 @@
 
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Loader\PhpFileLoader;
-use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Translator;
 
 // get primary language from the browser
 $lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
 
-$translator = new Translator($lang, new MessageSelector());
+$translator = new Translator($lang);
 // set the fallback, depending on the conference, from the config file
 $translator->setFallbackLocales([$settings['settings']['fallback_language']]);
 

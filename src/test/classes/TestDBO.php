@@ -927,18 +927,18 @@ class TestDBO extends TestCase
         $dbo = new DBO(self::$pdo);
         $csvout = $dbo->exportWorkshops();
         $expected = <<<EOF
-Room A,"topic1","user1","Description for topic1",17.0,17
-Room B,"topic2","user2","Description for topic2",5.0,5
+Room A,"topic1","user1","Description for topic1",17.00,17
+Room B,"topic2","user2","Description for topic2",5.00,5
 Room C,"topic3","user3","Description for topic3",16.25,16
-Room D,"topic4","user4","Description for topic4",6.0,6
+Room D,"topic4","user4","Description for topic4",6.00,6
 Room A,"topic5","user5","Description for topic5",15.75,15
-Room B,"topic6","user6","Description for topic6",7.0,7
+Room B,"topic6","user6","Description for topic6",7.00,7
 Room C,"topic7","user7","Description for topic7",18.25,18
 Room D,"topic8","user8","Description for topic8",19.75,19
-Room A,"topic9","user9","Description for topic9",8.0,8
-Room B,"Prep Team","user1, user2","Prep Team BoF",4.0,4
+Room A,"topic9","user9","Description for topic9",8.00,8
+Room B,"Prep Team","user1, user2","Prep Team BoF",4.00,4
 Room C,"topic10","user10","Description for topic10",21.75,21
-Room D,"topic11","user11","Description for topic11",9.0,9
+Room D,"topic11","user11","Description for topic11",9.00,9
 
 EOF;
         $this->assertEquals($expected, $csvout);

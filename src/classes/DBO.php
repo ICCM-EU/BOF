@@ -408,7 +408,7 @@ class DBO
                         '"'.str_replace('"', "'", strip_tags($row->name)).'",'.
                         '"'.$facilitators.'",'.
                         '"'.str_replace('"', "'", strip_tags($row->description)).'",'.
-                        $row->votes.",".
+                        sprintf('%0.2f', $row->votes).",".
                         $row->available."\n";
         }
 
