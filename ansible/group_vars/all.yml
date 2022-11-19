@@ -4,6 +4,9 @@ timezone: Europe/Brussels
 
 web_directory: /var/www/bof
 
+# expect default or 7.4
+php_version: default
+
 deploy_user: deploy
 
 # Oh my. Don't use this in production
