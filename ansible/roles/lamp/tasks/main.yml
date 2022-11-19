@@ -29,10 +29,14 @@
   command: cp "{{ web_directory }}/cfg/settings-example.php" "{{ web_directory }}/cfg/settings.php"
   when: example_settings_stat.stat.exists
 
-- name: "install composer modules"
-  composer:
-    command: install
-    working_dir: "{{ web_directory }}/src/"
+- name: "install composer modules
+  # somehow the internal composer task won't work on Debian Buster
+  #composer:
+  #  command: install
+  #  working_dir: "{{ web_directory }}/src/"
+  shell: composer install
+  args:
+      chdir: "{{ web_directory }}/src/"
 
 # same as running: npm install
 - name: "install npm modules"
