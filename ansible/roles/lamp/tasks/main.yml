@@ -11,7 +11,7 @@
 
 - name: "Install Packages required for Testing"
   apt:
-    pkg: ['php-xdebug', 'php-pdo-sqlite']
+    pkg: ['php-xdebug', 'php-sqlite3']
     state: present
   when: dev is defined
 
