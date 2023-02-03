@@ -8,7 +8,7 @@ $app->add(new \Tuupola\Middleware\JwtAuthentication([
     "path" => [ "/admin", "/vote", "/nomination", "/topics", "/moderation", "/projector"],
     #"passthrough" => ["/home", "/login", "/authenticate"],
     "secret" => $settings['settings']['secrettoken'],
-    "error" => function ($request, $response, $arguments) {
+    "error" => function ($response, $arguments) {
         return $response->withRedirect("/?message=invalid_login")->withStatus(302);
     }
 ]));
