@@ -7,6 +7,7 @@ body {
   max-width: 920px;
   width: 100%;
   padding: 0 10px;
+  min-height: calc(100vh - 149px);
 
   &--projector {
     padding: 16px;
@@ -26,6 +27,8 @@ body {
 
 .logoheader {
   background-color: siteColor(bof-logo-background);
+  position: sticky;
+  top: 0;
 }
 
 .logo {
