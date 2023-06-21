@@ -4,6 +4,10 @@
 
 .bof-form__item {
   margin-bottom: 16px;
+
+  &--help {
+    font-size: 10px;
+  }
 }
 
 .bof-form__checkbox {

@@ -15,4 +15,5 @@ require __DIR__.'/../classes/Moderation.php';
 require __DIR__.'/../classes/Nomination.php';
 require __DIR__.'/../classes/Projector.php';
 require __DIR__.'/../classes/Results.php';
+require __DIR__.'/../classes/Timezones.php';
 

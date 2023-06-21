@@ -21,7 +21,9 @@ class Admin
 		$is_admin = $request->getAttribute('is_admin');
 		if (!$is_admin) throw new RuntimeException("you don't have permissions for this page");
 
+		// TODO: How can this method use the client's local time to convert the $config dates from UTC to local?
 		$config = $this->dbo->getConfig();
+		$config['timezones'] = Timezones::List();
 		return $this->view->render($response, 'admin.html', $config);
 	}
 
@@ -70,6 +72,12 @@ class Admin
 			passthru("mysqldump --user=$dbuser --password=$dbpassword --host=$dbhost $dbname");
 
 			throw new RuntimeException();
+		}
+
+		// TODO: Handle local_timezone value input. Convert incoming datetime objects to UTC from this local time.
+		if (!empty($data['local_timezone'])) {
+			// $this->dbo->setConfigDateTime('nomination_begins', strtotime($data['nomination_begins']." ".$data['time_nomination_begins']));
+			echo $data['local_timezone'];
 		}
 
 		if (!empty($data['nomination_begins']) && !empty($data['time_nomination_begins'])) {

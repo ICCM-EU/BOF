@@ -14,6 +14,7 @@ require __DIR__.'/../classes/Results.php';
 require __DIR__.'/../classes/Cookies.php';
 require __DIR__.'/../classes/DBO.php';
 require __DIR__.'/../classes/Logger.php';
+require __DIR__.'/../classes/Timezones.php';
 
 // Register middleware
 require __DIR__ . '/../middleware.php';
@@ -30,5 +31,8 @@ require __DIR__ . '/../routes/voting.php';
 require __DIR__ . '/../routes/projector.php';
 require __DIR__ . '/../routes/moderation.php';
 require __DIR__ . '/../routes/topics.php';
+
+// Set the default timezone used by all date/time functions
+date_default_timezone_set('UTC');
 
 $app->run();
