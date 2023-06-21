@@ -85,6 +85,11 @@
 		update_prep(type);
 	}
 
+  let _cachedLocalTimezone = '';
+  function get_local_timezone() {
+    return (!!_cachedLocalTimezone) ? _cachedLocalTimezone : Intl.DateTimeFormat().resolvedOptions().timeZone;
+  }
+
 		(function(){
 			window.setTimeout(function() {
 				update_prep('location');
@@ -101,6 +106,20 @@
 
 <div>
 	<form action="{{ path_for( 'admin_config' )}}" method="POST">
+      <div class="bof-form__item2">
+        <label for="local_timezone" class="bof-form__label">Local timezone</label>
+        <select id="local_timezone" class="bof-form__input2">
+          {% for key, zone in timezones %}
+          <option value="{{key}}">{{zone}}</option>
+          {% endfor %}
+        </select>
+        <p class="bof-form__input--help">This value is used to automatically convert your time values into server time.</p>
+        <script>
+          (function(d, getter) {
+            d.getElementById('local_timezone').value = getter();
+          })(document, get_local_timezone);
+        </script>
+      </div>
 		<div class="bof-form__item2">
 			<label for="nomination_begins" class="bof-form__label">Nomination begins</label>
 			<input type="date" name="nomination_begins" value="{{nomination_begins}}" class="bof-form__input2"/>

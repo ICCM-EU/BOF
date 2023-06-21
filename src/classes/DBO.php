@@ -218,10 +218,10 @@ class DBO
         // Even if it's correct, we know our fake password was used because
         // count will be 0, and we validate count below.
         $sql = "SELECT COUNT(id) AS count,
-                       `active`,
-                       COALESCE(id, -1) AS id,
-                       COALESCE(name, ':name') AS name,
-                       COALESCE(password, '\$2y\$" . $this->passwordCost . "\$NYriOyGGQ0AwLbOxUwaFneXQzI4prjcNbfTs.zOu3PSJPSLaHvvGH') AS password
+                       MAX(`active`) as 'active',
+                       MAX(COALESCE(id, -1)) AS id,
+                       MAX(COALESCE(name, ':name')) AS name,
+                       MAX(COALESCE(password, '\$2y\$" . $this->passwordCost . "\$NYriOyGGQ0AwLbOxUwaFneXQzI4prjcNbfTs.zOu3PSJPSLaHvvGH')) AS password
                   FROM participant
                  WHERE name = :name or email = :email";
         $query=$this->db->prepare($sql);
