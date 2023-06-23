@@ -4,10 +4,6 @@
 
 .bof-form__item {
   margin-bottom: 16px;
-
-  &--help {
-    font-size: 10px;
-  }
 }
 
 .bof-form__checkbox {
@@ -32,6 +28,11 @@
   font-size: 16px;
   padding: 16px;
   width: 100%;
+
+  &--help {
+    font-size: 11px;
+    opacity: 0.66;
+  }
 }
 
 .bof-form__textarea {

@@ -31,19 +31,19 @@
 		var last_id_el = document.getElementById('last_' + type + '_id');
 		var last_id = parseInt(last_id_el.value);
 		var selected = false;
-		for (var id=0; id < last_id; id++) {
+		for (var id = 0; id < last_id; id++) {
 			var item = document.getElementById(type + '_' + id);
 			if (!item) {
 				continue;
 			}
 			if (item.value === selectedName) {
-			    options  += '<option value="' + item.value + '" selected>' + item.value + '</option>';
+				options += '<option value="' + item.value + '" selected>' + item.value + '</option>';
 				selected = true;
 			} else if (item) {
-			    options  += '<option value="' + item.value + '">' + item.value + '</option>';
+				options += '<option value="' + item.value + '">' + item.value + '</option>';
 			}
 		}
-        if (!selected) {
+		if (!selected) {
 			options += '<option value="-1" selected>{{'Default'|trans}}</option>';
 		} else {
 			options += '<option value="-1">{{'Default'|trans}}</option>';
@@ -85,85 +85,165 @@
 		update_prep(type);
 	}
 
-  let _cachedLocalTimezone = '';
-  function get_local_timezone() {
-    return (!!_cachedLocalTimezone) ? _cachedLocalTimezone : Intl.DateTimeFormat().resolvedOptions().timeZone;
-  }
+	let _cachedLocalTimezone = '';
+	function get_local_timezone() {
+		return (!!_cachedLocalTimezone) ? _cachedLocalTimezone : Intl.DateTimeFormat().resolvedOptions().timeZone;
+	}
 
-		(function(){
-			window.setTimeout(function() {
-				update_prep('location');
-				update_prep('round');
-			}, 250);
-		})();
+	(function () {
+		window.setTimeout(function () {
+			update_prep('location');
+			update_prep('round');
+		}, 250);
+	})();
 
 </script>
 <h1>Admin</h1>
 
-<div class="bof-form__label">local time on server</div><input type="text" readonly value="{{localservertime}}"/>
-<br/>
-<br/>
+<div class="bof-form__label">local time on server</div><input type="text" readonly value="{{localservertime}}" />
+<br />
+<br />
 
 <div>
 	<form action="{{ path_for( 'admin_config' )}}" method="POST">
-      <div class="bof-form__item2">
-        <label for="local_timezone" class="bof-form__label">Local timezone</label>
-        <select id="local_timezone" class="bof-form__input2">
-          {% for key, zone in timezones %}
-          <option value="{{key}}">{{zone}}</option>
-          {% endfor %}
-        </select>
-        <p class="bof-form__input--help">This value is used to automatically convert your time values into server time.</p>
-        <script>
-          (function(d, getter) {
-            d.getElementById('local_timezone').value = getter();
-          })(document, get_local_timezone);
-        </script>
-      </div>
+		<div class="bof-form__item2">
+			<label for="local_timezone" class="bof-form__label">Local timezone</label>
+			<select id="local_timezone" class="bof-form__input2">
+				{% for key, zone in timezones %}
+				<option value="{{key}}">{{zone}}</option>
+				{% endfor %}
+			</select>
+			<p class="bof-form__input--help">This value is used to automatically convert your time values into server
+				time.</p>
+		</div>
 		<div class="bof-form__item2">
 			<label for="nomination_begins" class="bof-form__label">Nomination begins</label>
-			<input type="date" name="nomination_begins" value="{{nomination_begins}}" class="bof-form__input2"/>
-			<input type="time" name="time_nomination_begins" value="{{nomination_begins_time}}"/><br/>
+			<input type="date" name="nomination_begins" id="nomination_begins" value="{{nomination_begins}}"
+				class="bof-form__input2" />
+			<input type="time" name="time_nomination_begins" id="time_nomination_begins"
+				value="{{nomination_begins_time}}" /><br />
 			<label for="nomination_ends" class="bof-form__label">Nomination ends</label>
-			<input type="date" name="nomination_ends" value="{{nomination_ends}}" class="bof-form__input2"/>
-			<input type="time" name="time_nomination_ends" value="{{nomination_ends_time}}"/><br/>
+			<input type="date" name="nomination_ends" value="{{nomination_ends}}" class="bof-form__input2" />
+			<input type="time" name="time_nomination_ends" id="time_nomination_ends"
+				value="{{nomination_ends_time}}" /><br />
 			<label for="voting_begins" class="bof-form__label">Voting begins</label>
-			<input type="date" name="voting_begins" value="{{voting_begins}}" class="bof-form__input2"/>
-			<input type="time" name="time_voting_begins" value="{{voting_begins_time}}"/><br/>
+			<input type="date" name="voting_begins" value="{{voting_begins}}" class="bof-form__input2" />
+			<input type="time" name="time_voting_begins" id="time_voting_begins" value="{{voting_begins_time}}" /><br />
 			<label for="voting_ends" class="bof-form__label">Voting ends</label>
-			<input type="date" name="voting_ends" value="{{voting_ends}}" class="bof-form__input2"/>
-			<input type="time" name="time_voting_ends" value="{{voting_ends_time}}"/><br/>
+			<input type="date" name="voting_ends" value="{{voting_ends}}" class="bof-form__input2" />
+			<input type="time" name="time_voting_ends" id="time_voting_ends" value="{{voting_ends_time}}" /><br />
 		</div>
-		<br/>
+		<script defer>
+			// Create an IFFE to "scope" methods and variables.
+			// https://developer.mozilla.org/en-US/docs/Glossary/IIFE
+			(function (d, timezoneGetter) {
+				// Create a curried function which will add pad a string with N instances of C.
+				function padN(n, c) { return (val) => { return (new Array(n + 1).join(c) + val).slice(n * -1); }; }
+				// Use the padN function and configure it to pad two zeros.
+				function pad2Zeros(val) { return padN(2, '0')(val); }
+
+				// Create a class to structure how we handle both time changes, and time zone changes. For now, we are knowingly ignoring
+				// the day threshold--if the time zone shifts over the midnight line, the date doesn't change.
+				class BofDateTime {
+					constructor(elDate, elTime, utcDate) {
+						this.elDate = elDate;
+						this.elTime = elTime;
+						this.utcDate = utcDate;
+						this.elTime.addEventListener('change', e => this.handleTimeChange(e.target.value), false);
+						this.elTime.addEventListener('change', console.log, false);
+					}
+					toInputTimeString(val) { return `${pad2Zeros(val.getHours())}:${pad2Zeros(val.getMinutes())}:${pad2Zeros(val.getSeconds())}`; }
+					toInputDateString(val) { return `${val.getFullYear()}-${pad2Zeros(val.getMonth() + 1)}-${pad2Zeros(val.getDate())}`; }
+					toTimeZone(timeZone) { return new Date(this.utcDate.toLocaleString('en-US', { timeZone: timeZone })); }
+					handleTimeZoneChange(timeZone) { this.elTime.value = this.toInputTimeString(this.toTimeZone(timeZone)); }
+					handleTimeChange(val) { this.utcDate = new Date(new Date(`${this.utcDate.toJSON().substring(0, 10)}T${val}`).toUTCString()); }
+				}
+				// Create a class to structure how we handle the time zone selection changes.
+				class BofTimeZone {
+					constructor(el, val, onChange) {
+						this.el = el;
+						this.val = val;
+						this.handleChange = onChange;
+						this.el.addEventListener('change', e => this.handleChange(e.target.value), false);
+						this.el.addEventListener('change', console.log, false);
+						this.el.value = val;
+					}
+				}
+				// Build a model which constructs instances of the above classes, complete with internal event handling.
+				let model = {
+					nomination_begins: new BofDateTime(
+						d.getElementById('nomination_begins'),
+						d.getElementById('time_nomination_begins'),
+						new Date('{{nomination_begins}} {{nomination_begins_time}} UTC')
+					),
+					nomination_ends: new BofDateTime(
+						d.getElementById('nomination_ends'),
+						d.getElementById('time_nomination_ends'),
+						new Date('{{nomination_ends}} {{nomination_ends_time}} UTC')
+					),
+					voting_begins: new BofDateTime(
+						d.getElementById('voting_begins'),
+						d.getElementById('time_voting_begins'),
+						new Date('{{voting_begins}} {{voting_begins_time}} UTC')
+					),
+					voting_ends: new BofDateTime(
+						d.getElementById('voting_ends'),
+						d.getElementById('time_voting_ends'),
+						new Date('{{voting_ends}} {{voting_ends_time}} UTC')
+					),
+					localTimezone: new BofTimeZone(
+						d.getElementById('local_timezone'),
+						timezoneGetter(),
+						val => {
+							// Update the time values (and perhaps the date values) based on the input timezone.
+							// First, mutate the 'model' object with the new timezone value so following changes can work from that value.
+							model.localTimezone.val = val;
+							model.nomination_begins.handleTimeZoneChange(val);
+							model.nomination_ends.handleTimeZoneChange(val);
+							model.voting_begins.handleTimeZoneChange(val);
+							model.voting_ends.handleTimeZoneChange(val);
+						}
+					)
+				};
+				// Handle initial value of the timeZone selection.
+				model.localTimezone.handleChange(model.localTimezone.val);
+			})(document, get_local_timezone);
+		</script>
+		<br />
 		<fieldset>
 			<legend tabindex="-1">{{'Slots'|trans}}</legend>
 			<div class="bof-form__item2" id="rounds">
-			{% for round in rounds %}
-				<input type="text" id="round_{{loop.index0}}" name="rounds[]" value="{{round}}" class="bof-form-input2" onchange="update_prep('round')"/>
-				<button type="button" id="delete_round_{{loop.index0}}" onclick="delete_item('round', {{loop.index0}} )">{{'Delete'|trans}}</button>
-				<br id="br_round_{{loop.index0}}"/>
-			{% endfor %}
+				{% for round in rounds %}
+				<input type="text" id="round_{{loop.index0}}" name="rounds[]" value="{{round}}" class="bof-form-input2"
+					onchange="update_prep('round')" />
+				<button type="button" id="delete_round_{{loop.index0}}"
+					onclick="delete_item('round', {{loop.index0}} )">{{'Delete'|trans}}</button>
+				<br id="br_round_{{loop.index0}}" />
+				{% endfor %}
 			</div>
 			<button type="button" onclick="add_item('round')">{{'Add Slot'|trans}}</button>
-			<input type="hidden" id="last_round_id" value="{{num_rounds}}"/>
+			<input type="hidden" id="last_round_id" value="{{num_rounds}}" />
 		</fieldset>
-		<br/>
+		<br />
 		<fieldset>
 			<legend tabindex="-1">{{'Rooms'|trans}}</legend>
 			<div class="bof-form__item2" id="locations">
-			{% for location in locations %}
-				<input type="text" id="location_{{loop.index0}}" name="locations[]" value="{{location}}" class="bof-form-input2" onchange="update_prep('location')"/>
-				<button type="button" id="delete_location_{{loop.index0}}" onclick="delete_item('location', {{loop.index0}} )">{{'Delete'|trans}}</button>
-				<br id="br_location_{{loop.index0}}"/>
-			{% endfor %}
+				{% for location in locations %}
+				<input type="text" id="location_{{loop.index0}}" name="locations[]" value="{{location}}"
+					class="bof-form-input2" onchange="update_prep('location')" />
+				<button type="button" id="delete_location_{{loop.index0}}"
+					onclick="delete_item('location', {{loop.index0}} )">{{'Delete'|trans}}</button>
+				<br id="br_location_{{loop.index0}}" />
+				{% endfor %}
 			</div>
 			<button type="button" onclick="add_item('location')">{{'Add Room'|trans}}</button>
-			<input type="hidden" id="last_location_id" value="{{num_locations}}"/>
+			<input type="hidden" id="last_location_id" value="{{num_locations}}" />
 		</fieldset>
-		<br/>
+		<br />
 		<fieldset>
 			<legend tabindex="-1">Prep BoF</legend>
-			<input type="checkbox" id="schedule_prep" name="schedule_prep" value="False" {{schedule_prep == "True" ? "" : 'checked'}} onclick="clicked_schedule_prep()">
+			<input type="checkbox" id="schedule_prep" name="schedule_prep" value="False" {{schedule_prep=="True" ? ""
+				: 'checked' }} onclick="clicked_schedule_prep()">
 			<label for="schedule_prep" class="bof-form__checkbox">{{'Prep BoF has its own slot'|trans}}</label>
 			<label for="prep_bof_round" class="bof-form__label">{{'Slot for Prep BoF'|trans}}</label>
 			<select id="prep_bof_round" name="prep_bof_round">
@@ -172,37 +252,37 @@
 			<select id="prep_bof_location" name="prep_bof_location">
 			</select>
 		</fieldset>
-		<br/>
+		<br />
 		<div class="bof-form__item2">
-		<br/>
-		<label for="password1" class="bof-form__label">New Admin Password</label>
-		<input type="password" name="password1" class="bof-form-input2"/>
-		<label for="password2" class="bof-form__label">Confirm Password</label>
-		<input type="password" name="password2" class="bof-form-input2"/>
+			<br />
+			<label for="password1" class="bof-form__label">New Admin Password</label>
+			<input type="password" name="password1" class="bof-form-input2" />
+			<label for="password2" class="bof-form__label">Confirm Password</label>
+			<input type="password" name="password2" class="bof-form-input2" />
 		</div>
-		<br/>
-		<br/>
-		<input type="submit" value="Save" class="btn btn--primary"/>
+		<br />
+		<br />
+		<input type="submit" value="Save" class="btn btn--primary" />
 	</form>
 
-	<br/>
-	<br/>
+	<br />
+	<br />
 	<form action="{{ path_for( 'admin_config' )}}" method="POST"
 		onsubmit="return confirm('This will delete all participants apart from admin, and all nominations and votes. Do you really want to delete the database?');">
-		<input type="hidden" name="reset_database" value="yes"/>
-		<input type="submit" value="Reset Database" class="btn btn--danger"/>
+		<input type="hidden" name="reset_database" value="yes" />
+		<input type="submit" value="Reset Database" class="btn btn--danger" />
 	</form>
 
-	<br/>
-	<br/>
+	<br />
+	<br />
 	<form action="{{ path_for( 'admin_config' )}}" method="POST">
-		<input type="hidden" name="download_database" value="yes"/>
-		<input type="submit" value="Download Database" class="btn btn--primary"/>
+		<input type="hidden" name="download_database" value="yes" />
+		<input type="submit" value="Download Database" class="btn btn--primary" />
 	</form>
 
 
-	<br/>
-	<br/>
+	<br />
+	<br />
 </div>
 
 {% endblock %}

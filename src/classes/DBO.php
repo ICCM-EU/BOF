@@ -538,8 +538,8 @@ class DBO
         $query->execute();
         $config = array ();
         while ($row=$query->fetch(PDO::FETCH_OBJ)) {
-            $config[$row->item] = date("Y-m-d", strtotime($row->value));
-            $config[$row->item."_time"] = date("H:i", strtotime($row->value));
+            $config[$row->item] = date("Y-m-d", strtotime($row->value . ' UTC'));
+            $config[$row->item."_time"] = date("H:i", strtotime($row->value . ' UTC'));
         }
         $config['loggedin'] = true;
         $config['localservertime'] = date("Y-m-d H:i:s");
