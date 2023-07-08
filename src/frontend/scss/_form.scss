@@ -29,10 +29,20 @@
   padding: 16px;
   width: 100%;
 
+  &2 {
+    background-color: white;
+    border: 1px solid #999;
+    border-radius: 2px;
+  }
+
   &--help {
     font-size: 11px;
     opacity: 0.66;
   }
+}
+
+.bof-form__text {
+    font-size: 12px;
 }
 
 .bof-form__textarea {

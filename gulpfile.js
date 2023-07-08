@@ -86,14 +86,15 @@ function bundleJS(isProduction) {
   
   // Browserify will bundle all our js files together in to one and will let
   // us use modules in the front end.
-  var appBundler = browserify({
-    entries: `${paths.js_src}/app.js`,
-    debug: true
-  });
+  var appBundler = browserify(
+    `${paths.js_src}/app.js`,
+      { debug: true }
+  );
  
   // If it's not for production, a separate vendors.js file will be created
   // the first time gulp is run so that we don't have to rebundle things like
   // react everytime there's a change in the js file
+/*
   if (!isProduction && scriptsCount === 1) {
       // create vendors.js for dev environment.
       browserify({
@@ -105,6 +106,7 @@ function bundleJS(isProduction) {
       .pipe(source('vendors.js'))
       .pipe(gulp.dest(paths.js_dest));
   }
+*/
     
   if (!isProduction) {
       // make the dependencies external so they dont get bundled by the 
@@ -118,7 +120,7 @@ function bundleJS(isProduction) {
       // transform ES6 and JSX to ES5 with babelify
       .transform("babelify", {presets: ["env"]})
       .bundle()
-      .on('error', gutil.log)
+      .on('error', function(e) { gutil.log(e.message); })
       .pipe(source('bundle.js'))
       .pipe(gulp.dest(paths.js_dest));
 }
