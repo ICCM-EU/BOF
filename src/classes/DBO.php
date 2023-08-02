@@ -1209,11 +1209,14 @@ class DBO
     public function setConfigDateTime($which, $timestamp) {
         static $query = null;
         // Validate $which
-        if (($which != 'nomination_begins')
-            && ($which != 'nomination_ends')
-            && ($which != 'voting_begins')
-            && ($which != 'voting_ends')) {
-                throw new RuntimeException('Invalid configuration item');
+        $validWhich = array(
+            'nomination_begins',
+            'nomination_ends',
+            'voting_begins',
+            'voting_ends'
+        );
+        if (!in_array($which, $validWhich, true)) {
+            throw new RuntimeException('Invalid configuration item');
         }
 
         if ($query == null) {

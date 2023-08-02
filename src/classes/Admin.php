@@ -21,10 +21,33 @@ class Admin
 		$is_admin = $request->getAttribute('is_admin');
 		if (!$is_admin) throw new RuntimeException("you don't have permissions for this page");
 
-		// TODO: How can this method use the client's local time to convert the $config dates from UTC to local?
 		$config = $this->dbo->getConfig();
 		$config['timezones'] = Timezones::List();
 		return $this->view->render($response, 'admin.html', $config);
+	}
+
+	/**
+	 * Take the form data and the various string keys, and if they're not empty
+	 * then update the config with their parsed values.
+	 * @param array[string]string $data The form data.
+	 * @param string $configKey When saving the config, this key is where the data will be saved.
+	 * must be one of:
+     * 'nomination_begins'
+     * 'nomination_ends'
+     * 'voting_begins'
+     * 'voting_ends'
+	 * @param string $dateKey The string key of where the date portion is stored in $data.
+	 * @param string $timeKey The string key of where the time portion is stored in $data.
+	 * @param string $timezone The string timezone (ex: 'Eastern Standard Time').
+	 * @return void
+	 */
+	private function convertAndSaveTimeIfSet($data, $configKey, $dateKey, $timeKey, $timezone) {
+		if (!empty($data[$dateKey]) && !empty($data[$timeKey])) {
+			$this->dbo->setConfigDateTime(
+				$configKey,
+				Timezones::ParseAndUtc($data[$dateKey], $data[$timeKey], $timezone)->getTimestamp()
+			);
+		}
 	}
 
 	public function update_config($request, $response, $args) {
@@ -74,27 +97,14 @@ class Admin
 			throw new RuntimeException();
 		}
 
-		// TODO: Handle local_timezone value input. Convert incoming datetime objects to UTC from this local time.
-		if (!empty($data['local_timezone'])) {
-			// $this->dbo->setConfigDateTime('nomination_begins', strtotime($data['nomination_begins']." ".$data['time_nomination_begins']));
-			echo $data['local_timezone'];
-		}
+        $localTimezone = !empty($data['local_timezone'])
+            ? $data['local_timezone']
+            : "UTC";
 
-		if (!empty($data['nomination_begins']) && !empty($data['time_nomination_begins'])) {
-			$this->dbo->setConfigDateTime('nomination_begins', strtotime($data['nomination_begins']." ".$data['time_nomination_begins']));
-		}
-
-		if (!empty($data['nomination_ends']) && !empty($data['time_nomination_ends'])) {
-			$this->dbo->setConfigDateTime('nomination_ends', strtotime($data['nomination_ends']." ".$data['time_nomination_ends']));
-		}
-
-		if (!empty($data['voting_begins']) && !empty($data['time_voting_begins'])) {
-			$this->dbo->setConfigDateTime('voting_begins', strtotime($data['voting_begins']." ".$data['time_voting_begins']));
-		}
-		
-		if (!empty($data['voting_ends']) && !empty($data['time_voting_ends'])) {
-			$this->dbo->setConfigDateTime('voting_ends', strtotime($data['voting_ends']." ".$data['time_voting_ends']));
-		}
+		$this->convertAndSaveTimeIfSet($data, 'nomination_begins','nomination_begins','time_nomination_begins',$localTimezone);
+		$this->convertAndSaveTimeIfSet($data, 'nomination_ends','nomination_ends','time_nomination_ends',$localTimezone);
+		$this->convertAndSaveTimeIfSet($data, 'voting_begins','voting_begins','time_voting_begins',$localTimezone);
+		$this->convertAndSaveTimeIfSet($data, 'voting_ends','voting_ends','time_voting_ends',$localTimezone);
 
 		$prepRound = -1;
 		if (is_array($data['rounds']) && count($data['rounds']) > 0) {

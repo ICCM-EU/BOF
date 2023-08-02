@@ -109,7 +109,7 @@ being entered). Upon submission it will be converted from your selected timezone
     <form action="{{ path_for( 'admin_config' )}}" method="POST">
         <div class="bof-form__item2">
             <label for="local_timezone" class="bof-form__label">Local timezone</label>
-            <select id="local_timezone" class="bof-form__input2">
+            <select name="local_timezone" id="local_timezone" class="bof-form__input2">
                 {% for key, zone in timezones %}
                 <option value="{{key}}">{{zone}}</option>
                 {% endfor %}
@@ -151,7 +151,6 @@ being entered). Upon submission it will be converted from your selected timezone
                         this.elTime = elTime;
                         this.utcDate = utcDate;
                         this.elTime.addEventListener('change', e => this.handleTimeChange(e.target.value), false);
-                        this.elTime.addEventListener('change', console.log, false);
                     }
                     toInputTimeString(val) { return `${pad2Zeros(val.getHours())}:${pad2Zeros(val.getMinutes())}:${pad2Zeros(val.getSeconds())}`; }
                     toInputDateString(val) { return `${val.getFullYear()}-${pad2Zeros(val.getMonth() + 1)}-${pad2Zeros(val.getDate())}`; }

@@ -70,15 +70,14 @@ LANG=en CYPRESS_baseUrl=http://localhost ./node_modules/.bin/cypress run --confi
 
 # Running the PHPUnit Tests
 
-```
+```bash
 cd /var/www/bof/src
 # need to run composer install again, because ansible does not include the dev dependancies by default when calling composer install
 composer install --dev
 apt-get install php-xdebug php-pdo-sqlite
 ./vendor/bin/phpunit -c phpunit.xml
+# If you want to test a single code file, use this:
+./vendor/bin/phpunit -c phpunit.xml test/classes/TestTimezones.php
 # Please note you should not install PHPUnit on anything but your development system.  See https://thephp.cc/news/2020/02/phpunit-a-security-risk for further explanation. 
 ```
 
-
-
- ssh -p 9277 tgordon@sheridan.tcsaf.com
