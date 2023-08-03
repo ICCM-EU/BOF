@@ -174,22 +174,22 @@ being entered). Upon submission it will be converted from your selected timezone
                     nomination_begins: new BofDateTime(
                         d.getElementById('nomination_begins'),
                         d.getElementById('time_nomination_begins'),
-                        new Date('{{nomination_begins}} {{nomination_begins_time}} UTC')
+                        new Date('{{nomination_begins}}T{{nomination_begins_time}}Z')
                     ),
                     nomination_ends: new BofDateTime(
                         d.getElementById('nomination_ends'),
                         d.getElementById('time_nomination_ends'),
-                        new Date('{{nomination_ends}} {{nomination_ends_time}} UTC')
+                        new Date('{{nomination_ends}}T{{nomination_ends_time}}Z')
                     ),
                     voting_begins: new BofDateTime(
                         d.getElementById('voting_begins'),
                         d.getElementById('time_voting_begins'),
-                        new Date('{{voting_begins}} {{voting_begins_time}} UTC')
+                        new Date('{{voting_begins}}T{{voting_begins_time}}Z')
                     ),
                     voting_ends: new BofDateTime(
                         d.getElementById('voting_ends'),
                         d.getElementById('time_voting_ends'),
-                        new Date('{{voting_ends}} {{voting_ends_time}} UTC')
+                        new Date('{{voting_ends}}T{{voting_ends_time}}Z')
                     ),
                     localTimezone: new BofTimeZone(
                         d.getElementById('local_timezone'),
