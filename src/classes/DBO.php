@@ -767,7 +767,7 @@ class DBO
                      LEFT JOIN participant p
                             ON wp.participant_id = p.id
                            AND wp.leader = 1
-                     WHERE w.tags NOT LIKE '%Cancelled%' AND (w.tags NOT LIKE 'ARCHIVE_%' OR w.tags LIKE CONCAT('%',:archivetag,';%'))
+                     WHERE w.tags NOT LIKE '%Cancelled%' AND (w.tags NOT LIKE 'ARCHIVE_%' OR w.tags NOT LIKE CONCAT('%',:archivetag,';%'))
                       ORDER BY p.name) AS t
               GROUP BY id
               ORDER BY votes DESC, id DESC";
