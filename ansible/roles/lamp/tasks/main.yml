@@ -1,6 +1,7 @@
 ---
 - name: "Prepare Node.js"
-  shell: curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+  # see https://github.com/nodesource/distributions
+  shell: curl -sL https://deb.nodesource.com/setup_20.x | sudo -E bash -
   args:
     creates: /etc/apt/sources.list.d/nodesource.list
 
