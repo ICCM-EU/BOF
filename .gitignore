@@ -3,6 +3,7 @@
 .vagrant/*
 node_modules/*
 cypress/plugins/*
+cypress/screenshots/*
 
 src/public/assets/css/*
 src/public/assets/js/*
