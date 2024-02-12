@@ -1,9 +1,10 @@
 // Gulpy gulp
-const autoprefixer  = require('gulp-autoprefixer');
+const gulp          = require('gulp');
+const postcss       = require('gulp-postcss');
+const autoprefixer  = require('autoprefixer');
 const babelify      = require('babelify');
 const browserify    = require('browserify');
 const del           = require('del');
-const gulp          = require('gulp');
 const gutil         = require('gulp-util');
 const sass          = require('gulp-sass')(require('sass'));
 const source        = require('vinyl-source-stream');
@@ -62,7 +63,7 @@ function bundleSVG() {
   return gulp.src(`${paths.svg_src}/**/*.svg`)
     .pipe(svgmin())
     .pipe(svgsymbols({
-      svgClassname: 'svg-icon',
+      class: 'svg-icon',
       templates: ['default-svg'],
       title: false,
     }))
@@ -76,7 +77,7 @@ function bundleCSS() {
     .pipe(sass({
       outputStyle: 'compressed'
     }).on('error', sass.logError))
-    .pipe(autoprefixer())
+    .pipe(postcss([ autoprefixer() ]))
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(paths.css_dest));
 }
