@@ -5,7 +5,7 @@ use \Firebase\JWT\JWT;
 $app->add(new \Tuupola\Middleware\JwtAuthentication([
     "secure" => false, // we know we are using https behind a proxy
     "cookie" => "authtoken",
-    "path" => [ "/admin", "/vote", "/nomination", "/topics", "/moderation", "/projector"],
+    "path" => [ "/admin", "/vote", "/nomination", "/topics", "/moderation"],
     #"passthrough" => ["/home", "/login", "/authenticate"],
     "secret" => $settings['settings']['secrettoken'],
     "error" => function ($response, $arguments) {
