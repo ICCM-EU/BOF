@@ -2,6 +2,22 @@ body {
   font-family: 'Lato', sans-serif;
 }
 
+/*
+.container--projector {
+	max-width: 800px;
+}
+
+body {
+   transform: scale(1.4);
+   transform-origin: 0 0;
+   // add prefixed versions too.
+}
+*/
+
+.container--projector .topic__detail h1 {
+	font-size: 25px;
+}
+
 .container {
   margin: 0 auto;
   max-width: 920px;
