@@ -28,6 +28,8 @@ class Auth
         $this->translator = $translator;
         $this->settings = require __DIR__.'/../../cfg/settings.php';
         $this->site = ($_SERVER && array_key_exists('SERVER_NAME',$_SERVER)?$_SERVER['SERVER_NAME']:'localhost');
+        //$this->scheme = ($_SERVER && array_key_exists('REQUEST_SCHEME',$_SERVER)?$_SERVER['REQUEST_SCHEME']:'https');
+	$this->scheme = "https";
     }
 
     private function signin($response, $login, $userid) {
@@ -110,7 +112,7 @@ class Auth
 
             if ($this->settings['settings']['moderated_registration']) {
                 $subject = $this->translator->trans("Please confirm your email address");
-                $accept_link = "https://".$this->site."/confirm_user?email=".urlencode($email)."&token=".$token;
+                $accept_link = $this->scheme."://".$this->site."/confirm_user?email=".urlencode($email)."&token=".$token;
                 $body_html = $this->translator->trans("email_confirm_user", ['%site%' => $this->site, '%login%' => $login, '%link%' => $accept_link]);
                 $body = str_replace("<br/>", "\n", $body_html);
                 $this->sendEmail($email, $subject, $body_html, $body);
@@ -138,7 +140,7 @@ class Auth
         if (!array_key_exists('token', $data)) {
             $token = bin2hex(random_bytes(16));
             $subject = $this->translator->trans("Reset Password");
-            $accept_link = "https://".$this->site."/reset_pwd?email=".urlencode($email)."&token=".$token;
+            $accept_link = $this->scheme."://".$this->site."/reset_pwd?email=".urlencode($email)."&token=".$token;
             $html_body = $this->translator->trans("email_reset_pwd", ['%site%' => $this->site, '%link%' => $accept_link]);
             $text_body = str_replace("<br/>", "\n", $html_body);
 
@@ -187,7 +189,7 @@ class Auth
         $userLang = $this->translator->getLocale();
         $this->translator->setLocale($this->settings['settings']['fallback_language']);
         $subject = $this->translator->trans('new registration %email%', ['%email%' => $email]);
-        $accept_link = "https://".$this->site."/confirm_user?email=".urlencode($email)."&token=".$this->settings['settings']['moderation_token'];
+        $accept_link = $this->scheme."://".$this->site."/confirm_user?email=".urlencode($email)."&token=".$this->settings['settings']['moderation_token'];
         $html_body = $this->translator->trans("email_moderate_user", ['%site%' => $this->site, '%login%' => $login, '%email%' => $email, '%userinfo%' => $userinfo, '%link%' => $accept_link]);
         $text_body = str_replace("<br/>", "\n", $html_body);
         $email_to = $this->settings['settings']['moderation_email'];
@@ -196,7 +198,6 @@ class Auth
     }
 
     public function sendEmail($email_to, $subject, $html_body, $text_body) {
-
         $mail = new PHPMailer();
         $mail->isSMTP();
         $mail->Host       = $this->settings['settings']['smtp']['host'];
@@ -254,7 +255,7 @@ class Auth
                         $this->sendEmail($email,
                             $this->translator->trans("Account has been activated"),
                             "",
-                            $this->translator->trans("Your account at %site% has been activated", ['%site%' => 'https://'.$this->site]));
+                            $this->translator->trans("Your account at %site% has been activated", ['%site%' => $this->scheme.'://'.$this->site]));
                         $this->translator->setLocale($adminLang);
 
                         // send an email notification for the moderators
