@@ -28,8 +28,8 @@ class Auth
         $this->translator = $translator;
         $this->settings = require __DIR__.'/../../cfg/settings.php';
         $this->site = ($_SERVER && array_key_exists('SERVER_NAME',$_SERVER)?$_SERVER['SERVER_NAME']:'localhost');
-        //$this->scheme = ($_SERVER && array_key_exists('REQUEST_SCHEME',$_SERVER)?$_SERVER['REQUEST_SCHEME']:'https');
-	$this->scheme = "https";
+        $this->scheme = ($_SERVER && array_key_exists('REQUEST_SCHEME',$_SERVER)?$_SERVER['REQUEST_SCHEME']:'https');
+	//$this->scheme = "http";
     }
 
     private function signin($response, $login, $userid) {

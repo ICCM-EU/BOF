@@ -27,6 +27,13 @@ class Projector
 		$bofs = array ();
 		$count = 0;
 		foreach (array_keys($rounds) as $roundId) {
+			/*if ($roundId == 0) {
+				continue;
+			}
+			if ($roundId == 1 && time() >= strtotime("20:05:00")) {
+				continue;
+			}*/
+
 			$bof = array();
 			$bof['name'] = $rounds[$roundId];
 			$bof['rooms'] = array();
@@ -80,7 +87,9 @@ class Projector
 			$bofs = $this->_getVotingStage();
 		}
 		else if ($stage == "finished") {
-			$bofs = $this->_getFinishedStage();
+			$bofs = $this->_getVotingStage();
+			$stage = "voting";
+		//	$bofs = $this->_getFinishedStage();
 		}
 
 		return $this->view->render($response, 'proj_layout.html', [

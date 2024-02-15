@@ -117,13 +117,15 @@ class Admin
 				$prepLocation = -1;
 			}
 		}
-
-		if (!empty($data['schedule_prep'])) {
+		/* this does not work properly
+		 *
+		if (empty($data['schedule_prep'])) {
 			$this->dbo->setConfigPrepBoF('False', -1, -1);
                 }
 		else {
 			$this->dbo->setConfigPrepBoF('True', $prepRound, $prepLocation);
 		}
+		*/
 
 		return $this->showAdminView($request, $response, $args);
 	}

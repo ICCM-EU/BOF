@@ -541,7 +541,7 @@ class DBO
             $config[$row->item] = date("Y-m-d", strtotime($row->value));
             $config[$row->item."_time"] = date("H:i", strtotime($row->value));
 	}
-        $config['schedule_prep'] = true;
+        $config['schedule_prep'] = 'True';
         $sql = "SELECT * FROM `config` WHERE NOT (item LIKE '%_begins' OR item LIKE '%_ends')";
         $query=$this->db->prepare($sql);
         $query->execute();
@@ -907,7 +907,17 @@ class DBO
                 FROM workshop
                -- WHERE published=1
                ORDER BY votes desc
-               LIMIT :workshops";
+	       LIMIT :workshops";
+	// we have a fixed workshop for round 0
+	$workshops --;
+	$sql = "SELECT id, name, votes,
+                     (SELECT COUNT(wp.id)
+                        FROM workshop_participant wp
+                       WHERE wp.workshop_id = workshop.id
+                         AND wp.participant = 1) AS available
+                FROM workshop
+		WHERE id = 77
+                UNION ".$sql;
         $qry_top3 = $this->db->prepare($sql);
         $qry_top3->bindValue(':workshops', (int) $workshops, PDO::PARAM_INT);
         $qry_top3->execute();

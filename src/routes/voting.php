@@ -58,7 +58,7 @@ $app->post('/votes/add', function (Request $request, Response $response, array $
        return $response->withRedirect($this->router->pathFor('home'), 302);
 
     // turn full votes for Prep BOF into quarter votes. we don't want to waste your full vote!
-    if ($data['workshopid'] == $PrepBofId) {
+    if ($data['workshopid'] == $PrepBofId || $data['workshopid'] == 124) {
         $data['vote'] = 0.25;
     }
 
