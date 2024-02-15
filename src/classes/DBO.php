@@ -166,7 +166,7 @@ class DBO
      * @param string $token The token that was sent in the password reset email
      */
     public function startResetPassword($email, $token) {
-        $sql = 'UPDATE `participant` SET `token` = :token WHERE `email` = :email AND `active` = 1 AND `confirmed` = 1';
+        $sql = 'UPDATE `participant` SET `token` = :token WHERE `email` = :email AND `active` = 1 AND `confirmed` >= 0';
         $query=$this->db->prepare($sql); 
         $query->bindValue(':email', $email, PDO::PARAM_STR); 
         $query->bindValue(':token', $token, PDO::PARAM_STR); 
@@ -188,7 +188,7 @@ class DBO
     public function resetPassword($email, $token, $password) {
         $pass = password_hash($password, PASSWORD_DEFAULT,
             ['cost' => $this->passwordCost]);
-        $sql = "UPDATE `participant` SET `password` = :password, `token` = '' WHERE `email` = :email AND `active` = 1 AND `confirmed` = 1 AND `token` = :token AND `token` <> ''";
+        $sql = "UPDATE `participant` SET `password` = :password, `token` = '' WHERE `email` = :email AND `active` = 1 AND `confirmed` >= 0 AND `token` = :token AND `token` <> ''";
         $query=$this->db->prepare($sql); 
         $query->bindValue(':email', $email, PDO::PARAM_STR); 
         $query->bindValue(':token', $token, PDO::PARAM_STR); 
