@@ -84,8 +84,8 @@ $app->get('/topics', function (Request $request, Response $response, array $args
 
     function cmp($a, $b)
     {
-        if ($a['vote'] > $b['vote']) return -1;
-        if ($a['vote'] < $b['vote']) return 1;
+        if ($a['votes'] > $b['votes']) return -1;
+        if ($a['votes'] < $b['votes']) return 1;
         if ($a['id'] < $b['id']) return -1;
         if ($a['id'] > $b['id']) return 1;
         return 0;
