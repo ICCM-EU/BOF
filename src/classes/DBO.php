@@ -533,13 +533,20 @@ class DBO
      * num_locations, stage, and schedule_prep.
      */
     public function getConfig() {
-        $sql = "SELECT * FROM `config` WHERE item != 'branding' AND item != 'schedule_prep'";
+        $sql = "SELECT * FROM `config` WHERE item LIKE '%_begins' OR item LIKE '%_ends'";
         $query=$this->db->prepare($sql);
         $query->execute();
         $config = array ();
         while ($row=$query->fetch(PDO::FETCH_OBJ)) {
             $config[$row->item] = date("Y-m-d", strtotime($row->value));
             $config[$row->item."_time"] = date("H:i", strtotime($row->value));
+	}
+        $config['schedule_prep'] = true;
+        $sql = "SELECT * FROM `config` WHERE NOT (item LIKE '%_begins' OR item LIKE '%_ends')";
+        $query=$this->db->prepare($sql);
+        $query->execute();
+        while ($row=$query->fetch(PDO::FETCH_OBJ)) {
+            $config[$row->item] = $row->value;
         }
         $config['loggedin'] = true;
         $config['localservertime'] = date("Y-m-d H:i:s");
@@ -548,15 +555,6 @@ class DBO
         $config['locations'] = $this->getLocationNames();
         $config['num_locations'] = count($config['locations']);
         $config['stage'] = $this->getStage();
-        $sql="SELECT value
-                FROM config 
-               WHERE item = 'schedule_prep'";
-        $row = $this->db->query($sql)->fetch(PDO::FETCH_NUM);
-        if ($row) {
-            $config['schedule_prep'] = $row[0];
-        } else {
-            $config['schedule_prep'] = 'True';
-        }
         return $config;
     }
 
