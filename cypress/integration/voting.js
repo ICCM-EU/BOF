@@ -2,20 +2,20 @@ function cast_vote(topic, vote) {
   cy.visit("/topics")
   // select the div class=topic
   // the first child is the warning div. so start to count at 2
-  cy.get('div[class=topic]:nth-child(' + (topic + 2) + ')').within(() => {
+  cy.get("div[class=topic]:nth-child(" + (topic + 2) + ")").within(() => {
 
     // select the form to click
     if (vote == 0) {
-      cy.get('form[class=facilitation] input[type=submit]').click()
+      cy.get("form[class=facilitation] input[type=submit]").click()
     }
     else if (vote == 1) {
-      cy.get('form[class=fullvote] input[type=submit]').click()
+      cy.get("form[class=fullvote] input[type=submit]").click()
     }
     else if (vote == 2) {
-      cy.get('form[class=quartervote] input[type=submit]').click()
+      cy.get("form[class=quartervote] input[type=submit]").click()
     }
     else if (vote == -1) {
-      cy.get('form[class=clearvote] input[type=submit]').click()
+      cy.get("form[class=clearvote] input[type=submit]").click()
     }
   })
 }
@@ -118,16 +118,16 @@ var votes_quarter = [
   [0, 1, 4, 8, 9, 10, 11, 13, 14, 15, 18, 25, 29, 34, 39, 40, 41, 42, 43, 46, 54, 55, 56, 58, 59  ],
 ]
 
-describe('test voting stage', function() {
+describe("test voting stage", function() {
   before(function() {
-    var resetDB = require('../support/reset_database.js')
+    var resetDB = require("../support/reset_database.js")
     resetDB.resetVoting()
     for(var i=1; i < 60; i++) {
-      cy.createUser({username: "user" + i, password: "Test123!pwd" + i, email: 'user' + i + '@example.org'})
+      cy.createUser({username: "user" + i, password: "Test123!pwd" + i, email: "user" + i + "@example.org"})
     }
   })
 
-  it('cast votes', function() {
+  it("cast votes", function() {
     var i
     for(i=1; i < 60; i++) {
       cy.typeLogin({username: "user" + i, password: "Test123!pwd" + i})
