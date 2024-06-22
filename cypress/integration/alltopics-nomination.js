@@ -2,10 +2,21 @@ describe('In the Nomination stage', function() {
   const navfooter = require('../support/navfooter.js')
   const resetDB = require('../support/reset_database.js')
   const topics = require('../support/topics.js')
+  const login = (user = {}) => {
+    cy.session(user, () => {
+      cy.typeLogin(user)
+    })
+  }
+
   describe('the All topics page for the admin user', function() {
     before(() => {
       resetDB.reset()
       cy.typeLogin({username: 'admin', password: 'secret'})
+    })
+
+    beforeEach(() => {
+      login({username: 'admin', password: 'secret'})
+      cy.visit('/topics')
     })
 
     it('loads successfully', function() {
@@ -27,7 +38,11 @@ describe('In the Nomination stage', function() {
     before(() => {
       resetDB.reset()
       cy.createUser({username: 'user1', password: 'Test123!pwd1', email: 'user1@example.org'})
-      cy.typeLogin({username: 'user1', password: 'Test123!pwd1'})
+    })
+
+    beforeEach(() => {
+      login({username: 'user1', password: 'Test123!pwd1'})
+      cy.visit('/topics')
     })
 
     it('loads successfully', function() {

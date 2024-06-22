@@ -1,8 +1,8 @@
 exports.check = function(stage, admin) {
   var pages = [
     { name: 'Nominate topic', dest: '/nomination', exists: stage === 'nomination' },
-    { name: 'Moderate topic', dest: '/moderation', exists: admin && stage !== 'voting' },
-    { name: 'Calculate result', dest: '/result', exists: admin && stage === '' },
+    { name: 'Moderate topic', dest: '/moderation', exists: (admin && stage !== 'voting') },
+    { name: 'Calculate result', dest: '/result', exists: (admin && stage === '') },
     { name: 'All topics', dest: '/topics', exists: true },
     { name: 'Projector', dest: '/projector', exists: true },
     { name: 'Admin', dest: '/admin', exists: admin },

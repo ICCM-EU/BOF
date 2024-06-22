@@ -2,11 +2,16 @@ describe('In the Nomination stage, the Nominate topic page', function() {
   before(() => {
     require('../support/reset_database.js').reset()
     cy.createUser({username: 'user1', password: 'Test123!pwd1', email: 'user1@example.org'})
-    cy.typeLogin({username: 'user1', password: 'Test123!pwd1'})
   })
 
   beforeEach(() => {
-    Cypress.Cookies.preserveOnce('authtoken')
+    const login = (user = {}) => {
+      cy.session(user, () => {
+        cy.typeLogin(user)
+      })
+    }
+    login({username: 'user1', password: 'Test123!pwd1'})
+    cy.visit("/nomination")
   })
 
   it('loads successfully', function() {
@@ -30,6 +35,8 @@ describe('In the Nomination stage, the Nominate topic page', function() {
   })
 
   it ('thanks the user after submission with topics and nominate buttons', function() {
+    cy.get('input[type=text][name="title"]').type('nominate-test-non-admin-user-topic')
+    cy.get('textarea[name="description"]').type('description for\nnominate-test-non-admin-user-topic\n')
     cy.get('input[type=submit][value="Nominate"]').click().then(() => {
       cy.contains('Thank you')
       cy.get('a[href="/topics"]')
@@ -38,7 +45,6 @@ describe('In the Nomination stage, the Nominate topic page', function() {
   })
 
   it ('shows an error if a topic with the same title is submitted again', function() {
-      cy.visit("/nomination")
       cy.get('input[type=text][name="title"]').type('nominate-test-non-admin-user-topic')
       cy.get('textarea[name="description"]').type('description for\nnominate-test-non-admin-user-topic\n')
       cy.get('input[type=submit][value="Nominate"]').click().then(() => {

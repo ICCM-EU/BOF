@@ -1,4 +1,8 @@
 describe('The home page', function() {
+  beforeEach(() => {
+    cy.visit("/")
+  })
+
   it('loads successfully', function() {
     cy.visit("/")
   })
@@ -8,14 +12,12 @@ describe('The home page', function() {
   })
 
   it('has a register button that goes to the /register page', function() {
-    cy.visit("/")
     cy.contains('a', 'Register').click()
     cy.url().should('include', '/register')
 
   })
 
   it('has a login button that goes to the /login page', function() {
-    cy.visit("/")
     cy.contains('a', 'Sign in').click()
     cy.url().should('include', '/login')
   })

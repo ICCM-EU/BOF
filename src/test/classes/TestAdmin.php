@@ -5,6 +5,7 @@ use phpmock\spy\Spy;
 use ICCM\BOF\Admin;
 use ICCM\BOF\DBO;
 use ICCM\BOF\Results;
+use ICCM\BOF\Timezones;
 use Slim\Views\Twig;
 use Slim\Http\Request;
 use Psr\Http\Message\ResponseInterface;
@@ -23,7 +24,8 @@ class TestAdmin extends TestCase
             'loggedin' => true,
             'stage' => 'blah',
             'csvdata' => 'blah,blah,blah',
-            'log' => 'Logged info'
+            'log' => 'Logged info',
+            'timezones' => Timezones::List()
         ];
 
         // Results mock
@@ -119,7 +121,8 @@ class TestAdmin extends TestCase
         $config = [
             'loggedin' => true,
             'num_rounds' => 8,
-            'num_locations' => 6
+            'num_locations' => 6,
+            'timezones' => Timezones::List()
         ];
         // DBO mock
         $dbo = $this->getMockBuilder(DBO::class)
@@ -399,6 +402,7 @@ class TestAdmin extends TestCase
     public function updateConfigFailsToDownloadDatabase() {
         $config = [
             'loggedin' => true,
+            'timezones' => Timezones::List()
         ];
         $data = [
             'password1' => null,
@@ -530,6 +534,7 @@ class TestAdmin extends TestCase
     public function updateConfigResetsDatabase() {
         $config = [
             'loggedin' => true,
+            'timezones' => Timezones::List()
         ];
         $data = [
             'password1' => null,
@@ -606,6 +611,7 @@ class TestAdmin extends TestCase
     private function _updateConfigUpdatesDateTime($which, $failType) {
         $config = [
             'loggedin' => true,
+            'timezones' => Timezones::List()
         ];
         $data = [
             'password1' => null,
@@ -746,6 +752,7 @@ class TestAdmin extends TestCase
     public function updateConfigDoesNotUpdateEmptyLocationsOrRounds() {
         $config = [
             'loggedin' => true,
+            'timezones' => Timezones::List()
         ];
         $data = [
             'password1' => null,
@@ -821,6 +828,7 @@ class TestAdmin extends TestCase
     public function updateConfigUpdatesLocations() {
         $config = [
             'loggedin' => true,
+            'timezones' => Timezones::List()
         ];
         $data = [
             'password1' => null,
@@ -905,6 +913,7 @@ class TestAdmin extends TestCase
     public function updateConfigUpdatesPassword() {
         $config = [
             'loggedin' => true,
+            'timezones' => Timezones::List()
         ];
         $data = [
             'password1' => 'password1',
@@ -986,6 +995,7 @@ class TestAdmin extends TestCase
     public function updateConfigUpdatesRounds() {
         $config = [
             'loggedin' => true,
+            'timezones' => Timezones::List()
         ];
         $data = [
             'password1' => null,
@@ -1071,6 +1081,7 @@ class TestAdmin extends TestCase
     public function updateConfigUpdatesPrepBoF() {
         $config = [
             'loggedin' => true,
+            'timezones' => Timezones::List()
         ];
         $data = [
             'password1' => null,
@@ -1149,6 +1160,7 @@ class TestAdmin extends TestCase
     public function updateConfigUpdatesPrepBoFWithInvalidRoundAndLocation() {
         $config = [
             'loggedin' => true,
+            'timezones' => Timezones::List()
         ];
         $data = [
             'password1' => null,

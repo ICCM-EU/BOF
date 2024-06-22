@@ -6,6 +6,10 @@ describe('The logout page', function() {
     cy.getCookie('authtoken').should('have.property', 'value')
   })
 
+  beforeEach(() => {
+    cy.visit("/logout")
+  })
+
   it('loads successfully', function() {
     cy.visit("/logout")
     /* The code should probably redirect the user to / after logging out,

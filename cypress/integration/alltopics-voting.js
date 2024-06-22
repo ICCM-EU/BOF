@@ -2,10 +2,20 @@ describe('In the Voting stage', function() {
   const navfooter = require('../support/navfooter.js')
   const resetDB = require('../support/reset_database.js')
   const topics = require('../support/topics.js')
+  const login = (user = {}) => {
+    cy.session(user, () => {
+      cy.typeLogin(user)
+    })
+  }
+
   describe('the All topics page for an admin user', function() {
     before(() => {
       resetDB.resetVoting()
-      cy.typeLogin({username: 'admin', password: 'secret'})
+    })
+
+    beforeEach(() => {
+      login({username: 'admin', password: 'secret'})
+      cy.visit('/topics')
     })
 
     it('loads successfully', function() {
@@ -27,11 +37,11 @@ describe('In the Voting stage', function() {
     before(() => {
       resetDB.resetVoting()
       cy.createUser({username: 'user1', password: 'Test123!pwd1', email: 'user1@example.org'})
-      cy.typeLogin({username: 'user1', password: 'Test123!pwd1'})
     })
 
     beforeEach(() => {
-      Cypress.Cookies.preserveOnce('authtoken')
+      login({username: 'user1', password: 'Test123!pwd1'})
+      cy.visit('/topics')
     })
 
     it('loads successfully', function() {
@@ -68,7 +78,8 @@ describe('In the Voting stage', function() {
       })
 
       beforeEach(() => {
-        Cypress.Cookies.preserveOnce('authtoken')
+        login({username: 'user1', password: 'Test123!pwd1'})
+        cy.visit('/topics')
       })
 
       it('adds a full vote for topic1 and does not set facilitator', function() {
@@ -91,7 +102,8 @@ describe('In the Voting stage', function() {
     })
 
     beforeEach(() => {
-      Cypress.Cookies.preserveOnce('authtoken')
+      login({username: 'user1', password: 'Test123!pwd1'})
+      cy.visit('/topics')
     })
 
     it('allows only 3 full votes', function() {
