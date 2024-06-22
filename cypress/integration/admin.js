@@ -149,7 +149,7 @@ describe('In the Nomination stage, the admin page', function() {
       expect(minutes).to.be.closeTo(expectedMinutes, 60)
     })
   })
-/*
+
   it('has three slots with delete buttons', function() {
     cy.get('input[id=round_0][name="rounds[]"][type=text]').should('have.attr', 'value', 'first')
     cy.get('button[id=delete_round_0]')
@@ -323,9 +323,9 @@ describe('In the Nomination stage, the admin page', function() {
       cy.get('@footer').get('a[href="/logout"]')
     })
   })
-*/
+
 })
-/*
+
 describe('In the Voting stage, the admin page', function() {
   const login = (user = {}) => {
     cy.session(user, () => {
@@ -511,4 +511,4 @@ describe('Download the database', function() {
     })
   })
 })
-*/
+
