@@ -49,18 +49,18 @@ describe("In the Nomination stage, the admin page", function() {
   })
 
   it("has the server and local times", function() {
-    let utcnow = dayjs().tz("UTC");
-    let utcnowSec = parseInt(utcnow.format("X"), 10)
-    let now = dayjs();
-    let nowSec = parseInt(now.format("X"), 10)
+    const utcnow = dayjs().tz("UTC");
+    const utcnowSec = parseInt(utcnow.format("X"), 10)
+    const now = dayjs();
+    const nowSec = parseInt(now.format("X"), 10)
     cy.get("p[id=servertime]").should("contain", "Server time:").and(($value) => {
-      let value = $value.text();
-      let serverDate = parseInt(dayjs(value.substring(12), "YYYY-MM-DD HH:mm:ss").format("X"), 10)
+      const value = $value.text();
+      const serverDate = parseInt(dayjs(value.substring(12), "YYYY-MM-DD HH:mm:ss").format("X"), 10)
       expect(serverDate).to.be.closeTo(utcnowSec, 3)
     })
     cy.get("p[id=localtime]").should("contain", "Local time:").and(($value) => {
-      let value = $value.text();
-      let serverDate = parseInt(dayjs(value.substring(11), "YYYY-MM-DD HH:mm:ss").utc().format("X"), 10)
+      const value = $value.text();
+      const serverDate = parseInt(dayjs(value.substring(11), "YYYY-MM-DD HH:mm:ss").utc().format("X"), 10)
       expect(serverDate).to.be.closeTo(nowSec, 3)
     })
   })
@@ -69,7 +69,7 @@ describe("In the Nomination stage, the admin page", function() {
     cy.get("input[name=nomination_begins][type=date]").should("have.attr", "value").and(($value) => {
       // Nomination begins date is 1 day before NOW() when
       // reset_database was invoked above
-      let now = dayjs().subtract(1, "days").hour(0).minute(0).second(0).millisecond(0).tz("UTC").format("YYYY-MM-DD")
+      const now = dayjs().subtract(1, "days").hour(0).minute(0).second(0).millisecond(0).tz("UTC").format("YYYY-MM-DD")
       expect($value).to.eq(now)
     })
   })
@@ -78,10 +78,10 @@ describe("In the Nomination stage, the admin page", function() {
     cy.get("input[name=time_nomination_begins][type=time]").should("have.attr", "value").and(($value) => {
       // Nomination begins time is NOW() when
       // reset_database was invoked above
-      let now = dayjs().tz("UTC").format("HH:mm").split(":")
-      let expectedMinutes = parseInt(now[0], 10) * 60 + parseInt(now[1], 10)
-      let serverTime = dayjs($value, "HH:mm").format("HH:mm").split(":")
-      let minutes = parseInt(serverTime[0], 10) * 60 + parseInt(serverTime[1], 10)
+      const now = dayjs().tz("UTC").format("HH:mm").split(":")
+      const expectedMinutes = parseInt(now[0], 10) * 60 + parseInt(now[1], 10)
+      const serverTime = dayjs($value, "HH:mm").format("HH:mm").split(":")
+      const minutes = parseInt(serverTime[0], 10) * 60 + parseInt(serverTime[1], 10)
       expect(minutes).to.be.closeTo(expectedMinutes, 60)
     })
   })
@@ -90,7 +90,7 @@ describe("In the Nomination stage, the admin page", function() {
     cy.get("input[name=nomination_ends][type=date]").should("have.attr", "value").and(($value) => {
       // Nomination ends date is 1 day after NOW() when
       // reset_database was invoked above
-      let now = dayjs().add(1, "days").add(1, "minutes").hour(0).minute(0).second(0).millisecond(0).tz("UTC").format("YYYY-MM-DD")
+      const now = dayjs().add(1, "days").add(1, "minutes").hour(0).minute(0).second(0).millisecond(0).tz("UTC").format("YYYY-MM-DD")
       expect($value).to.eq(now)
     })
   })
@@ -99,10 +99,10 @@ describe("In the Nomination stage, the admin page", function() {
     cy.get("input[name=time_nomination_ends][type=time]").should("have.attr", "value").and(($value) => {
       // Nomination ends time is one minute after NOW() when
       // reset_database was invoked above
-      let now = dayjs().add(1, "minutes").tz("UTC").format("HH:mm").split(":")
-      let expectedMinutes = parseInt(now[0], 10) * 60 + parseInt(now[1], 10)
-      let serverTime = dayjs($value, "HH:mm").format("HH:mm").split(":")
-      let minutes = parseInt(serverTime[0], 10) * 60 + parseInt(serverTime[1], 10)
+      const now = dayjs().add(1, "minutes").tz("UTC").format("HH:mm").split(":")
+      const expectedMinutes = parseInt(now[0], 10) * 60 + parseInt(now[1], 10)
+      const serverTime = dayjs($value, "HH:mm").format("HH:mm").split(":")
+      const minutes = parseInt(serverTime[0], 10) * 60 + parseInt(serverTime[1], 10)
       expect(minutes).to.be.closeTo(expectedMinutes, 60)
     })
   })
@@ -111,7 +111,7 @@ describe("In the Nomination stage, the admin page", function() {
     cy.get("input[name=voting_begins][type=date]").should("have.attr", "value").and(($value) => {
       // Voting begins date is 1 day after NOW() when
       // reset_database was invoked above
-      let now = dayjs().add(1, "days").add(1, "hours").tz("UTC").hour(0).minute(0).second(0).millisecond(0).format("YYYY-MM-DD")
+      const now = dayjs().add(1, "days").add(1, "hours").tz("UTC").hour(0).minute(0).second(0).millisecond(0).format("YYYY-MM-DD")
       expect($value).to.eq(now)
     })
   })
@@ -120,10 +120,10 @@ describe("In the Nomination stage, the admin page", function() {
     cy.get("input[name=time_voting_begins][type=time]").should("have.attr", "value").and(($value) => {
       // Voting begins time is one hour after NOW() when
       // reset_database was invoked above
-      let now = dayjs().add(1, "hours").tz("UTC").format("HH:mm").split(":")
-      let expectedMinutes = parseInt(now[0], 10) * 60 + parseInt(now[1], 10)
-      let serverTime = dayjs($value, "HH:mm").format("HH:mm").split(":")
-      let minutes = parseInt(serverTime[0], 10) * 60 + parseInt(serverTime[1], 10)
+      const now = dayjs().add(1, "hours").tz("UTC").format("HH:mm").split(":")
+      const expectedMinutes = parseInt(now[0], 10) * 60 + parseInt(now[1], 10)
+      const serverTime = dayjs($value, "HH:mm").format("HH:mm").split(":")
+      const minutes = parseInt(serverTime[0], 10) * 60 + parseInt(serverTime[1], 10)
       expect(minutes).to.be.closeTo(expectedMinutes, 60)
     })
   })
@@ -132,7 +132,7 @@ describe("In the Nomination stage, the admin page", function() {
     cy.get("input[name=voting_ends][type=date]").should("have.attr", "value").and(($value) => {
       // Voting ends date is 2 days after NOW() when
       // reset_database was invoked above
-      let now = dayjs().add(2, "days").add(2, "hours").tz("UTC").hour(0).minute(0).second(0).millisecond(0).format("YYYY-MM-DD")
+      const now = dayjs().add(2, "days").add(2, "hours").tz("UTC").hour(0).minute(0).second(0).millisecond(0).format("YYYY-MM-DD")
       expect($value).to.eq(now)
     })
   })
@@ -141,11 +141,11 @@ describe("In the Nomination stage, the admin page", function() {
     cy.get("input[name=time_voting_ends][type=time]").should("have.attr", "value").and(($value) => {
       // Voting ends time is two hours after NOW() when
       // reset_database was invoked above
-      let now = dayjs().add(2, "hours").tz("UTC").format("HH:mm").split(":")
-      let expectedMinutes = parseInt(now[0], 10) * 60 + parseInt(now[1], 10)
-      //let serverTime = dayjs($value, "HH:mm").format("HH:mm").split(":")
-      let serverTime = ($value + "").split(":")
-      let minutes = parseInt(serverTime[0], 10) * 60 + parseInt(serverTime[1], 10)
+      const now = dayjs().add(2, "hours").tz("UTC").format("HH:mm").split(":")
+      const expectedMinutes = parseInt(now[0], 10) * 60 + parseInt(now[1], 10)
+      //const serverTime = dayjs($value, "HH:mm").format("HH:mm").split(":")
+      const serverTime = ($value + "").split(":")
+      const minutes = parseInt(serverTime[0], 10) * 60 + parseInt(serverTime[1], 10)
       expect(minutes).to.be.closeTo(expectedMinutes, 60)
     })
   })
@@ -504,7 +504,7 @@ describe("Download the database", function() {
     cy.request({url: "/admin", method: "POST", form: true, body: {download_database: "yes"}}).then((response) => {
       let now = dayjs.utc().format("YYYY-MM-DD_hhmm")
       now = dayjs().utc().format("YYYY-MM-DD_hhmm")
-      let disposition = "attachment; filename=db-backup-BOF-" + now + ".sql"
+      const disposition = "attachment; filename=db-backup-BOF-" + now + ".sql"
       expect(response.status).to.eq(200)
       expect(response.headers["content-disposition"]).to.eq(disposition)
       expect(response.headers["content-type"]).to.eq("application/octet-stream")

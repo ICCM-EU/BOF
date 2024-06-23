@@ -11,7 +11,7 @@ describe("test nomination stage", function() {
   })
 
   it("create users", function() {
-    var i
+    let i
     for(i=1; i < 60; i++) {
       cy.createUser({username: "user" + i, password: "Test123!pwd" + i, email: "user" + i + "@example.org"})
     }
@@ -19,7 +19,7 @@ describe("test nomination stage", function() {
 
   it("nominate topics", function() {
     cy.typeLogin({username: "user1", password: "Test123!pwd1"})
-    var i
+    let i
     for(i=1; i < 15; i++) {
       create_topic("topic" + i)
     }
