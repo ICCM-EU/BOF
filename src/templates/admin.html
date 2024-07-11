@@ -2,6 +2,9 @@
 
 {% block body %}
 <script type="text/javascript">
+	const language = navigator.languages ?
+		navigator.languages[0] :
+		(navigator.language || navigator.userLanguage);
 	function clicked_schedule_prep() {
 		var checkbox = document.getElementById('schedule_prep');
 		if (checkbox) {
@@ -37,13 +40,13 @@
 				continue;
 			}
 			if (item.value === selectedName) {
-			    options  += '<option value="' + item.value + '" selected>' + item.value + '</option>';
+				options += '<option value="' + item.value + '" selected>' + item.value + '</option>';
 				selected = true;
 			} else if (item) {
-			    options  += '<option value="' + item.value + '">' + item.value + '</option>';
+				options += '<option value="' + item.value + '">' + item.value + '</option>';
 			}
 		}
-        if (!selected) {
+		if (!selected) {
 			options += '<option value="-1" selected>{{'Default'|trans}}</option>';
 		} else {
 			options += '<option value="-1">{{'Default'|trans}}</option>';
@@ -85,36 +88,152 @@
 		update_prep(type);
 	}
 
-		(function(){
-			window.setTimeout(function() {
-				update_prep('location');
-				update_prep('round');
-			}, 250);
-		})();
+	let _cachedLocalTimezone = '';
+	function get_local_timezone() {
+		return (!!_cachedLocalTimezone)
+			? _cachedLocalTimezone
+			: Intl.DateTimeFormat().resolvedOptions().timeZone;
+	}
+
+	// Create a curried function which will pad a string with N instances of C.
+	function padN(n, c) {
+		return (val) => {
+			return (new Array(n + 1).join(c) + val).slice(n * -1);
+		};
+	}
+
+	// Use the padN function and configure it to pad two zeros.
+	function pad2Zeros(val) {
+		return padN(2, '0')(val);
+	}
+
+	function toInputTimeString(val) {
+		return `${pad2Zeros(val.getHours())}:${pad2Zeros(val.getMinutes())}:${pad2Zeros(val.getSeconds())}`;
+	}
+
+	function toInputDateString(val) {
+		return `${val.getFullYear()}-${pad2Zeros(val.getMonth() + 1)}-${pad2Zeros(val.getDate())}`;
+	}
+
+	function set_local_time(timezone) {
+		ltEl = document.getElementById('localtime');
+		localDate = new Date(new Date("{{localservertime}}Z")
+			.toLocaleString(
+				language, { timeZone: timezone }
+			));
+		ltEl.innerHTML = "{{'Local time: '|trans}}" + toInputDateString(localDate) + ' ' + toInputTimeString(localDate);
+	}
+
+	(function(){
+		window.setTimeout(function() {
+			update_prep('location');
+			update_prep('round');
+			set_local_time(get_local_timezone());
+                        document.getElementById('local_timezone').addEventListener('change', function(ev) { set_local_time(ev.target.value); });
+		}, 250);
+	})();
 
 </script>
 <h1>Admin</h1>
 
-<div class="bof-form__label">local time on server</div><input type="text" readonly value="{{localservertime}}"/>
-<br/>
-<br/>
+<p class="bof-form__text">{{'Select your timezone below (or a timezone for the time being entered). Upon submission it will be converted from your selected timezone to UTC time.'|trans}}</p>
 
 <div>
 	<form action="{{ path_for( 'admin_config' )}}" method="POST">
 		<div class="bof-form__item2">
-			<label for="nomination_begins" class="bof-form__label">Nomination begins</label>
-			<input type="date" name="nomination_begins" value="{{nomination_begins}}" class="bof-form__input2"/>
-			<input type="time" name="time_nomination_begins" value="{{nomination_begins_time}}"/><br/>
-			<label for="nomination_ends" class="bof-form__label">Nomination ends</label>
-			<input type="date" name="nomination_ends" value="{{nomination_ends}}" class="bof-form__input2"/>
-			<input type="time" name="time_nomination_ends" value="{{nomination_ends_time}}"/><br/>
-			<label for="voting_begins" class="bof-form__label">Voting begins</label>
-			<input type="date" name="voting_begins" value="{{voting_begins}}" class="bof-form__input2"/>
-			<input type="time" name="time_voting_begins" value="{{voting_begins_time}}"/><br/>
-			<label for="voting_ends" class="bof-form__label">Voting ends</label>
-			<input type="date" name="voting_ends" value="{{voting_ends}}" class="bof-form__input2"/>
-			<input type="time" name="time_voting_ends" value="{{voting_ends_time}}"/><br/>
+			<label for="local_timezone" class="bof-form__label">Local timezone</label>
+			<select name="local_timezone" id="local_timezone" class="bof-form__input2">
+				{% for key, zone in timezones %}
+				<option value="{{key}}">{{zone}}</option>
+				{% endfor %}
+			</select>
+			<p class="bof-form__input--help">{{'This value is used to automatically convert your time values into UTC.'|trans}}</p>
+			<p class="bof-form__item2" id="servertime">{{'Server time: '|trans}}{{localservertime}}</p>
+			<p class="bof-form__item2" id="localtime">{{'Local time: '|trans}}</p>
 		</div>
+		<div class="bof-form__item2">
+			<label for="nomination_begins" class="bof-form__label">Nomination begins</label>
+			<input type="date" name="nomination_begins" id="nomination_begins" value="{{nomination_begins}}" class="bof-form__input2"/>
+			<input type="time" name="time_nomination_begins" id="time_nomination_begins" value="{{nomination_begins_time}}"/><br/>
+			<label for="nomination_ends" class="bof-form__label">Nomination ends</label>
+			<input type="date" name="nomination_ends" id="nomination_ends" value="{{nomination_ends}}" class="bof-form__input2"/>
+			<input type="time" name="time_nomination_ends" id="time_nomination_ends" value="{{nomination_ends_time}}"/><br/>
+			<label for="voting_begins" class="bof-form__label">Voting begins</label>
+			<input type="date" name="voting_begins" id="voting_begins" value="{{voting_begins}}" class="bof-form__input2"/>
+			<input type="time" name="time_voting_begins" id="time_voting_begins" value="{{voting_begins_time}}"/><br/>
+			<label for="voting_ends" class="bof-form__label">Voting ends</label>
+			<input type="date" name="voting_ends" id="voting_ends" value="{{voting_ends}}" class="bof-form__input2"/>
+			<input type="time" name="time_voting_ends" id="time_voting_ends" value="{{voting_ends_time}}"/><br/>
+		</div>
+		<script defer>
+			// Create an IIFE to "scope" methods and variables.
+			// https://developer.mozilla.org/en-US/docs/Glossary/IIFE
+			(function (d, timezoneGetter) {
+				// Create a class to structure how we handle both time changes, and time zone changes. For now, we are knowingly ignoring
+				// the day threshold--if the time zone shifts over the midnight line, the date doesn't change.
+				class BofDateTime {
+					constructor(elDate, elTime, utcDate) {
+						this.elDate = elDate;
+						this.elTime = elTime;
+						this.utcDate = utcDate;
+						this.elTime.addEventListener('change', e => this.handleTimeChange(e.target.value), false);
+					}
+					toTimeZone(timeZone) { return new Date(this.utcDate.toLocaleString(language, { timeZone: timeZone })); }
+					handleTimeZoneChange(timeZone) { this.elTime.value = toInputTimeString(this.toTimeZone(timeZone)); this.elDate.value = toInputDateString(this.toTimeZone(timeZone));
+ }
+					handleTimeChange(val) { this.utcDate = new Date(new Date(`${this.utcDate.toJSON().substring(0, 10)}T${val}`).toUTCString()); }
+				}
+				// Create a class to structure how we handle the time zone selection changes.
+				class BofTimeZone {
+					constructor(el, val, onChange) {
+						this.el = el;
+						this.val = val;
+						this.handleChange = onChange;
+						this.el.addEventListener('change', e => this.handleChange(e.target.value), false);
+						this.el.addEventListener('change', console.log, false);
+						this.el.value = val;
+					}
+				}
+				// Build a model which constructs instances of the above classes, complete with internal event handling.
+				let model = {
+					nomination_begins: new BofDateTime(
+						d.getElementById('nomination_begins'),
+						d.getElementById('time_nomination_begins'),
+						new Date('{{nomination_begins}}T{{nomination_begins_time}}Z')
+					),
+					nomination_ends: new BofDateTime(
+						d.getElementById('nomination_ends'),
+						d.getElementById('time_nomination_ends'),
+						new Date('{{nomination_ends}}T{{nomination_ends_time}}Z')
+					),
+					voting_begins: new BofDateTime(
+						d.getElementById('voting_begins'),
+						d.getElementById('time_voting_begins'),
+						new Date('{{voting_begins}}T{{voting_begins_time}}Z')
+					),
+					voting_ends: new BofDateTime(
+						d.getElementById('voting_ends'),
+						d.getElementById('time_voting_ends'),
+						new Date('{{voting_ends}}T{{voting_ends_time}}Z')
+					),
+					localTimezone: new BofTimeZone(
+						d.getElementById('local_timezone'),
+						timezoneGetter(),
+						val => {
+							// Update the time values (and perhaps the date values) based on the input timezone.
+							// First, mutate the 'model' object with the new timezone value so following changes can work from that value.
+							model.localTimezone.val = val;
+							model.nomination_begins.handleTimeZoneChange(val);
+							model.nomination_ends.handleTimeZoneChange(val);
+							model.voting_begins.handleTimeZoneChange(val);
+							model.voting_ends.handleTimeZoneChange(val);
+						}
+					)
+				};
+				// Handle initial value of the timeZone selection.
+				model.localTimezone.handleChange(model.localTimezone.val);
+			})(document, get_local_timezone);
+		</script>
 		<br/>
 		<fieldset>
 			<legend tabindex="-1">{{'Slots'|trans}}</legend>

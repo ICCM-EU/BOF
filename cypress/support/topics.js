@@ -41,7 +41,7 @@ exports.checkTopics = function(isVoting, fullVotes, quarterVotes, facilitators) 
   var quarterVoteToggled = quarterVotes.includes(0) ? 'have.class' : 'not.have.class'
   exports.checkVotes(isVoting,
                      'Prep Team',
-                     'The Prep Team is a handful of people who plan these annual conferences. If you might be interested in joining this team please come to this BOF. We\'re always looking for new ideas and help to make ICCM special every year!',
+                     'The Prep Team is a handful of people who plan these annual conferences. If you might be interested in joining this team please come to this BOF. We\'re always looking for new ideas and help to make',
                      'not.have.class',
                      fullVoteEnabled,
                      quarterVoteToggled)

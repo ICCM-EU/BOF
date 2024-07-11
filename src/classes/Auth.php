@@ -88,7 +88,7 @@ class Auth
             $active = 1;
         }
         if (strlen($login) == 0 || strlen($password) == 0 || strlen($email) == 0) {
-            return $this->view->render($response, 'register.html', array('error' => $this->translator->trans("Empty user or pass. Don't do that!"),
+            return $this->view->render($response, 'register.html', array('error' => $this->translator->trans("Empty user, email, or pass. Don't do that!"),
                 'user_name' => $login, 'email' => $email, 'userinfo' => $userinfo));
         }
         if (!$this->checkPasswordQuality($password)) {

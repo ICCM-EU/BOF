@@ -2,25 +2,25 @@ function cast_vote(topic, vote) {
   cy.visit("/topics")
   // select the div class=topic
   // the first child is the warning div. so start to count at 2
-  cy.get('div[class=topic]:nth-child(' + (topic + 2) + ')').within(() => {
+  cy.get("div[class=topic]:nth-child(" + (topic + 2) + ")").within(() => {
 
     // select the form to click
     if (vote == 0) {
-      cy.get('form[class=facilitation] input[type=submit]').click()
+      cy.get("form[class=facilitation] input[type=submit]").click()
     }
     else if (vote == 1) {
-      cy.get('form[class=fullvote] input[type=submit]').click()
+      cy.get("form[class=fullvote] input[type=submit]").click()
     }
     else if (vote == 2) {
-      cy.get('form[class=quartervote] input[type=submit]').click()
+      cy.get("form[class=quartervote] input[type=submit]").click()
     }
     else if (vote == -1) {
-      cy.get('form[class=clearvote] input[type=submit]').click()
+      cy.get("form[class=clearvote] input[type=submit]").click()
     }
   })
 }
 
-var votes_facilitator = [
+const votes_facilitator = [
   // topic 1
   [3, 12 ],
   // topic 2
@@ -53,7 +53,7 @@ var votes_facilitator = [
   [3 ],
 ]
 
-var votes_full = [
+const votes_full = [
   // topic 1
   [3, 12, 15, 17, 24, 25, 28, 30, 32, 33, 36, 41, 51, 58, 59  ],
   // topic 2
@@ -85,7 +85,7 @@ var votes_full = [
   // topic 15
   [3, 5, 6, 7, 19, 22, 23, 32, 35  ],
 ]
-var votes_quarter = [
+const votes_quarter = [
   // topic 1
   [2, 8, 9, 10, 11, 13, 19, 20, 26, 27, 34, 37, 40, 42, 45, 46, 47, 49, 50, 54, 57  ],
   // topic 2
@@ -118,21 +118,21 @@ var votes_quarter = [
   [0, 1, 4, 8, 9, 10, 11, 13, 14, 15, 18, 25, 29, 34, 39, 40, 41, 42, 43, 46, 54, 55, 56, 58, 59  ],
 ]
 
-describe('test voting stage', function() {
+describe("test voting stage", function() {
   before(function() {
-    var resetDB = require('../support/reset_database.js')
+    const resetDB = require("../support/reset_database.js")
     resetDB.resetVoting()
-    for(var i=1; i < 60; i++) {
-      cy.createUser({username: "user" + i, password: "Test123!pwd" + i, email: 'user' + i + '@example.org'})
+    for(let i=1; i < 60; i++) {
+      cy.createUser({username: "user" + i, password: "Test123!pwd" + i, email: "user" + i + "@example.org"})
     }
   })
 
-  it('cast votes', function() {
-    var i
+  it("cast votes", function() {
+    let i
     for(i=1; i < 60; i++) {
       cy.typeLogin({username: "user" + i, password: "Test123!pwd" + i})
 
-      var topic
+      let topic
       for (topic=0; topic < 14; topic++)
       {
         if (votes_facilitator[topic].indexOf(i) > -1)

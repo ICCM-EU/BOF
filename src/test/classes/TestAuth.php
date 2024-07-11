@@ -393,7 +393,7 @@ class TestAuth extends TestCase
 
         $translator->expects($this->once())
             ->method('trans')
-            ->with("Empty user or pass. Don't do that!");
+            ->with("Empty user, email, or pass. Don't do that!");
 
         $auth = new Auth($view, null, $dbo, 'secret_token', $cookies, $translator);
         $this->assertEquals(0, $auth->new_user($request, $response, null));
@@ -466,7 +466,7 @@ class TestAuth extends TestCase
 
         $translator->expects($this->once())
             ->method('trans')
-            ->with("Empty user or pass. Don't do that!");
+            ->with("Empty user, email, or pass. Don't do that!");
 
         $auth = new Auth($view, null, $dbo, 'secret_token', $cookies, $translator);
         $this->assertEquals(0, $auth->new_user($request, $response, null));
