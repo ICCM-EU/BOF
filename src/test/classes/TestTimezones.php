@@ -14,7 +14,16 @@ class TestTimezones extends TestCase
     $sut = ICCM\BOF\Timezones::List();
     $this->assertTrue(!empty($sut));
     $this->assertEquals('(GMT) UTC', $sut['UTC']);
-    $this->assertEquals('(GMT-04:00) America, New York', $sut['America/New_York']);
+    $timezone = 'America/New_York';
+    $date = new DateTime('now', new DateTimeZone($timezone));
+    $summertime = $date->format('I') > 0;
+    if ($summertime == 1) {
+      # in summer time
+      $this->assertEquals('(GMT-04:00) America, New York', $sut[$timezone]);
+    } else {
+      # in winter time
+      $this->assertEquals('(GMT-05:00) America, New York', $sut[$timezone]);
+    }
   }
 
   /**
